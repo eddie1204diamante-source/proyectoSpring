@@ -1,4 +1,4 @@
-/* ...TU CSS ORIGINAL SIN CAMBIOS */
+/* === ESTILO CORPORATIVO SENA === */
 * {
   margin: 0;
   padding: 0;
@@ -6,55 +6,61 @@
 }
 
 body {
-  font-family: 'Merriweather', serif;
-  background-color: #fffaf1;
-  color: #333;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f8f9fa;
+  color: #222;
   line-height: 1.6;
 }
 
+/* ======== ENCABEZADO ======== */
 .header {
-  background-color: #f3e8fc;
+  background-color: #009879; /* Verde institucional SENA */
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 40px;
+  padding: 18px 40px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .logo-box {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
 }
 
 .logo-img {
-  height: 50px;
+  height: 75px;
+  border-radius: 100%;
 }
 
 .logo-text {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #672e9b;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 1px;
 }
 
+/* Botón corporativo */
 .btn-sesion {
   padding: 10px 20px;
-  background-color: #cc96f9;
+  background-color: #006c58;
   color: #fff;
   text-decoration: none;
-  font-weight: bold;
-  border-radius: 6px;
+  font-weight: 600;
+  border-radius: 5px;
   transition: background 0.3s;
 }
 
 .btn-sesion:hover {
-  background-color: #b179e3;
+  background-color: #00b48a;
 }
 
+/* ======== CARRUSEL ======== */
 .carrusel {
   position: relative;
   overflow: hidden;
   width: 100%;
-  height: 500px;
+  height: 480px;
 }
 
 .slider {
@@ -81,7 +87,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -92,13 +98,17 @@ body {
 }
 
 .overlay h2 {
-  font-size: 3rem;
+  font-size: 2.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .overlay p {
   font-size: 1.2rem;
+  margin-top: 10px;
 }
 
+/* Botones del carrusel */
 .btn-nav {
   position: absolute;
   top: 50%;
@@ -106,25 +116,22 @@ body {
   background-color: rgba(0, 0, 0, 0.5);
   color: #fff;
   border: none;
-  padding: 15px;
+  padding: 14px;
   border-radius: 50%;
   cursor: pointer;
-  font-size: 24px;
+  font-size: 22px;
   z-index: 10;
+  transition: background 0.3s;
 }
 
 .btn-nav:hover {
   background-color: rgba(0, 0, 0, 0.7);
 }
 
-.left {
-  left: 10px;
-}
+.left { left: 15px; }
+.right { right: 15px; }
 
-.right {
-  right: 10px;
-}
-
+/* ======== SECCIÓN DE INFORMACIÓN ======== */
 .info {
   display: flex;
   flex-wrap: wrap;
@@ -134,13 +141,13 @@ body {
 }
 
 .info-box {
-  width: 500px;
+  width: 460px;
   perspective: 1000px;
 }
 
 .flip-card {
   width: 100%;
-  height: 360px;
+  height: 340px;
   position: relative;
 }
 
@@ -163,7 +170,7 @@ body {
   backface-visibility: hidden;
   background-color: #fff;
   border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -172,25 +179,23 @@ body {
   text-align: center;
 }
 
+.front h3 {
+  color: #009879;
+}
+
 .back {
   transform: rotateY(180deg);
+  background-color: #006c58;
+  color: #fff;
 }
 
 .info-img {
   width: 100%;
-  margin-top: 15px;
   border-radius: 10px;
-  transition: transform 0.4s ease;
+  margin-top: 15px;
 }
 
-footer {
-  background-color: #333;
-  color: #fff;
-  text-align: center;
-  padding: 20px;
-}
-
-/* 🔥 NUEVA SECCIÓN INTERACTIVA 🔥 */
+/* ======== NUEVA SECCIÓN INTERACTIVA ======== */
 .interactive-section {
   display: flex;
   justify-content: space-between;
@@ -198,6 +203,7 @@ footer {
   padding: 60px 40px;
   gap: 40px;
   flex-wrap: wrap;
+  background-color: #e9f5f1;
 }
 
 .interactive-text {
@@ -207,41 +213,35 @@ footer {
 }
 
 .interactive-text h2 {
-  font-size: 2.5rem;
-  color: #cc96f9;
+  font-size: 2.3rem;
+  color: #009879;
+  margin-bottom: 20px;
 }
 
 .interactive-image-container {
   flex: 1;
   display: flex;
   justify-content: center;
-  perspective: 1000px; /* más profundidad al efecto */
+  perspective: 1000px;
 }
 
 #interactive-img {
-  width: 320px;
+  width: 300px;
   height: auto;
   transition: transform 0.2s ease;
-  transform-style: preserve-3d;
   cursor: pointer;
-  will-change: transform;
 }
 
-@keyframes boing {
-  0% {
-    transform: scale(1) rotateX(0deg) rotateY(0deg);
-  }
-  30% {
-    transform: scale(0.85) rotateX(0deg) rotateY(0deg);
-  }
-  60% {
-    transform: scale(1.1) rotateX(0deg) rotateY(0deg);
-  }
-  100% {
-    transform: scale(1) rotateX(0deg) rotateY(0deg);
-  }
+#interactive-img:hover {
+  transform: rotateY(10deg) scale(1.05);
 }
 
-#interactive-img.boing {
-  animation: boing 0.4s ease;
+/* ======== PIE DE PÁGINA ======== */
+footer {
+  background-color: #004f3b;
+  color: #fff;
+  text-align: center;
+  padding: 25px 10px;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
 }
