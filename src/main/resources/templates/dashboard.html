@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - MindWell</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link rel="stylesheet" href="css/dashboard.css">
+ 
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">🧠</div>
+      <h1 class="sidebar-title">MINDWELL</h1>
+    </div>
+    <div class="toggle-btn" onclick="toggleSidebar()">▶</div>
+    <ul>
+      <li data-icon="🏠" class="{{ request()->routeIs('estudiante.home') ? 'active' : '' }}">
+        <a href="{{ route('estudiante.home') }}">
+          <span>Inicio</span>
+        </a>
+      </li>
+      <li data-icon="📅" class="{{ request()->routeIs('estudiante.programarcita') ? 'active' : '' }}">
+        <a href="{{ route('estudiante.programarcita') }}">
+          <span>Programar Cita</span> 
+        </a>
+      </li>
+      <li data-icon="🔍" class="{{ request()->routeIs('estudiante.consultardiag') ? 'active' : '' }}">
+        <a href="{{ route('estudiante.consultardiag') }}">
+          <span>Consultar Diagnóstico</span>
+        </a>
+      </li>
+      <li data-icon="📈" class="{{ request()->routeIs('estudiante.resultado') ? 'active' : '' }}">
+        <a href="{{ route('estudiante.resultado') }}">
+          <span>Resultados</span>
+        </a>
+      </li>
+      <li data-icon="🧘‍♀" class="{{ request()->routeIs('estudiante.bienestar.view') ? 'active' : '' }}">
+        <a href="{{ route('estudiante.bienestar.view') }}">
+          <span>Bienestar y Autoayuda</span>
+        </a>
+      </li>
+      <li data-icon="🎓" class="{{ request()->routeIs('estudiante.talleres') ? 'active' : '' }}">
+        <a href="{{ route('estudiante.talleres') }}">
+          <span>Talleres Psicoeducativos</span>
+        </a>
+      </li>
+      <li data-icon="⚙" class="{{ request()->routeIs('configuracion.index') ? 'active' : '' }}">
+        <a href="{{ route('configuracion.index') }}">
+          <span>Configuración</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-title">Dashboard</div>
+    <div class="user-info">
+      <div class="user-avatar">U</div>
+      <form class="logout-form" method="POST" action="{{ route('logout') }}">
+  
+        <button type="submit" class="btn-sesion">Cerrar sesión</button>
+      </form>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-icon">👥</span>
+        <div class="stat-value">100 </div>
+        <div class="stat-label">Usuarios Activos</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">📅</span>
+        <div class="stat-value">0</div>
+        <div class="stat-label">Personas Registradas</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">🎓</span>
+        <div class="stat-value">0</div>
+        <div class="stat-label">Aprendices</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">🧘‍♀</span>
+        <div class="stat-value">0</div>
+        <div class="stat-label">Bienestar</div>
+      </div>
+    </div>
+
+    <div class="quick-actions">
+      <a href="{{ route('estudiante.programarcita') }}" class="action-btn">
+        📅 <span>Nueva Cita</span>
+      </a>
+      <a href="{{ route('estudiante.consultardiag') }}" class="action-btn">
+        🔍 <span>Ver Diagnóstico</span>
+      </a>
+      <a href="{{ route('estudiante.bienestar.view') }}" class="action-btn">
+        🧘‍♀ <span>Ejercicios</span>
+      </a>
+      <a href="{{ route('estudiante.talleres') }}" class="action-btn">
+        🎓 <span>Talleres</span>
+      </a>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="chart-container">
+        <div class="chart-title">
+          📊 Distribución del Estrés
+        </div>
+        <canvas id="pieChart" style="max-height: 300px;"></canvas>
+        <p class="chart-desc">Distribución actual del nivel de estrés en usuarios activos</p>
+      </div>
+      <div class="chart-container">
+        <div class="chart-title">
+          📈 Tendencia Mensual
+        </div>
+        <canvas id="lineChart" style="max-height: 300px;"></canvas>
+        <p class="chart-desc">Evolución del estrés por categoría durante el año 2025</p>
+      </div>
+    </div>
+
+    <div class="recent-activity">
+      <div class="chart-title">
+        🕒 Actividad Reciente
+      </div>
+      <div class="activity-item">
+        <div class="activity-icon" style="background: #dbeafe; color: #3b82f6;">📅</div>
+        <div class="activity-content">
+          <h4>Nueva cita programada</h4>
+          <p>Sesión de terapia cognitivo-conductual</p>
+        </div>
+        <div class="activity-time">Hace 5 min</div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-icon" style="background: #dcfce7; color: #16a34a;">✅</div>
+        <div class="activity-content">
+          <h4>Evaluación completada</h4>
+          <p>Test de ansiedad GAD-7</p>
+        </div>
+        <div class="activity-time">Hace 2 horas</div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-icon" style="background: #fef3c7; color: #d97706;">🧘‍♀</div>
+        <div class="activity-content">
+          <h4>Ejercicio de mindfulness</h4>
+          <p>Sesión de 10 minutos completada</p>
+        </div>
+        <div class="activity-time">Ayer</div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; Team scrum 2 Sena.</p>
+  </footer>
+
+  <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema">
+    <span id="theme-icon">🌙</span>
+  </button>
+
+</body>
+</html>
