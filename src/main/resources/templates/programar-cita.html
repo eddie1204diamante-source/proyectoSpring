@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!--Este Codigo esta hecho Por Sebastian Guerrero-->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Estudiante P-Citas MindWell</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Inter:wght@300;400;500;600&display=block" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" />
+    <link rel="stylesheet" href="css/programar-cita.css">
+    <style></style>
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">🧠</div>
+            <h1 class="sidebar-title">MINDWELL</h1>
+        </div>
+        <div class="toggle-btn" onclick="toggleSidebar()">▶</div>
+        <ul>
+            <li data-icon="🏠" class="{{ request()->routeIs('estudiante.home') ? 'active' : '' }}">
+                <a href="{{ route('estudiante.home') }}"><span>Inicio</span></a>
+            </li>
+            <li data-icon="📅" class="{{ request()->routeIs('estudiante.programarcita') ? 'active' : '' }}">
+                <a href="{{ route('estudiante.programarcita') }}"><span>Programar Cita</span></a>
+            </li>
+            <li data-icon="🔍" class="{{ request()->routeIs('estudiante.consultardiag') ? 'active' : '' }}">
+                <a href="{{ route('estudiante.consultardiag') }}"><span>Consultar Diagnóstico</span></a>
+            </li>
+            <li data-icon="📈" class="{{ request()->routeIs('estudiante.resultado') ? 'active' : '' }}">
+                <a href="{{ route('estudiante.resultado') }}"><span>Resultados</span></a>
+            </li>
+            <li data-icon="🧘‍♀️" class="{{ request()->routeIs('estudiante.bienestar.view') ? 'active' : '' }}">
+                <a href="{{ route('estudiante.bienestar.view') }}"><span>Bienestar y Autoayuda</span></a>
+            </li>
+            <li data-icon="🎓" class="{{ request()->routeIs('estudiante.talleres') ? 'active' : '' }}">
+                <a href="{{ route('estudiante.talleres') }}"><span>Talleres Psicoeducativos</span></a>
+            </li>
+            <li data-icon="⚙️" class="{{ request()->routeIs('estudiante.configuracion') ? 'active' : '' }}">
+                <a href="{{ route('estudiante.configuracion') }}"><span>Configuración</span></a>
+            </li>
+        </ul>
+    </div>
+
+    <header class="header">
+        <div class="header-title">Programar Cita</div>
+        <div class="user-info">
+            <form class="logout-form" method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="btn-sesion">Cerrar sesión</button>
+            </form>
+        </div>
+    </header>
+
+    <main class="main-content">
+        @if (session('success'))
+            <div style="background: var(--success-color); color: white; padding: 1rem; border-radius: 10px; margin-bottom: 1rem;">
+                {{ session('success') }}
+            </div>
+        @endif
+        @if ($errors->any())
+            <div style="background: var(--error-color); color: white; padding: 1rem; border-radius: 10px; margin-bottom: 1rem;">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <section class="cita-section">
+            <h2>Programar Cita</h2>
+            <div class="cita-buttons">
+                <button class="btn-cita" onclick="abrirModal('modal-programar')">Programar Nueva Cita</button>
+                <button class="btn-cita" onclick="abrirModal('modal-consultar')">Consultar Citas</button>
+                <button class="btn-cita" onclick="abrirModal('modal-reprogramar')">Reprogramar Cita</button>
+                <button class="btn-cita" onclick="abrirModal('modal-cancelar')">Cancelar Cita</button>
+            </div>
+        </section>
+
+        <div id="modal-overlay" class="modal-overlay" onclick="cerrarModal()"></div>
+
+        <div id="modal-programar" class="modal">
+            <h3>Programar Nueva Cita</h3>
+            <form method="POST" action="{{ route('estudiante.programarcita.store') }}" id="form-programar">
+                @csrf
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" value="{{ Auth::user()->persona ? Auth::user()->persona->nombre_completo : 'Sin nombre' }}" required readonly />
+                <label for="orientador_input" class="orientador-info">Orientador:</label>
+                <input type="text" id="orientador_input" name="orientador_name" placeholder="Escribe para buscar orientador" required />
+                <input type="hidden" id="id_orientador" name="id_orientador" required />
+                <ul id="sugerencias" class="sugerencias-lista"></ul>
+                <label for="fecha">Fecha:</label>
+                <input type="date" id="fecha" name="fecha" required />
+                <div class="alerta-fecha" id="alerta-fecha"></div>
+                <label for="hora">Hora:</label>
+                <input type="time" id="hora" name="hora" step="60" required />
+                <label for="observaciones">Observaciones:</label>
+                <textarea id="observaciones" name="observaciones"></textarea>
+                <div class="modal-buttons">
+                    <button type="submit">Programar</button>
+                    <button type="button" onclick="cerrarModal()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="modal-consultar" class="modal">
+            <h3>Consultar Citas</h3>
+            <ul class="cita-list">
+                @empty($citasEnProceso)
+                    <li class="no-citas">No hay citas en proceso.</li>
+                @else
+                    @foreach($citasEnProceso as $cita)
+                        <li>
+                            <strong>📅 Fecha:</strong> {{ $cita['fecha'] }} <br />
+                            <strong>Hora:</strong> {{ $cita['hora'] }} <br />
+                            <strong>Paciente:</strong> {{ $cita['nombre'] }} <br />
+                            <strong>Orientador:</strong> {{ $cita['profesional'] }} <br />
+                            <strong>Observaciones:</strong> {{ $cita['observaciones'] ?? 'Ninguna' }} <br />
+                            <span class="estado {{ $cita['estado'] }}">{{ ucfirst($cita['estado']) }}</span>
+                        </li>
+                    @endforeach
+                @endempty
+            </ul>
+            <div class="modal-buttons">
+                <button type="button" onclick="cerrarModal()">Cerrar</button>
+            </div>
+        </div>
+
+        <div id="modal-reprogramar" class="modal">
+            <h3>Reprogramar Cita</h3>
+            <ul id="lista-reprogramar" class="cita-list">
+                @empty($citasEnProceso)
+                    <li class="no-citas">No hay citas disponibles para reprogramar.</li>
+                @else
+                    @foreach($citasEnProceso as $cita)
+                        <li data-id="{{ $cita['id'] }}" data-fecha="{{ $cita['fecha'] }}" data-hora="{{ $cita['hora'] }}" data-observaciones="{{ $cita['observaciones'] ?? '' }}">
+                            <strong>📅 Fecha:</strong> {{ $cita['fecha'] }} <br />
+                            <strong>Hora:</strong> {{ $cita['hora'] }} <br />
+                            <strong>Paciente:</strong> {{ $cita['nombre'] }} <br />
+                            <strong>Orientador:</strong> {{ $cita['profesional'] }} <br />
+                            <strong>Observaciones:</strong> {{ $cita['observaciones'] ?? 'Ninguna' }} <br />
+                        </li>
+                    @endforeach
+                @endempty
+            </ul>
+            <div class="modal-buttons">
+                <button type="button" onclick="cerrarModal()">Cerrar</button>
+            </div>
+        </div>
+
+        <div id="modal-reprogramar-form" class="modal">
+            <h3>Reprogramar Cita</h3>
+            <form id="form-reprogramar" method="POST" action="">
+                @csrf
+                <input type="hidden" id="reprogramar-id" name="cita_id" />
+                <label for="reprogramar-fecha">Nueva Fecha:</label>
+                <input type="date" id="reprogramar-fecha" name="fecha" required />
+                <div class="alerta-fecha" id="alerta-reprogramar-fecha"></div>
+                <label for="reprogramar-hora">Nueva Hora:</label>
+                <input type="time" id="reprogramar-hora" name="hora" step="60" required />
+                <label for="reprogramar-observaciones">Observaciones:</label>
+                <textarea id="reprogramar-observaciones" name="observaciones"></textarea>
+                <div class="modal-buttons">
+                    <button type="submit">Guardar cambios</button>
+                    <button type="button" onclick="cerrarModal()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="modal-cancelar" class="modal">
+            <h3>Cancelar Cita</h3>
+            <ul id="lista-cancelar" class="cita-list">
+                @empty($citasEnProceso)
+                    <li class="no-citas">No hay citas disponibles para cancelar.</li>
+                @else
+                    @foreach($citasEnProceso as $cita)
+                        <li data-id="{{ $cita['id'] }}">
+                            <strong>📅 Fecha:</strong> {{ $cita['fecha'] }} <br />
+                            <strong>Hora:</strong> {{ $cita['hora'] }} <br />
+                            <strong>Paciente:</strong> {{ $cita['nombre'] }} <br />
+                            <strong>Orientador:</strong> {{ $cita['profesional'] }} <br />
+                            <strong>Observaciones:</strong> {{ $cita['observaciones'] ?? 'Ninguna' }} <br />
+                            <form method="POST" action="{{ route('estudiante.programarcita.cancelar', $cita['id']) }}" onsubmit="return confirmarAccion(event, '¿Cancelar esta cita?')">
+                                @csrf
+                                <button type="submit" class="btn-cita">Cancelar</button>
+                            </form>
+                        </li>
+                    @endforeach
+                @endempty
+            </ul>
+            <div class="modal-buttons">
+                <button type="button" onclick="cerrarModal()">Cerrar</button>
+            </div>
+        </div>
+
+        <section class="interactive-section">
+            <div class="interactive-text">
+                <h2>Programar Cita</h2>
+                <p>Agenda tu cita con un profesional de salud mental de forma rápida y sencilla.</p>
+            </div>
+            <div class="interactive-image-container">
+                <div id="interactive-img">🧠</div>
+            </div>
+        </section>
+    </main>
+
+    <section class="historico-citas-section">
+        <h2>Histórico de Citas Agendadas</h2>
+        <div class="filtro-fecha">
+            <label for="filtro-fecha">Filtrar por fecha:</label>
+            <input type="date" id="filtro-fecha" name="filtro-fecha" />
+        </div>
+        <ul class="lista-historico-citas" id="lista-historico-citas">
+            @empty($citasHistoricas)
+                <li class="no-citas">No hay citas en el historial.</li>
+            @else
+                @foreach($citasHistoricas as $cita)
+                    <li>
+                        <strong>📅 Fecha:</strong> {{ $cita['fecha'] }} <br />
+                        <strong>Hora:</strong> {{ $cita['hora'] }} <br />
+                        <strong>Paciente:</strong> {{ $cita['nombre'] }} <br />
+                        <strong>Orientador:</strong> {{ $cita['profesional'] }} <br />
+                        <strong>Observaciones:</strong> {{ $cita['observaciones'] ?? 'Ninguna' }} <br />
+                        <span class="estado {{ $cita['estado'] }}">{{ ucfirst($cita['estado']) }}</span>
+                    </li>
+                @endforeach
+            @endempty
+        </ul>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 MindWell. Todos los derechos reservados.</p>
+    </footer>
+
+    <div class="theme-toggle" onclick="toggleTheme()">
+        <span id="theme-icon">🌙</span>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/programar-cita.js"></script>
+</body>
+</html>
