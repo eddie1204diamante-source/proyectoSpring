@@ -80,4 +80,5 @@ if (interactiveImg) {
       isAnimating = false;
     });
   });
+  
 }

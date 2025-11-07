@@ -1,4 +1,4 @@
-    // Crear estrellas animadas
+   // Crear estrellas animadas
     function createStars() {
       const container = document.getElementById('starsContainer');
       const starCount = 40;
@@ -8,19 +8,15 @@
         const type = Math.floor(Math.random() * 3) + 1;
         star.className = `star type${type}`;
         
-        // Posición horizontal aleatoria
         const leftPosition = Math.random() * 100;
         star.style.left = leftPosition + '%';
         
-        // Retraso aleatorio para efecto escalonado
         const delay = Math.random() * 8;
         star.style.animationDelay = delay + 's';
         
-        // Duración aleatoria para variedad
         const duration = 6 + Math.random() * 4;
         star.style.animationDuration = duration + 's';
         
-        // Deriva horizontal durante la subida
         const drift = (Math.random() - 0.5) * 100;
         star.style.setProperty('--drift', drift + 'px');
         
@@ -190,8 +186,8 @@
           
           setTimeout(() => {
             hideLoginOverlay(() => {
+            window.location.href = "/dashboard.html";
               alert('¡Login exitoso! Redirigiendo al dashboard...');
-              // window.location.href = 'dashboard.html';
             });
           }, 1500);
         });
