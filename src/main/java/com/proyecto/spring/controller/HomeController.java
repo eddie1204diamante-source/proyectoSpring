@@ -18,6 +18,14 @@ public class HomeController {
 
     @GetMapping("/dashboard")
     public String dashboard() {
-        return "dashboard"; // -> busca templates/dashboard.html
+        return "estudiante/dashboard"; // -> busca templates/dashboard.html
+    } 
+    @GetMapping("/gestionCita")
+    public String gestionarCita() {
+        return "estudiante/gestionarCita"; // -> busca templates/gestionarCita.html
+    }
+    @GetMapping("/actividades")
+    public String consultarProceso() {
+        return "estudiante/consultarProceso"; // -> busca templates/consultarProceso.html
     }
 }

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestionar Citas - MindWell</title>
+  <link rel="stylesheet" href="css/gestionarCita.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <style>
+
+  </style>
+
+</head>
+
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">🧠</div>
+      <h1 class="sidebar-title">MINDWELL</h1>
+    </div>
+    <div class="toggle-btn" onclick="toggleSidebar()">▶</div>
+        <ul>
+    <li data-icon="🏠" >
+        <a href="/dashboard">
+          <span>Inicio</span> 
+        </a>
+      </li>
+      <li data-icon="📅" >
+       
+          <span>Gesiona tus citas</span> 
+        </a>
+      </li>
+      <li data-icon="🎓" class="">
+        <a href="/actividades">
+          <span>Talleres </span>
+        </a>
+      </li>  
+        <li data-icon="📈" >
+        <a href="*">
+          <span>Resultados</span>
+        </a>
+      </li>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-title">Gestión de Citas</div>
+  <div class="user-info">
+    <div class="user-avatar">U</div>
+    <button class="btn-sesion">Cerrar sesión</button>
+  </div>
+</header>
+
+<!-- MAIN CONTENT -->
+<main class="main-content">
+
+  <!-- NUEVA CITA -->
+  <section class="new-appointment-card">
+    <h2>📅 Solicitar Nueva Cita</h2>
+    <p>Programa una cita con bienestar para recibir orientación emocional.</p>
+
+    <!-- ABRIR MODAL NUEVA CITA -->
+    <button class="btn-primary" onclick="openModal('modal-crear')">+ Nueva Solicitud</button>
+  </section>
+
+  <!-- LISTA DE CITAS -->
+  <section class="appointments-section">
+    <h2 class="section-title">🗂 Mis Solicitudes de Cita</h2>
+
+    <div class="table-container">
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Motivo</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <!-- CITA 1 -->
+          <tr>
+            <td>2025-11-12</td>
+            <td>14:00</td>
+            <td>Ansiedad</td>
+            <td><span class="status pendiente">Pendiente</span></td>
+            <td class="actions">
+              <button onclick="openModal('modal-crear')">👁 Ver</button>
+              <button onclick="openModal('modal-reprogramar')">✏ Reprogramar</button>
+              <button onclick="openModal('modal-cancelar')">❌ Cancelar</button>
+            </td>
+          </tr>
+
+          <!-- CITA 2 -->
+          <tr>
+            <td>2025-10-27</td>
+            <td>09:00</td>
+            <td>Estrés académico</td>
+            <td><span class="status aprobado">Aprobada</span></td>
+            <td class="actions">
+              <button onclick="openModal('modal-crear')">👁 Ver</button>
+            </td>
+          </tr>
+
+          <!-- CITA 3 -->
+          <tr>
+            <td>2025-10-18</td>
+            <td>15:00</td>
+            <td>Duelo emocional</td>
+            <td><span class="status cancelado">Cancelada</span></td>
+            <td class="actions">
+              <button onclick="openModal('modal-crear')">👁 Ver</button>
+            </td>
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <p>&copy; Team Scrum 2 - SENA</p>
+</footer>
+
+<!-- MODALES -->
+<div class="modal" id="modal-crear">
+  <div class="modal-content">
+    <h2>📅 Nueva Cita</h2>
+    <input type="date" id="fecha">
+    <input type="time" id="hora">
+    <textarea placeholder="Motivo" id="motivo"></textarea>
+
+    <div class="modal-actions">
+      <button class="btn-close" onclick="closeModal('modal-crear')">Cerrar</button>
+      <button class="btn-primary">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal-reprogramar">
+  <div class="modal-content">
+    <h2>✏ Reprogramar Cita</h2>
+    <input type="date">
+    <input type="time">
+
+    <div class="modal-actions">
+      <button class="btn-close" onclick="closeModal('modal-reprogramar')">Cerrar</button>
+      <button class="btn-primary">Actualizar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal-cancelar">
+  <div class="modal-content">
+    <h2>❌ Cancelar Cita</h2>
+    <p>¿Seguro que deseas cancelar esta cita?</p>
+
+    <div class="modal-actions">
+      <button class="btn-close" onclick="closeModal('modal-cancelar')">No</button>
+      <button class="btn-primary">Sí, cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/cita.js">
+
+</script>
+
+</body>
+</html>

@@ -18,39 +18,26 @@
     </div>
     <div class="toggle-btn" onclick="toggleSidebar()">▶</div>
     <ul>
-      <li data-icon="🏠" class="{{ request()->routeIs('estudiante.home') ? 'active' : '' }}">
-        <a href="{{ route('estudiante.home') }}">
+      <li data-icon="🏠" class="">
+
           <span>Inicio</span>
         </a>
       </li>
-      <li data-icon="📅" class="{{ request()->routeIs('estudiante.programarcita') ? 'active' : '' }}">
-        <a href="{{ route('estudiante.programarcita') }}">
-          <span>Programar Cita</span> 
+      <li data-icon="📅" class="">
+        <a href="/gestionCita">
+          <span>Gesiona tus citas</span> 
         </a>
       </li>
-      <li data-icon="🔍" class="{{ request()->routeIs('estudiante.consultardiag') ? 'active' : '' }}">
-        <a href="{{ route('estudiante.consultardiag') }}">
-          <span>Consultar Diagnóstico</span>
+      <li data-icon="🎓" class="">
+        <a href="/actividades">
+          <span>Talleres </span>
         </a>
-      </li>
-      <li data-icon="📈" class="{{ request()->routeIs('estudiante.resultado') ? 'active' : '' }}">
-        <a href="{{ route('estudiante.resultado') }}">
+      </li>   
+      <li data-icon="📈" class="">
+        <a href="*">
           <span>Resultados</span>
         </a>
       </li>
-      <li data-icon="🧘‍♀" class="{{ request()->routeIs('estudiante.bienestar.view') ? 'active' : '' }}">
-        <a href="{{ route('estudiante.bienestar.view') }}">
-          <span>Bienestar y Autoayuda</span>
-        </a>
-      </li>
-      <li data-icon="🎓" class="{{ request()->routeIs('estudiante.talleres') ? 'active' : '' }}">
-        <a href="{{ route('estudiante.talleres') }}">
-          <span>Talleres Psicoeducativos</span>
-        </a>
-      </li>
-      <li data-icon="⚙" class="{{ request()->routeIs('configuracion.index') ? 'active' : '' }}">
-        <a href="{{ route('configuracion.index') }}">
-          <span>Configuración</span>
         </a>
       </li>
     </ul>
