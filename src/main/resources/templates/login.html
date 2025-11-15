@@ -40,28 +40,30 @@
       <div class="form-container">
         <!-- Formulario de Login -->
         <form class="form active" id="loginForm">
-          <div class="input-group">
-            <div class="input-container">
-              <input type="text" class="form-input" id="loginDocumento" placeholder=" " required>
-              <label class="floating-label">Documento</label>
+          <div class="input-row">
+            <div class="input-group full-width">
+              <div class="input-container">
+                <input type="text" class="form-input" id="loginDocumento" placeholder=" " required>
+                <label class="floating-label">Documento</label>
+              </div>
+              <div class="error-message" id="loginDocumentoError">
+                <span>⚠️</span>
+                <span class="error-text"></span>
+              </div>
             </div>
-            <div class="error-message" id="loginDocumentoError">
-              <span>⚠️</span>
-              <span class="error-text"></span>
-            </div>
-          </div>
 
-          <div class="input-group">
-            <div class="input-container">
-              <input type="password" class="form-input" id="loginContrasena" placeholder=" " required>
-              <label class="floating-label">Contraseña</label>
-              <button type="button" class="password-toggle" data-target="loginContrasena">
-                👁️
-              </button>
-            </div>
-            <div class="error-message" id="loginContrasenaError">
-              <span>⚠️</span>
-              <span class="error-text"></span>
+            <div class="input-group full-width">
+              <div class="input-container">
+                <input type="password" class="form-input" id="loginContrasena" placeholder=" " required>
+                <label class="floating-label">Contraseña</label>
+                <button type="button" class="password-toggle" data-target="loginContrasena">
+                  👁️
+                </button>
+              </div>
+              <div class="error-message" id="loginContrasenaError">
+                <span>⚠️</span>
+                <span class="error-text"></span>
+              </div>
             </div>
           </div>
 
@@ -85,84 +87,86 @@
 
         <!-- Formulario de Registro -->
         <form class="form" id="registerForm">
-          <div class="input-group">
-            <div class="input-container">
-              <input type="text" class="form-input" id="registerNombres" placeholder=" " required>
-              <label class="floating-label">Nombres</label>
-            </div>
-            <div class="error-message" id="registerNombresError">
-              <span>⚠️</span>
-              <span class="error-text"></span>
-            </div>
-          </div>
-
-          <div class="input-group">
-            <div class="input-container">
-              <input type="text" class="form-input" id="registerApellidos" placeholder=" " required>
-              <label class="floating-label">Apellidos</label>
-            </div>
-            <div class="error-message" id="registerApellidosError">
-              <span>⚠️</span>
-              <span class="error-text"></span>
-            </div>
-          </div>
-
-          <div class="input-group">
-            <div class="input-container">
-              <input type="text" class="form-input" id="registerDocumento" placeholder=" " required>
-              <label class="floating-label">Documento</label>
-            </div>
-            <div class="error-message" id="registerDocumentoError">
-              <span>⚠️</span>
-              <span class="error-text"></span>
-            </div>
-          </div>
-
-          <div class="input-group">
-            <div class="input-container">
-              <input type="email" class="form-input" id="registerEmail" placeholder=" " required>
-              <label class="floating-label">Correo Electrónico</label>
-            </div>
-            <div class="error-message" id="registerEmailError">
-              <span>⚠️</span>
-              <span class="error-text"></span>
-            </div>
-          </div>
-
-          <div class="input-group">
-            <div class="input-container">
-              <input type="password" class="form-input" id="registerContrasena" placeholder=" " required>
-              <label class="floating-label">Contraseña</label>
-              <button type="button" class="password-toggle" data-target="registerContrasena">
-                👁️
-              </button>
-            </div>
-            <div class="password-strength">
-              <div class="strength-bar">
-                <div class="strength-fill" id="strengthFill"></div>
+          <div class="input-row">
+            <div class="input-group">
+              <div class="input-container">
+                <input type="text" class="form-input" id="registerNombres" placeholder=" " required>
+                <label class="floating-label">Nombres</label>
               </div>
-              <div class="strength-text" id="strengthText">Ingresa una contraseña</div>
+              <div class="error-message" id="registerNombresError">
+                <span>⚠️</span>
+                <span class="error-text"></span>
+              </div>
             </div>
-            <div class="error-message" id="registerContrasenaError">
-              <span>⚠️</span>
-              <span class="error-text"></span>
+        
+            <div class="input-group">
+              <div class="input-container">
+                <input type="text" class="form-input" id="registerApellidos" placeholder=" " required>
+                <label class="floating-label">Apellidos</label>
+              </div>
+              <div class="error-message" id="registerApellidosError">
+                <span>⚠️</span>
+                <span class="error-text"></span>
+              </div>
+            </div>
+        
+            <div class="input-group">
+              <div class="input-container">
+                <input type="text" class="form-input" id="registerDocumento" placeholder=" " required>
+                <label class="floating-label">Documento</label>
+              </div>
+              <div class="error-message" id="registerDocumentoError">
+                <span>⚠️</span>
+                <span class="error-text"></span>
+              </div>
+            </div>
+        
+            <div class="input-group">
+              <div class="input-container">
+                <input type="email" class="form-input" id="registerEmail" placeholder=" " required>
+                <label class="floating-label">Correo Electrónico</label>
+              </div>
+              <div class="error-message" id="registerEmailError">
+                <span>⚠️</span>
+                <span class="error-text"></span>
+              </div>
+            </div>
+        
+            <div class="input-group full-width">
+              <div class="input-container">
+                <input type="password" class="form-input" id="registerContrasena" placeholder=" " required>
+                <label class="floating-label">Contraseña</label>
+                <button type="button" class="password-toggle" data-target="registerContrasena">
+                  👁️
+                </button>
+              </div>
+              <div class="password-strength">
+                <div class="strength-bar">
+                  <div class="strength-fill" id="strengthFill"></div>
+                </div>
+                <div class="strength-text" id="strengthText">Ingresa una contraseña</div>
+              </div>
+              <div class="error-message" id="registerContrasenaError">
+                <span>⚠️</span>
+                <span class="error-text"></span>
+              </div>
+            </div>
+        
+            <div class="input-group full-width">
+              <div class="input-container">
+                <input type="password" class="form-input" id="confirmContrasena" placeholder=" " required>
+                <label class="floating-label">Confirmar Contraseña</label>
+                <button type="button" class="password-toggle" data-target="confirmContrasena">
+                  👁️
+                </button>
+              </div>
+              <div class="error-message" id="confirmContrasenaError">
+                <span>⚠️</span>
+                <span class="error-text"></span>
+              </div>
             </div>
           </div>
-
-          <div class="input-group">
-            <div class="input-container">
-              <input type="password" class="form-input" id="confirmContrasena" placeholder=" " required>
-              <label class="floating-label">Confirmar Contraseña</label>
-              <button type="button" class="password-toggle" data-target="confirmContrasena">
-                👁️
-              </button>
-            </div>
-            <div class="error-message" id="confirmContrasenaError">
-              <span>⚠️</span>
-              <span class="error-text"></span>
-            </div>
-          </div>
-
+        
           <div class="checkbox-container">
             <label class="custom-checkbox">
               <input type="checkbox" id="acceptTerms" required>
@@ -170,12 +174,12 @@
             </label>
             <label for="acceptTerms" style="font-size: 14px; color: #666;">Acepto los términos y condiciones</label>
           </div>
-
+        
           <button type="submit" class="btn btn-primary">
             <span class="btn-text">Crear Cuenta</span>
             <span class="loading-spinner"></span>
           </button>
-
+        
           <div class="form-switch">
             <p>¿Ya tienes una cuenta? <a href="#" id="showLogin">Inicia sesión aquí</a></p>
           </div>
