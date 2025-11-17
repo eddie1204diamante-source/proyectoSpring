@@ -33,4 +33,13 @@ public class HomeController {
     public String consultarProcesoOrientador() {
         return "orientador/consultarProceso"; // -> busca templates/consultarProceso.html
     }
+
+        @GetMapping("/orientador-dashboard")
+    public String dashboardOrientador() {
+        return "orientador/dashboard"; // -> busca templates/dashboard.html
+    } 
+    @GetMapping("/orientador-gestionCita")
+    public String gestionarCitaOrientador() {
+        return "orientador/gestionarCita";
+}
 }

@@ -23,12 +23,12 @@
         </a>
       </li>
       <li data-icon="📅" class="">
-        <a href="/gestionCita">
+        <a href="/orientador-gestionCita">
           <span>Gestiona tus citas</span>
         </a>
       </li>
       <li data-icon="🎓" class="">
-        <a href="/actividades">
+        <a href="/orientador-actividades">
           <span>Talleres</span>
         </a>
       </li>
@@ -74,16 +74,16 @@
       </div>
     </div>
     <div class="quick-actions">
-      <a href="{{ route('estudiante.programarcita') }}" class="action-btn">
+      <a href="" class="action-btn">
         📅 <span>Nueva Cita</span>
       </a>
-      <a href="{{ route('estudiante.consultardiag') }}" class="action-btn">
+      <a href="" class="action-btn">
         🔍 <span>Ver Diagnóstico</span>
       </a>
-      <a href="{{ route('estudiante.bienestar.view') }}" class="action-btn">
+      <a href="" class="action-btn">
         🧘‍♀ <span>Ejercicios</span>
       </a>
-      <a href="{{ route('estudiante.talleres') }}" class="action-btn">
+      <a href="" class="action-btn">
         🎓 <span>Talleres</span>
       </a>
     </div>
@@ -139,38 +139,6 @@
   <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema">
     <span id="theme-icon">🌙</span>
   </button>
-  <script>
-    // Función para alternar el sidebar (ya existente en HTML, pero aseguramos coherencia)
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      sidebar.classList.toggle('closed');
-    }
-
-    // Código para cambiar el tema (claro/oscuro)
-    const themeToggle = document.getElementById('theme-toggle');
-    const themeIcon = document.getElementById('theme-icon');
-
-    // Verificar si hay un tema guardado en localStorage
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      document.documentElement.setAttribute('data-theme', savedTheme);
-      themeIcon.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-    }
-
-    // Evento para alternar el tema al hacer clic en el botón
-    themeToggle.addEventListener('click', () => {
-      const currentTheme = document.documentElement.getAttribute('data-theme');
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      
-      // Aplicar el nuevo tema
-      document.documentElement.setAttribute('data-theme', newTheme);
-      
-      // Cambiar el icono: luna para claro, sol para oscuro
-      themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-      
-      // Guardar la preferencia en localStorage para persistencia
-      localStorage.setItem('theme', newTheme);
-    });
-  </script>
+  <script src="js/cambiarTema.js"></script>
 </body>
 </html>
