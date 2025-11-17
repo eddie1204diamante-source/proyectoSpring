@@ -614,7 +614,7 @@
   }
 
   .branding-panel {
-    padding: 35px 30px;
+    padding: 20px 20px;
   }
 
   .forms-panel {
@@ -697,7 +697,7 @@
 
   #registerForm .password-strength {
     margin-top: 2px;
-    margin-bottom: 2px;
+    margin-bottom: 1px;
   }
 
   #registerForm .strength-bar {
@@ -706,12 +706,12 @@
 
   #registerForm .strength-text {
     font-size: 11px;
-    margin-top: 3px;
+    margin-top: 2px;
   }
 
   #registerForm .error-message {
     font-size: 11.5px;
-    margin-top: 3px;
+    margin-top: 2px;
   }
 
   #registerForm .checkbox-container {
@@ -719,8 +719,8 @@
   }
 
   #registerForm .btn {
-    margin-top: 8px;
-    margin-bottom: 5px;
+    margin-top: 7px;
+    margin-bottom: 4px;
   }
 
   #registerForm .form-switch {
