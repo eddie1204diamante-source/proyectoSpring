@@ -22,7 +22,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.85) 0%, rgba(118, 75, 162, 0.85) 100%);
+      background: linear-gradient(135deg, #00987a98 0%, #00987a77 100%);
       z-index: 1;
     }
 
@@ -145,7 +145,7 @@
     /* Panel izquierdo - Branding */
     .branding-panel {
       flex: 1;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #2db196 0%, #175347 100%);
       padding: 60px 50px;
       display: flex;
       flex-direction: column;
@@ -304,7 +304,7 @@
 
     .form-input:focus {
       outline: none;
-      border-color: #cc96f9;
+      border-color: #009879;
       box-shadow: 0 0 0 3px rgba(204, 150, 249, 0.1);
       transform: translateY(-2px);
     }
@@ -343,7 +343,7 @@
     }
 
     .password-toggle:hover {
-      color: #cc96f9;
+      color: #009879;
       transform: translateY(-50%) scale(1.1);
     }
 
@@ -365,7 +365,7 @@
     .form-input:not(:placeholder-shown) + .floating-label {
       top: 0;
       font-size: 12px;
-      color: #cc96f9;
+      color: #009879;
       font-weight: 600;
     }
 
@@ -429,14 +429,14 @@
     }
 
     .btn-primary {
-      background: linear-gradient(45deg, #cc96f9, #672e9b);
+      background: linear-gradient(45deg, #009879, #003b30);
       color: white;
       box-shadow: 0 4px 15px rgba(204, 150, 249, 0.4);
     }
 
     .btn-primary:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(204, 150, 249, 0.6);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.288);
     }
 
     .btn-primary:active {
@@ -515,7 +515,7 @@
     }
 
     .form-switch a:hover {
-      color: #672e9b;
+      color: #009879;
       text-decoration: underline;
     }
 

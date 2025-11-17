@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Actividades - MindWell</title>
+  <link rel="stylesheet" href="css/actividades.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">🧠</div>
+      <h1 class="sidebar-title">MINDWELL</h1>
+    </div>
+    <div class="toggle-btn" onclick="toggleSidebar()">▶</div>
+    <ul>
+      <li data-icon="🏠">
+        <a href="/dashboard">
+          <span>Inicio</span>
+        </a>
+      </li>
+      <li data-icon="📅">
+        <a href="/gestionCita">
+          <span>Gestiona tus citas</span>
+        </a>
+      </li>
+      <li data-icon="🎓">
+        <a href="#">
+          <span>Talleres</span>
+        </a>
+      </li>
+      <li data-icon="📈">
+        <a href="*">
+          <span>Resultados</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+  <!-- header -->
+  <header class="header">
+    <div class="header-title">Actividades y Ejercicios</div>
+    <div class="user-info">
+      <div class="crear-actividad" id="abrirModalCrearBtn">
+        <button class="Crear">Crear Actividad</button>
+      </div>
+      <div class="user-avatar">U</div>
+      <button class="btn-sesion">Cerrar sesión</button>
+    </div>
+  </header>
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <div class="split-container">
+      <!-- COLUMNA IZQUIERDA - ASIGNADAS POR ORIENTADOR -->
+      <div class="column">
+        <h2>📘 Actividades Asignadas por tu Orientador</h2>
+        <div class="activity-card">
+          <h3>Ejercicio de Respiración</h3>
+          <p>Realiza respiración diafragmática 5 minutos antes de tu próxima sesión.</p>
+          <div class="activity-actions">
+            <button class="btn-ver" onclick="openModal('Ejercicio de Respiración', 'Instrucciones detalladas de respiración...')">Ver</button>
+            <button class="btn-done" onclick="openConfirmModal('Ejercicio de Respiración', '¿Deseas marcar esta actividad como completada?')">Marcar como hecho</button>
+          </div>
+        </div>
+        <div class="activity-card">
+          <h3>Diario Emocional</h3>
+          <p>Anota al menos 3 situaciones que te generaron estrés esta semana.</p>
+          <div class="activity-actions">
+            <button class="btn-ver" onclick="openModal('Diario Emocional', 'Instrucciones del diario emocional...')">Ver</button>
+            <button class="btn-done" onclick="openConfirmModal('Diario Emocional', '¿Confirmas que completaste esta actividad?')">Marcar como hecho</button>
+          </div>
+        </div>
+      </div>
+      <!-- COLUMNA DERECHA - ACTIVIDADES INDEPENDIENTES -->
+      <div class="column">
+        <h2>🧘 Actividades de Autoayuda (Opcionales)</h2>
+        <div class="activity-card">
+          <h3>Meditación guiada</h3>
+          <p>Reproduce esta meditación para reducir la tensión emocional.</p>
+          <div class="activity-actions">
+            <button class="btn-ver" onclick="openModal('Meditación Guiada', 'Aquí iría tu video o guía de meditación.')">Ver</button>
+          </div>
+        </div>
+        <div class="activity-card">
+          <h3>Caminata consciente</h3>
+          <p>Realiza una caminata de 10 minutos enfocándote en tus sentidos.</p>
+          <div class="activity-actions">
+            <button class="btn-ver" onclick="openModal('Caminata consciente', 'Explicación de la caminata consciente...')">Ver</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; Team Scrum 2 - SENA</p>
+  </footer>
+  <!-- 🔥 MODAL GENERAL PARA VER ACTIVIDADES -->
+  <div class="modal" id="modalInfo">
+    <div class="modal-content">
+      <h2 class="modal-title" id="modalTitle"></h2>
+      <p class="modal-text" id="modalText"></p>
+      <button class="btn-close" onclick="closeModal()">Cerrar</button>
+    </div>
+  </div>
+  
+<!-- Modal para crear recurso/actividad -->
+<div id="crearModal" class="modal">
+  <div class="modal-content crear-modal">
+    <span id="cerrarModalCrearBtn" class="close">&times;</span>
+    <h2 class="modal-title">Crear Nuevo Recurso</h2>
+    <form id="formCrearRecurso" class="crear-form">
+      <div class="form-group">
+        <label for="nombre_recurso">Nombre del Recurso <span class="required">*</span></label>
+        <input type="text" id="nombre_recurso" name="nombre_recurso" maxlength="100" required>
+      </div>
+      <div class="form-group">
+        <label for="tipo_recurso">Tipo de Recurso <span class="required">*</span></label>
+        <input type="text" id="tipo_recurso" name="tipo_recurso" maxlength="100" required>
+      </div>
+      <div class="form-group">
+        <label for="objetivo_recurso">Objetivo del Recurso</label>
+        <input type="text" id="objetivo_recurso" name="objetivo_recurso" maxlength="100">
+      </div>
+      <div class="form-group">
+        <label for="cargo_recurso">Cargo Recurso</label>
+        <input type="text" id="cargo_recurso" name="cargo_recurso" maxlength="60">
+      </div>
+      <div class="form-group">
+        <label for="descripcion_recurso">Descripción del Recurso <span class="required">*</span></label>
+        <textarea id="descripcion_recurso" name="descripcion_recurso" maxlength="400" rows="4" required></textarea>
+      </div>
+      <div class="form-group">
+        <label for="fecha_creacion_recurso">Fecha de Creación</label>
+        <input type="date" id="fecha_creacion_recurso" name="fecha_creacion_recurso">
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-close" onclick="closeCrearModal()">Cancelar</button>
+        <button type="submit" class="btn-confirm">Crear Recurso</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+  <!-- 🔥 MODAL DE CONFIRMACIÓN -->
+  <div class="modal" id="modalConfirm">
+    <div class="modal-content">
+      <h2 class="modal-title" id="confirmTitle"></h2>
+      <p class="modal-text" id="confirmText"></p>
+      <div class="modal-actions">
+        <button class="btn-close" onclick="closeConfirmModal()">Cancelar</button>
+        <button class="btn-confirm" onclick="confirmAction()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+  <!-- SCRIPT -->
+  <script src="js/actividad.js"></script>
+  <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema">
+    <span id="theme-icon">🌙</span>
+  </button>
+  <script src="js/cambiarTema.js"></script>
+</body>
+</html>

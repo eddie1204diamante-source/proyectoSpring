@@ -3,7 +3,6 @@
   padding: 0;
   box-sizing: border-box;
 }
-
 /* =============================
    PALETA CORPORATIVA SENA EJECUTIVO
    ============================= */
@@ -23,7 +22,6 @@
   --sidebar-collapsed: 80px;
   --header-height: 70px;
 }
-
 [data-theme="dark"] {
   --primary-color: #00C389;
   --secondary-color: #00966C;
@@ -37,7 +35,6 @@
   --text-secondary: #94A3B8;
   --border-color: #334155;
 }
-
 body {
   font-family: 'Inter', sans-serif;
   background: var(--bg-primary);
@@ -45,7 +42,6 @@ body {
   overflow-x: hidden;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
-
 /* =============================
    BOTÓN CAMBIO DE TEMA
    ============================= */
@@ -67,12 +63,10 @@ body {
   z-index: 1000;
   transition: all 0.3s ease;
 }
-
 .theme-toggle:hover {
   transform: translateY(-3px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
-
 /* =============================
    SIDEBAR
    ============================= */
@@ -88,11 +82,9 @@ body {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
-
 .sidebar.closed {
   width: var(--sidebar-collapsed);
 }
-
 .sidebar-header {
   padding: 1.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
@@ -100,7 +92,6 @@ body {
   align-items: center;
   gap: 1rem;
 }
-
 .sidebar-logo {
   width: 45px;
   height: 45px;
@@ -112,7 +103,6 @@ body {
   font-size: 1.4rem;
   backdrop-filter: blur(4px);
 }
-
 .sidebar-title {
   font-family: 'Merriweather', serif;
   font-size: 1.6rem;
@@ -121,11 +111,9 @@ body {
   opacity: 1;
   transition: opacity 0.3s ease;
 }
-
 .sidebar.closed .sidebar-title {
   opacity: 0;
 }
-
 /* =============================
    BOTÓN DE COLAPSAR MENU
    ============================= */
@@ -147,11 +135,9 @@ body {
   font-size: 12px;
   z-index: 1001;
 }
-
 .sidebar.closed .toggle-btn {
   transform: rotate(180deg);
 }
-
 /* =============================
    ITEMS DEL MENÚ LATERAL
    ============================= */
@@ -159,21 +145,18 @@ body {
   list-style: none;
   padding: 1rem 0;
 }
-
 .sidebar li {
   margin: 0.25rem 0;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
 }
-
 .sidebar li a {
   display: block;
   text-decoration: none;
   color: white;
   width: 100%;
 }
-
 .sidebar li::before {
   content: attr(data-icon);
   position: absolute;
@@ -184,7 +167,6 @@ body {
   z-index: 1;
   pointer-events: none;
 }
-
 .sidebar li span {
   display: block;
   padding: 1rem 1.5rem 1rem 4rem;
@@ -193,18 +175,15 @@ body {
   border-radius: 0 25px 25px 0;
   margin-right: 1rem;
 }
-
 .sidebar.closed li span {
   opacity: 0;
   transform: translateX(-20px);
 }
-
 .sidebar li:hover span,
 .sidebar li.active span {
   background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(8px);
 }
-
 .sidebar li.active::after {
   content: '';
   position: absolute;
@@ -215,7 +194,6 @@ body {
   background: white;
   border-radius: 2px 0 0 2px;
 }
-
 /* =============================
    HEADER
    ============================= */
@@ -234,11 +212,9 @@ body {
   z-index: 999;
   transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
 .sidebar.closed ~ .header {
   left: var(--sidebar-collapsed);
 }
-
 .header-title {
   font-size: 1.75rem;
   font-weight: 600;
@@ -247,12 +223,10 @@ body {
   align-items: center;
   gap: 0.5rem;
 }
-
 .header-title::before {
   content: '📈';
   font-size: 1.8rem;
 }
-
 /* =============================
    PERFIL DE USUARIO
    ============================= */
@@ -261,7 +235,6 @@ body {
   align-items: center;
   gap: 1rem;
 }
-
 .user-avatar {
   width: 40px;
   height: 40px;
@@ -273,7 +246,6 @@ body {
   color: white;
   font-weight: 600;
 }
-
 .btn-sesion {
   padding: 0.5rem 1.5rem;
   background: var(--error-color);
@@ -288,13 +260,11 @@ body {
   font-family: 'Inter', sans-serif;
   font-size: 0.9rem;
 }
-
 .btn-sesion:hover {
   background: #C53030;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(230, 57, 70, 0.5);
 }
-
 /* =============================
    CONTENIDO PRINCIPAL
    ============================= */
@@ -306,11 +276,9 @@ body {
   min-height: calc(100vh - var(--header-height));
   background: var(--bg-primary);
 }
-
 .sidebar.closed ~ .main-content {
   margin-left: var(--sidebar-collapsed);
 }
-
 /* =============================
    TARJETAS Y SECCIONES
    ============================= */
@@ -321,7 +289,6 @@ body {
   gap: 2rem;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
-
 .stat-card {
   background: var(--bg-secondary);
   padding: 1.5rem;
@@ -332,7 +299,6 @@ body {
   overflow: hidden;
   transition: all 0.3s ease;
 }
-
 .stat-card::before {
   content: '';
   position: absolute;
@@ -342,30 +308,25 @@ body {
   height: 4px;
   background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
 }
-
 .stat-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
-
 .stat-icon {
   font-size: 2.5rem;
   margin-bottom: 1rem;
   color: var(--primary-color);
 }
-
 .stat-value {
   font-size: 2.5rem;
   font-weight: 700;
   color: var(--primary-color);
   margin-bottom: 0.5rem;
 }
-
 .stat-label {
   color: var(--text-secondary);
   font-weight: 500;
 }
-
 .stat-change {
   font-size: 0.9rem;
   margin-top: 0.5rem;
@@ -373,15 +334,12 @@ body {
   align-items: center;
   gap: 0.25rem;
 }
-
 .stat-change.positive {
   color: var(--success-color);
 }
-
 .stat-change.negative {
   color: var(--error-color);
 }
-
 /* =============================
    GRÁFICAS
    ============================= */
@@ -393,12 +351,10 @@ body {
   border: 1px solid var(--border-color);
   transition: all 0.3s ease;
 }
-
 .chart-container:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
-
 .chart-title {
   font-size: 1.25rem;
   font-weight: 600;
@@ -408,7 +364,6 @@ body {
   align-items: center;
   gap: 0.5rem;
 }
-
 .chart-desc {
   color: var(--text-secondary);
   font-size: 0.9rem;
@@ -416,7 +371,6 @@ body {
   text-align: center;
   font-style: italic;
 }
-
 /* =============================
    BOTONES DE ACCIÓN
    ============================= */
@@ -432,16 +386,13 @@ body {
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(0, 150, 108, 0.3);
 }
-
 .action-btn:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 25px rgba(0, 150, 108, 0.4);
 }
-
 .action-btn i {
   font-size: 1.5rem;
 }
-
 /* =============================
    ACTIVIDAD RECIENTE
    ============================= */
@@ -452,7 +403,6 @@ body {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   border: 1px solid var(--border-color);
 }
-
 .activity-item {
   display: flex;
   align-items: center;
@@ -460,11 +410,9 @@ body {
   padding: 1rem 0;
   border-bottom: 1px solid var(--border-color);
 }
-
 .activity-item:last-child {
   border-bottom: none;
 }
-
 .activity-icon {
   width: 40px;
   height: 40px;
@@ -476,23 +424,20 @@ body {
   background: rgba(0, 150, 108, 0.15);
   color: var(--primary-color);
 }
-
 .activity-content h4 {
   font-weight: 600;
   margin-bottom: 0.25rem;
+  color: var(--text-primary);
 }
-
 .activity-content p {
   color: var(--text-secondary);
   font-size: 0.9rem;
 }
-
 .activity-time {
   margin-left: auto;
   color: var(--text-secondary);
   font-size: 0.8rem;
 }
-
 /* =============================
    FOOTER
    ============================= */
@@ -504,11 +449,9 @@ footer {
   margin-left: var(--sidebar-width);
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
 .sidebar.closed ~ footer {
   margin-left: var(--sidebar-collapsed);
 }
-
 /* =============================
    RESPONSIVE
    ============================= */
@@ -542,43 +485,67 @@ footer {
 }/* =============================
    MEJORAS DE ESPACIADO Y DISTRIBUCIÓN
    ============================= */
-
 /* Espaciado general entre bloques principales */
 .main-content > * {
   margin-bottom: 2.5rem; /* separa secciones verticales */
 }
-
 /* Aumenta el espacio entre tarjetas del grid */
 .stats-grid {
   gap: 2.5rem;
   margin-bottom: 2rem;
 }
-
 /* Espaciado entre botones de acción */
 .quick-actions {
   gap: 1.5rem;
   margin-bottom: 2.5rem;
 }
-
 /* Espacio entre los contenedores de gráficos */
 .dashboard-grid {
   gap: 2.5rem;
   margin-bottom: 2.5rem;
 }
-
 /* Sección de actividad reciente más destacada */
 .recent-activity {
   margin-top: 2.5rem;
   padding: 2.5rem;
 }
-
 /* Espaciado entre ítems de actividad */
 .activity-item {
   padding: 1.25rem 0;
 }
-
 /* Mejora el aire entre el footer y el contenido */
 footer {
   margin-top: 3rem;
   padding: 2.5rem;
-} 
+}
+/* Ajustes para coherencia en modo oscuro: aseguramos visibilidad de textos en activity-icon */
+[data-theme="dark"] .activity-icon {
+  background: rgba(0, 195, 137, 0.2); /* Ajuste para mejor contraste en oscuro */
+  color: var(--primary-color);
+}
+/* Ajustes para coherencia en modo oscuro: textos en stat-card */
+[data-theme="dark"] .stat-value {
+  color: var(--primary-color);
+}
+[data-theme="dark"] .stat-label {
+  color: var(--text-secondary);
+}
+/* Ajustes para coherencia en modo oscuro: header-title */
+[data-theme="dark"] .header-title {
+  color: var(--text-primary);
+}
+/* Ajustes para coherencia en modo oscuro: chart-title y desc */
+[data-theme="dark"] .chart-title {
+  color: var(--text-primary);
+}
+[data-theme="dark"] .chart-desc {
+  color: var(--text-secondary);
+}
+/* Ajustes para coherencia en modo oscuro: footer */
+[data-theme="dark"] footer {
+  color: white; /* Mantiene blanco para visibilidad */
+}
+/* Ajustes para coherencia en modo oscuro: toggle-btn */
+[data-theme="dark"] .toggle-btn {
+  color: var(--primary-color);
+}

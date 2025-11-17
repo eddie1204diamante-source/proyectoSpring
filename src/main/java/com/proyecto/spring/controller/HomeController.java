@@ -28,4 +28,9 @@ public class HomeController {
     public String consultarProceso() {
         return "estudiante/consultarProceso"; // -> busca templates/consultarProceso.html
     }
+
+    @GetMapping("/orientador-actividades")
+    public String consultarProcesoOrientador() {
+        return "orientador/consultarProceso"; // -> busca templates/consultarProceso.html
+    }
 }
