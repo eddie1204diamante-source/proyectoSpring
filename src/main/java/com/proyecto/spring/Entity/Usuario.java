@@ -17,15 +17,14 @@ public class Usuario {
     @JoinColumn(name = "Id_persona", nullable = false)
     private persona persona;
 
-    @Column(name = "username", length = 50, unique = true) // Campo añadido para login
-    private String username;
+    @Column(name = "correo", length = 50, unique = true) // correo esta pero solo para usarlo en futuros modulos
+    private String correo;
 
     @Column(name = "contrasena", length = 100) // Contraseña movida de Persona a Usuario
     private String contrasena; 
 
-    // Relación Many-to-Many con Roles (usando la tabla de unión UsuarioRol)
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<UsuarioRol> roles;
+    @Column(name = "rol_id", length = 2, nullable= false)
+    private int rol_id;
 
     public Integer getIdUsuario() {
         return idUsuario;
@@ -44,11 +43,19 @@ public class Usuario {
     }
 
     public String getUsername() {
-        return username;
+        return correo;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public int getRol_id() {
+    return rol_id;
+    }
+    
+    public void setRol_id(int rol_id) {
+        this.rol_id = rol_id;
+    }
+
+    public void setUsername(String correo) {
+        this.correo = correo;
     }
 
     public String getContrasena() {
@@ -58,14 +65,4 @@ public class Usuario {
     public void setContrasena(String contrasena) {
         this.contrasena = contrasena;
     }
-
-    public Set<UsuarioRol> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<UsuarioRol> roles) {
-        this.roles = roles;
-    }
-    
-    // ... Getters y Setters ...
 }

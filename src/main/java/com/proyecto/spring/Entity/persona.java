@@ -1,7 +1,11 @@
 package com.proyecto.spring.Entity;
 
 import jakarta.persistence.*;
+
 import java.util.Set;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 @Entity
 @Table(name = "persona")
@@ -12,25 +16,27 @@ public class persona {
     @Column(name = "Id_persona")
     private int Id_persona;
 
-    @Column(name = "p_nombre", length = 100)
+    @Column(name = "p_nombre", length = 16)
     private String p_nombre;
 
-    @Column(name = "s_nombre", length = 100)
+    @Column(name = "s_nombre", length = 16)
     private String s_nombre;
 
-    @Column(name = "p_apellido", length = 100)
+    @Column(name = "p_apellido", length = 16)
     private String p_apellido;
 
-    @Column(name = "s_apellido", length = 100)
+    @Column(name = "s_apellido", length = 16)
     private String s_apellido;
 
-    @Column(name = "documento", length = 20, unique = true)
+    @Min(value = 10)
+    @Max(value = 10)
+    @Column(name = "documento", length = 10, unique = true)
     private String documento;
 
     @Column(name = "edad")
     private int edad;
 
-    @Column(name = "contraseña", length = 100)
+    @Column(name = "contrasena", length = 100)
     private String contrasena; // Asumiendo que "contraseña" se mapea a "contrasena" en Java
 
     // Relaciones
