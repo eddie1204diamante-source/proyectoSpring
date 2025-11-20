@@ -1,7 +1,6 @@
 package com.proyecto.spring.Entity;
 
 import jakarta.persistence.*;
-import java.util.Set;
 
 @Entity
 @Table(name = "usuario")
@@ -12,20 +11,20 @@ public class Usuario {
     @Column(name = "Id_usuario")
     private Integer idUsuario;
 
-    // Clave Foránea a Persona (OneToOne)
     @OneToOne
     @JoinColumn(name = "Id_persona", nullable = false)
     private persona persona;
 
-    @Column(name = "correo", length = 50, unique = true) // correo esta pero solo para usarlo en futuros modulos
+    @Column(name = "correo", length = 50, unique = true)
     private String correo;
 
-    @Column(name = "contrasena", length = 100) // Contraseña movida de Persona a Usuario
-    private String contrasena; 
+    @Column(name = "contrasena", length = 100)
+    private String contrasena;
 
-    @Column(name = "rol_id", length = 2, nullable= false)
+    @Column(name = "rol_id", length = 2, nullable = false)
     private int rol_id;
 
+    // === GETTERS Y SETTERS CORRECTOS ===
     public Integer getIdUsuario() {
         return idUsuario;
     }
@@ -42,19 +41,11 @@ public class Usuario {
         this.persona = persona;
     }
 
-    public String getUsername() {
+    public String getCorreo() {
         return correo;
     }
 
-    public int getRol_id() {
-    return rol_id;
-    }
-    
-    public void setRol_id(int rol_id) {
-        this.rol_id = rol_id;
-    }
-
-    public void setUsername(String correo) {
+    public void setCorreo(String correo) {
         this.correo = correo;
     }
 
@@ -64,5 +55,13 @@ public class Usuario {
 
     public void setContrasena(String contrasena) {
         this.contrasena = contrasena;
+    }
+
+    public int getRol_id() {
+        return rol_id;
+    }
+
+    public void setRol_id(int rol_id) {
+        this.rol_id = rol_id;
     }
 }

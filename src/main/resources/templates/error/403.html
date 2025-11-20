@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Denegado (403) - MindWell</title>
+    <link rel="stylesheet" href="/css/base.css"> 
+    <style>
+        /* Paleta de MindWell: por ejemplo, un verde menta suave y un azul tranquilo */
+        :root {
+            --color-primary: #80CBC4; /* Verde menta suave */
+            --color-secondary: #4DD0E1; /* Azul cielo tranquilo */
+            --color-text: #263238; /* Gris oscuro para el texto */
+            --color-background: #F4F6F6; /* Fondo blanco roto/gris claro */
+            --color-shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Arial', sans-serif; /* Cambia a tu fuente de marca */
+            background: var(--color-background);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: var(--color-text);
+        }
+
+        .error-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px var(--color-shadow);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .error-code {
+            font-size: 80px;
+            font-weight: 700;
+            color: var(--color-primary); /* Resaltar el código con el color principal */
+            margin-bottom: 5px;
+        }
+
+        .error-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--color-text);
+            margin-bottom: 10px;
+        }
+
+        .error-message {
+            font-size: 18px;
+            color: #546E7A; /* Gris medio */
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .action-group button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+            min-width: 150px;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4DB6AC; /* Tono más oscuro al pasar el ratón */
+            box-shadow: 0 4px 10px rgba(128, 203, 196, 0.5);
+        }
+
+        .btn-secondary {
+            background: none;
+            color: var(--color-text);
+            border: 2px solid var(--color-text);
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-text);
+            color: white;
+        }
+
+        .support-link {
+            display: block;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #90A4AE; /* Gris suave */
+            text-decoration: none;
+        }
+
+        .support-link:hover {
+            color: var(--color-text);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-card">
+        <span style="font-size: 40px; display: block; margin-bottom: 10px;">🔒</span> 
+        <div class="error-code">403</div>
+        <div class="error-title">Acceso Denegado</div>
+        <p class="error-message">
+            Lamentablemente, no tienes los permisos necesarios para ver esta página. 
+            Tu rol de usuario actual no permite acceder a esta sección de **MindWell**.
+        </p>
+        
+        <div class="action-group">
+            <button class="btn-primary" onclick="window.location.href='/'">
+                <i class="fas fa-home"></i> Ir al Inicio
+            </button>
+            <button class="btn-secondary" onclick="window.history.back()">
+                Volver
+            </button>
+        </div>
+
+        <a href="" class="support-link">
+            Si crees que es un error, contacta a soporte.
+        </a>
+    </div>
+    </body>
+</html>

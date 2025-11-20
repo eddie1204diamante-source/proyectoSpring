@@ -6,40 +6,40 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class HomeController {
 
-    @GetMapping("/") 
+    @GetMapping("/")
     public String index() {
-        return "index"; // -> busca templates/index.html
+        return "index"; // → templates/index.html
     }
 
-    @GetMapping("/login") 
+    @GetMapping("/login")
     public String login() {
-        return "login"; // -> busca templates/login.html
+        return "login"; // → templates/login.html (tu diseño hermoso)
     }
 
-    @GetMapping("/dashboard")
-    public String dashboard() {
-        return "estudiante/dashboard"; // -> busca templates/dashboard.html
-    } 
-    @GetMapping("/gestionCita")
-    public String gestionarCita() {
-        return "estudiante/gestionarCita"; // -> busca templates/gestionarCita.html
-    }
-    @GetMapping("/actividades")
-    public String consultarProceso() {
-        return "estudiante/consultarProceso"; // -> busca templates/consultarProceso.html
+    // Estas rutas son IMPORTANTES: apuntan directo al archivo en templates/
+    @GetMapping("/estudiante/dashboard")
+    public String dashboardEstudiante() {
+        return "estudiante/dashboard"; // → templates/estudiante/dashboard.html
     }
 
-    @GetMapping("/orientador-actividades")
-    public String consultarProcesoOrientador() {
-        return "orientador/consultarProceso"; // -> busca templates/consultarProceso.html
-    }
-
-        @GetMapping("/orientador-dashboard")
+    @GetMapping("/orientador/dashboard")
     public String dashboardOrientador() {
-        return "orientador/dashboard"; // -> busca templates/dashboard.html
-    } 
+        return "orientador/dashboard"; // → templates/orientador/dashboard.html
+    }
+
+    @GetMapping("/administrador/dashboard")
+    public String dashboardAdministrador() {
+        return "administrador/dashboard"; // → templates/administrador/dashboard.html
+    }
+
+    // Opcional: otras rutas que ya tenías
+    @GetMapping("/gestionCita")
+    public String gestionCita() {
+        return "estudiante/gestionarCita";
+    }
+
     @GetMapping("/orientador-gestionCita")
-    public String gestionarCitaOrientador() {
+    public String gestionCitaOrientador() {
         return "orientador/gestionarCita";
-}
+    }
 }

@@ -6,7 +6,7 @@
   <title>Dashboard - MindWell</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
 </head>
 <body>
   <!-- Sidebar -->
@@ -44,9 +44,8 @@
     <div class="header-title">Dashboard</div>
     <div class="user-info">
       <div class="user-avatar">U</div>
-      <form class="logout-form" method="POST" action="{{ route('logout') }}">
-        <button type="submit" class="btn-sesion">Cerrar sesión</button>
-      </form>
+      <a href="../index.html"><button type="submit" class="btn-sesion">Cerrar sesión</button></a>
+        
     </div>
   </header>
   <!-- Main Content -->
