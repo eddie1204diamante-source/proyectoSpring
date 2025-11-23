@@ -219,6 +219,11 @@ loginForm.addEventListener('submit', async (e) => {
             body: JSON.stringify({ documento, contrasena })
         });
         const apiData = await apiRes.json();
+        // GUARDAR ID DEL USUARIO
+if (apiData.id) {
+    localStorage.setItem("idAprendiz", apiData.id);
+}
+
 
         if (!apiData.success) {
             showError('loginContrasena', 'loginContrasenaError', apiData.message || 'Credenciales incorrectas');
