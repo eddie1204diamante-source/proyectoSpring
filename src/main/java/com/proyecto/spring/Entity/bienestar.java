@@ -17,7 +17,7 @@ public class bienestar {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id_bienestar;
 
-    // Error: usabas @OneToMany con un solo objeto
+
     @OneToOne
     @JoinColumn(name = "Id_persona", nullable = false)
     private persona persona;

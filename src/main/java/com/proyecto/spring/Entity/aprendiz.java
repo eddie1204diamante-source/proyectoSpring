@@ -13,8 +13,18 @@ public class aprendiz {
     @Column(name = "tipo_problema", length = 100)
     private String tipo_problema;
 
-    @Column(name = "Id_usuario_int", length = 10)
-    private String Id_usuario_int;
+   @OneToOne
+@JoinColumn(name = "Id_usuario_int", referencedColumnName = "Id_usuario", nullable = false)
+private Usuario usuario;
+
+public Usuario getUsuario() {
+    return usuario;
+}
+
+public void setUsuario(Usuario usuario) {
+    this.usuario = usuario;
+}
+
 
     @Column(name = "trastorno", length = 10)
     private String trastorno;
@@ -43,14 +53,6 @@ public class aprendiz {
 
     public void setTipo_problema(String tipo_problema) {
         this.tipo_problema = tipo_problema;
-    }
-
-    public String getId_usuario_int() {
-        return Id_usuario_int;
-    }
-
-    public void setId_usuario_int(String id_usuario_int) {
-        Id_usuario_int = id_usuario_int;
     }
 
     public String getTrastorno() {
