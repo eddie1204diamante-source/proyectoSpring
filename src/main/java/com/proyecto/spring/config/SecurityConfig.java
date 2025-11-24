@@ -29,7 +29,7 @@ public class SecurityConfig {
             )
             .formLogin(form -> form
                 .loginPage("/login")
-                .loginProcessingUrl("/login")           // Aquí Spring Security valida usuario/contraseña
+                .loginProcessingUrl("/login")    
                 .defaultSuccessUrl("/", true)
                 .permitAll()
             )
@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .deleteCookies("JSESSIONID")
             )
             .exceptionHandling(ex -> ex
-                .accessDeniedPage("/error/403")   // Pantalla bonita de "sin permiso"
+                .accessDeniedPage("/error/403")  
             );
 
         return http.build();
@@ -50,4 +50,4 @@ public class SecurityConfig {
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-}   
+}
