@@ -24,13 +24,13 @@ public class bienestar {
 
     @OneToOne
     @JoinColumn(name = "Id_estudiante", nullable = false)
-    private Aprendiz aprendiz;
+    private aprendiz aprendiz;
 
     // Getters y Setters
     public int getId_bienestar() { return id_bienestar; }
     public void setId_bienestar(int id_bienestar) { this.id_bienestar = id_bienestar; }
     public persona getPersona() { return persona; }
     public void setPersona(persona persona) { this.persona = persona; }
-    public Aprendiz getAprendiz() { return aprendiz; }
-    public void setAprendiz(Aprendiz aprendiz) { this.aprendiz = aprendiz; }
+    public aprendiz getAprendiz() { return aprendiz; }
+    public void setAprendiz(aprendiz aprendiz) { this.aprendiz = aprendiz; }
 }

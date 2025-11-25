@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.proyecto.spring.Entity.Cita;
+import com.proyecto.spring.Entity.*;
 import com.proyecto.spring.Entity.persona;
 import com.proyecto.spring.services.CitaService;
 

@@ -1,6 +1,6 @@
 package com.proyecto.spring.repository;
 
-<<<<<<< HEAD
+
 import com.proyecto.spring.Entity.aprendiz;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -17,11 +17,4 @@ public interface aprendizRepository extends JpaRepository<aprendiz, Integer> {
         return findByUsuarioIdUsuario(idUsuario);
     }
 }
-=======
-import com.proyecto.spring.Entity.Aprendiz;
-import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface aprendizRepository extends JpaRepository<Aprendiz, Integer> {
-
-}
->>>>>>> 41314187b2acd41cab3eac745c9aed83b1c8bf31

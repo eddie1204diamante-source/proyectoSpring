@@ -5,16 +5,9 @@ import lombok.*;
 
 @Entity
 @Table(name = "aprendiz")
-<<<<<<< HEAD
+
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class aprendiz {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Id_estudiante")
-    private int idEstudiante;
-=======
-public class Aprendiz {
 
     @Id
     @Column(name = "idEstudiante")
@@ -24,7 +17,7 @@ public class Aprendiz {
     @MapsId
     @JoinColumn(name = "Id_usuario_int", referencedColumnName = "Id_usuario")
     private Usuario usuario;
->>>>>>> 41314187b2acd41cab3eac745c9aed83b1c8bf31
+
 
     @Column(name = "tipo_problema", length = 100)
     private String tipo_problema;
@@ -38,14 +31,17 @@ public class Aprendiz {
     @OneToMany(mappedBy = "aprendiz")
     private Set<grupo_asignado> grupos_asignados;
 
-<<<<<<< HEAD
+    
+
     public int getId_estudiante() {
         return idEstudiante;
     }
 
     public void setId_estudiante(int id_estudiante) {
         idEstudiante = id_estudiante;
-=======
+
+    }
+
     public Integer getIdEstudiante() {
         return idEstudiante;
     }
@@ -60,7 +56,6 @@ public class Aprendiz {
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
->>>>>>> 41314187b2acd41cab3eac745c9aed83b1c8bf31
     }
 
     public String getTipo_problema() {
