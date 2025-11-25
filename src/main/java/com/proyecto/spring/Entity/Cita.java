@@ -14,9 +14,15 @@ public class Cita {
     @Column(name = "id_cita")
     private Long idCita;
 
+<<<<<<< HEAD
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_estudiante", nullable = false)
     private aprendiz aprendiz;
+=======
+    @ManyToOne
+    @JoinColumn(name = "id_aprendiz")
+    private Aprendiz aprendiz;
+>>>>>>> 41314187b2acd41cab3eac745c9aed83b1c8bf31
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_orientador", nullable = false)
@@ -59,8 +65,8 @@ public class Cita {
     public Long getIdCita() { return idCita; }
     public void setIdCita(Long idCita) { this.idCita = idCita; }
 
-    public aprendiz getAprendiz() { return aprendiz; }
-    public void setAprendiz(aprendiz aprendiz) { this.aprendiz = aprendiz; }
+    public Aprendiz getAprendiz() { return aprendiz; }
+    public void setAprendiz(Aprendiz aprendiz) { this.aprendiz = aprendiz; }
 
     public psicologica getOrientador() { return orientador; }
     public void setOrientador(psicologica orientador) { this.orientador = orientador; }

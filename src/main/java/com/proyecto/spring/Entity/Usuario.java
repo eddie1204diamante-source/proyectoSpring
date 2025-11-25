@@ -21,8 +21,9 @@ public class Usuario {
     @Column(name = "contrasena", length = 100)
     private String contrasena;
 
-    @Column(name = "rol_id", length = 2, nullable = false)
-    private int rol_id;
+   @Column(name = "rol_id")
+private int rolId;
+
 
     // === GETTERS Y SETTERS CORRECTOS ===
     public Integer getIdUsuario() {
@@ -57,11 +58,12 @@ public class Usuario {
         this.contrasena = contrasena;
     }
 
-    public int getRol_id() {
-        return rol_id;
+    public int getRolId() {
+        return rolId;
     }
 
-    public void setRol_id(int rol_id) {
-        this.rol_id = rol_id;
+    public void setRolId(int rolId) {
+        this.rolId = rolId;
     }
+
 }

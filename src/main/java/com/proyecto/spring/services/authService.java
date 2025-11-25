@@ -1,11 +1,20 @@
 // src/main/java/com/proyecto/spring/services/authService.java
 package com.proyecto.spring.services;
 
+<<<<<<< HEAD
 import com.proyecto.spring.Entity.*;
 import com.proyecto.spring.Entity.administrador;
 import com.proyecto.spring.Entity.aprendiz;
 import com.proyecto.spring.Entity.psicologica;
 import com.proyecto.spring.repository.*;
+=======
+import com.proyecto.spring.Entity.Usuario;
+import com.proyecto.spring.Entity.Aprendiz;
+import com.proyecto.spring.Entity.persona;
+import com.proyecto.spring.repository.personaRepository;
+import com.proyecto.spring.repository.usuarioRepository;
+import com.proyecto.spring.repository.aprendizRepository;
+>>>>>>> 41314187b2acd41cab3eac745c9aed83b1c8bf31
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,12 +34,15 @@ public class authService {
     private aprendizRepository aprendizRepository;
 
     @Autowired
+<<<<<<< HEAD
     private psicologicaRepository psicologicaRepository;
 
     @Autowired
     private administradorRepository administradorRepository;
 
     @Autowired
+=======
+>>>>>>> 41314187b2acd41cab3eac745c9aed83b1c8bf31
     private BCryptPasswordEncoder passwordEncoder;
 
     // Determinar rol según dominio del correo
@@ -74,9 +86,16 @@ public class authService {
         persona.setP_apellido(p_apellido);
         persona.setS_apellido(s_apellido);
         persona.setDocumento(documento);
+<<<<<<< HEAD
         persona.setEdad(0); // Puedes pedirlo después en un formulario
 
         persona = personaRepository.save(persona); // Ya tiene ID generado
+=======
+        persona.setEdad(0);
+        persona.setContrasena(passwordEncoder.encode(contrasena));
+
+        persona = personaRepository.save(persona);
+>>>>>>> 41314187b2acd41cab3eac745c9aed83b1c8bf31
 
         // 2. Determinar rol
         int rolId = determinarRol(correo);
@@ -86,6 +105,7 @@ public class authService {
         usuario.setPersona(persona);
         usuario.setCorreo(correo.toLowerCase().trim());
         usuario.setContrasena(passwordEncoder.encode(contrasena));
+<<<<<<< HEAD
         usuario.setRol_id(rolId);
 
         usuario = usuarioRepository.save(usuario); // Ya tiene Id_usuario
@@ -121,6 +141,24 @@ public class authService {
                 aprendiz.setId_trastorno_int(null);
                 aprendizRepository.save(aprendiz);
                 break;
+=======
+        int rol = determinarRol(correo);
+        usuario.setRolId(rol);
+
+        usuario = usuarioRepository.save(usuario);
+
+        // ---------------------------------------
+        //  🔥 SI ES APRENDIZ, CREAR REGISTRO EN TABLA aprendiz
+        // ---------------------------------------
+        if (rol == 2) {
+            Aprendiz ap = new Aprendiz();
+            ap.setUsuario(usuario);         // relación con usuario
+            ap.setTipo_problema(null);
+            ap.setTrastorno(null);
+            ap.setId_trastorno_int(null);
+
+            aprendizRepository.save(ap);
+>>>>>>> 41314187b2acd41cab3eac745c9aed83b1c8bf31
         }
 
         return usuario;

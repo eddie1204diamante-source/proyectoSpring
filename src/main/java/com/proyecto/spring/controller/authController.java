@@ -44,8 +44,8 @@ public class authController {
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Registro exitoso");
-            response.put("rol", usuario.getRol_id());
-            response.put("redirect", getRedirectUrl(usuario.getRol_id()));
+            response.put("rol", usuario.getRolId());
+            response.put("redirect", getRedirectUrl(usuario.getRolId()));
 
             return ResponseEntity.ok(response);
 
@@ -63,8 +63,8 @@ public class authController {
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Login exitoso");
-            response.put("rol", usuario.getRol_id());
-            response.put("redirect", getRedirectUrl(usuario.getRol_id()));
+            response.put("rol", usuario.getRolId());
+            response.put("redirect", getRedirectUrl(usuario.getRolId()));
 
             return ResponseEntity.ok(response);
 

@@ -63,7 +63,6 @@ public class Actividad {
         this.fechaCreacion = fechaCreacion;
     }
 
-    // getters y setters...
 
 
     

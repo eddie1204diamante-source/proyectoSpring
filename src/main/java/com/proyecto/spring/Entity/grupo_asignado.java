@@ -18,7 +18,7 @@ public class grupo_asignado {
 
     @ManyToOne
     @JoinColumn(name = "Id_estudiante")
-    private aprendiz aprendiz;
+    private Aprendiz aprendiz;
 
     // ... (getters y setters de Id_grupo_asignado)
 
@@ -31,11 +31,11 @@ public class grupo_asignado {
     }
     
     // Y harías lo mismo para aprendiz si estuviera con minúscula
-    public aprendiz getAprendiz() {
+    public Aprendiz getAprendiz() {
         return aprendiz;
     }
 
-    public void setAprendiz(aprendiz aprendiz) {
+    public void setAprendiz(Aprendiz aprendiz) {
         this.aprendiz = aprendiz;
     }
 

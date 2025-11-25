@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Actividades</title>
+  <link rel="stylesheet" href="/css/dashboardO.css" />
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">📊</div>
+      <h1 class="sidebar-title">ACTIVIDADES</h1>
+    </div>
+    <div class="toggle-btn" onclick="toggleSidebar()">▶</div>
+    <ul>
+      <li data-icon="🏠">
+        <a href="#">
+          <span>Inicio</span>
+        </a>
+      </li>
+      <li data-icon="📅">
+        <a href="#">
+          <span>Calendario</span>
+        </a>
+      </li>
+      <li data-icon="🎓">
+        <a href="#">
+          <span>Talleres</span>
+        </a>
+      </li>
+      <li data-icon="📈" class="active">
+        <a href="#">
+          <span>Reportes</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-title">Dashboard</div>
+    <div class="user-info">
+      <div class="user-avatar">U</div>
+      <a href="/" class="btn-sesion">Cerrar sesión</a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Estadísticas rápidas -->
+      <div class="stat-card">
+        <span class="stat-icon">📝</span>
+        <div class="stat-value">25</div>
+        <div class="stat-label">Reportes Generados</div>
+      </div>
+    </div>
+
+    <!-- Botón generar PDF -->
+    <div class="quick-actions">
+      <a href="/reporte/actividades" target="_blank" class="action-btn">
+        📄 <span>Generar Reporte PDF</span>
+      </a>
+    </div>
+
+    <!-- Gráficas de ejemplo -->
+    <div class="dashboard-grid">
+      <div class="chart-container">
+        <div class="chart-title">📊 Distribución de Actividades</div>
+        <canvas id="pieChart" style="max-height: 300px;"></canvas>
+        <p class="chart-desc">Distribución de actividades por tipo</p>
+      </div>
+      <div class="chart-container">
+        <div class="chart-title">📈 Tendencia Mensual</div>
+        <canvas id="lineChart" style="max-height: 300px;"></canvas>
+        <p class="chart-desc">Evolución de actividades registradas por mes</p>
+      </div>
+    </div>
+
+    <!-- Actividad reciente -->
+    <div class="recent-activity">
+      <div class="chart-title">🕒 Actividad Reciente</div>
+      <div class="activity-item">
+        <div class="activity-icon" style="background: #dbeafe; color: #3b82f6;">📅</div>
+        <div class="activity-content">
+          <h4>Nueva actividad creada</h4>
+          <p>Clase de yoga</p>
+        </div>
+        <div class="activity-time">Hace 10 min</div>
+      </div>
+      <div class="activity-item">
+        <div class="activity-icon" style="background: #dcfce7; color: #16a34a;">✅</div>
+        <div class="activity-content">
+          <h4>Reporte generado</h4>
+          <p>PDF de actividades descargado</p>
+        </div>
+        <div class="activity-time">Hace 1 hora</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; Team Scrum 2 Sena</p>
+  </footer>
+
+  <!-- Botón cambio de tema -->
+  <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema">
+    <span id="theme-icon">🌙</span>
+  </button>
+
+  <!-- Scripts -->
+  <script src="/js/cambiarTema.js"></script>
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('closed');
+    }
+  </script>
+</body>
+</html>

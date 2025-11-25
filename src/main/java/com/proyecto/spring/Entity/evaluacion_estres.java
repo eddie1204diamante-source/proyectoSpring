@@ -34,7 +34,7 @@ public class evaluacion_estres {
     private String estudiante_Id_estudiante_int;
     @ManyToOne
     @JoinColumn(name = "Id_estudiante")
-    private aprendiz aprendiz;
+    private Aprendiz aprendiz;
 
     //@ManyToOne
     //@JoinColumn(name = "Id_niveles_estres")
@@ -95,11 +95,11 @@ public class evaluacion_estres {
         this.estudiante_Id_estudiante_int = estudiante_Id_estudiante_int;
     }
 
-    public aprendiz getAprendiz() {
+    public Aprendiz getAprendiz() {
         return aprendiz;
     }
 
-    public void setAprendiz(aprendiz aprendiz) {
+    public void setAprendiz(Aprendiz aprendiz) {
         this.aprendiz = aprendiz;
     }
 

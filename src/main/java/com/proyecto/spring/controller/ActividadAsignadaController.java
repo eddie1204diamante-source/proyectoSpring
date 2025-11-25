@@ -1,45 +1,77 @@
 package com.proyecto.spring.controller;
 
 import com.proyecto.spring.Entity.ActividadAsignada;
+import com.proyecto.spring.dto.ActividadAsignadaRequest;
 import com.proyecto.spring.services.ActividadAsignadaService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/actividades-asignadas")
+@RequestMapping("/api/actividad-asignada")
 @CrossOrigin(origins = "*")
 public class ActividadAsignadaController {
 
-    private final ActividadAsignadaService service;
+    @Autowired
+    private ActividadAsignadaService service;
 
-    public ActividadAsignadaController(ActividadAsignadaService service) {
-        this.service = service;
+    // Crear actividad asignada
+    @PostMapping("/crear")
+    public ResponseEntity<?> crear(@RequestBody ActividadAsignadaRequest req) {
+        try {
+            return ResponseEntity.ok(service.crearAsignada(req));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al crear: " + e.getMessage());
+        }
     }
 
-    @PostMapping
-    public ActividadAsignada asignar(@RequestBody ActividadAsignada actividadAsignada) {
-        return service.asignarActividad(actividadAsignada);
+    // Listar todas
+    @GetMapping("/listar")
+    public ResponseEntity<List<ActividadAsignada>> listar() {
+        return ResponseEntity.ok(service.listarTodas());
     }
 
-    @GetMapping
-    public List<ActividadAsignada> listar() {
-        return service.listarAsignadas();
+    // Listar por id de estudiante
+    @GetMapping("/estudiante/{id}")
+    public ResponseEntity<?> porEstudiante(@PathVariable Integer id) {
+        try {
+            return ResponseEntity.ok(service.listarPorEstudiante(id));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
     }
 
+    // Buscar por id
     @GetMapping("/{id}")
-    public ActividadAsignada obtener(@PathVariable Integer id) {
-        return service.obtenerAsignada(id);
+    public ResponseEntity<?> buscar(@PathVariable Integer id) {
+        ActividadAsignada act = service.buscarPorId(id);
+        if (act == null) {
+            return ResponseEntity.status(404).body("No encontrado");
+        }
+        return ResponseEntity.ok(act);
     }
 
-    @PutMapping("/{id}")
-    public ActividadAsignada actualizar(@PathVariable Integer id, @RequestBody ActividadAsignada actividadAsignada) {
-        actividadAsignada.setIdAsignada(id);
-        return service.actualizarAsignada(actividadAsignada);
+    // Editar asignada
+    @PutMapping("/editar/{id}")
+    public ResponseEntity<?> editar(@PathVariable Integer id, @RequestBody ActividadAsignada datos) {
+        try {
+            return ResponseEntity.ok(service.editar(id, datos));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al editar: " + e.getMessage());
+        }
     }
 
-    @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Integer id) {
-        service.eliminarAsignada(id);
+    // Eliminar asignada
+    @DeleteMapping("/eliminar/{id}")
+    public ResponseEntity<?> eliminar(@PathVariable Integer id) {
+        try {
+            service.eliminar(id);
+            return ResponseEntity.ok("Eliminado correctamente");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al eliminar: " + e.getMessage());
+        }
     }
 }
