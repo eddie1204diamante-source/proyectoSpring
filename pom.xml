@@ -52,6 +52,30 @@
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
+        <dependency>
+    <groupId>net.sf.jasperreports</groupId>
+    <artifactId>jasperreports</artifactId>
+    <version>6.20.0</version>
+</dependency>
+
+<dependency>
+    <groupId>com.lowagie</groupId>
+    <artifactId>itext</artifactId>
+    <version>2.1.7</version>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-logging</artifactId>
+</dependency>
+
+<!-- Para exportar imágenes (si usas fotos en el reporte) -->
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-collections4</artifactId>
+    <version>4.4</version>
+</dependency>
+
 
         <!-- Dependecia de Seguridad -->
 
