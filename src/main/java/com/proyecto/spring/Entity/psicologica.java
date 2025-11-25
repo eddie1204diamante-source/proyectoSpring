@@ -10,31 +10,28 @@ public class psicologica {
 
     @Id
     @Column(name = "Id_orientador")
-    private int Id_orientador; 
+    private Long idOrientador;        // ← CAMBIO AQUÍ: camelCase normal (sin guion bajo)
 
     @OneToOne
     @JoinColumn(name = "Id_persona", referencedColumnName = "Id_persona")
     private persona persona;
 
-    @Column(name = "Id_orientador_int", length = 11)
-    private String Id_orientador_int;
-
     @Column(name = "sociedad", length = 40)
     private String sociedad;
 
     @Column(name = "fecha_contratacion")
-    private Date fecha_contratacion; // Asumiendo Date para DATE
+    private Date fecha_contratacion;
 
-    // Relaciones
     @OneToMany(mappedBy = "psicologica")
     private Set<area_trabajo> areas_trabajo;
 
-    public int getId_orientador() {
-        return Id_orientador;
+    // ========= GETTERS & SETTERS =========
+    public Long getIdOrientador() {
+        return idOrientador;
     }
 
-    public void setId_orientador(int id_orientador) {
-        Id_orientador = id_orientador;
+    public void setIdOrientador(Long idOrientador) {
+        this.idOrientador = idOrientador;
     }
 
     public persona getPersona() {
@@ -45,14 +42,6 @@ public class psicologica {
         this.persona = persona;
     }
 
-    public String getId_orientador_int() {
-        return Id_orientador_int;
-    }
-
-    public void setId_orientador_int(String id_orientador_int) {
-        Id_orientador_int = id_orientador_int;
-    }
-
     public String getSociedad() {
         return sociedad;
     }
@@ -61,23 +50,19 @@ public class psicologica {
         this.sociedad = sociedad;
     }
 
-    public Date getFecha_contratacion() {
+    public Date getFechaContratacion() {
         return fecha_contratacion;
     }
 
-    public void setFecha_contratacion(Date fecha_contratacion) {
+    public void setFechaContratacion(Date fecha_contratacion) {
         this.fecha_contratacion = fecha_contratacion;
     }
 
-    public Set<area_trabajo> getAreas_trabajo() {
+    public Set<area_trabajo> getAreasTrabajo() {
         return areas_trabajo;
     }
 
-    public void setAreas_trabajo(Set<area_trabajo> areas_trabajo) {
+    public void setAreasTrabajo(Set<area_trabajo> areas_trabajo) {
         this.areas_trabajo = areas_trabajo;
     }
-
-    // GETTERS & SETTERS (Omitidos)
-    // ...
-    
 }

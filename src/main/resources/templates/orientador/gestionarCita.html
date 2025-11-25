@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gestionar Citas - MindWell</title>
+  <title>Gestionar Citas - MindWell Orientador</title>
   <link rel="stylesheet" href="/css/gestionarCitaO.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +17,7 @@
     </div>
     <div class="toggle-btn" onclick="toggleSidebar()">▶</div>
     <ul>
-      <li data- icon="🏠">
+      <li data-icon="🏠">
         <a href="/orientador/dashboard">
           <span>Inicio</span>
         </a>
@@ -39,30 +39,56 @@
       </li>
     </ul>
   </div>
+
   <!-- HEADER -->
   <header class="header">
-    <div class="header-title">Gestión de Citas</div>
+    <div class="header-title">Gestión de Citas - Orientador</div>
     <div class="user-info">
-      <div class="user-avatar">U</div>
+      <div class="user-avatar">O</div>
       <button class="btn-sesion">Cerrar sesión</button>
     </div>
   </header>
+
   <!-- MAIN CONTENT -->
   <main class="main-content">
-    <!-- NUEVA CITA -->
+    <!-- ACCIONES ORIENTADOR -->
     <section class="new-appointment-card">
-      <h2>📅 Solicitar Nueva Cita</h2>
-      <p>Programa una cita con bienestar para recibir orientación emocional.</p>
-      <!-- ABRIR MODAL NUEVA CITA -->
-      <button class="btn-primary" onclick="openModal('modal-crear')">+ Nueva Solicitud</button>
+      <h2>⚙️ Gestión de Citas</h2>
+      <p>Administra las solicitudes de citas de los estudiantes.</p>
+      <div id="btns-orientador" style="display: flex; gap: 10px; margin-top: 15px;">
+        <button class="btn-primary" onclick="abrirModalAprobar()">✓ Aprobar Citas</button>
+        <button class="btn-primary" onclick="abrirModalReprogramarOrientador()">📅 Reprogramar Citas</button>
+        <button class="btn-primary" onclick="abrirModalCancelarOrientador()">❌ Cancelar Citas</button>
+      </div>
     </section>
+
+    <!-- FILTROS -->
+    <section class="filters-section">
+      <h3>🔍 Filtrar Historial</h3>
+      <div class="filters-container">
+        <input type="text" id="filtro-estudiante" placeholder="Nombre estudiante">
+        <input type="date" id="filtro-fecha" placeholder="Fecha">
+        <input type="time" id="filtro-hora" placeholder="Hora">
+        <select id="filtro-estado">
+          <option value="">Todos los estados</option>
+          <option value="PENDIENTE">Pendiente</option>
+          <option value="APROBADA">Aprobada</option>
+          <option value="CANCELADA">Cancelada</option>
+          <option value="FINALIZADA">Finalizada</option>
+        </select>
+        <button class="btn-primary" onclick="aplicarFiltros()">Aplicar Filtros</button>
+        <button class="btn-secondary" onclick="limpiarFiltros()">Limpiar</button>
+      </div>
+    </section>
+
     <!-- LISTA DE CITAS -->
     <section class="appointments-section">
-      <h2 class="section-title">🗂 Mis Solicitudes de Cita</h2>
+      <h2 class="section-title">🗂 Historial de Citas</h2>
       <div class="table-container">
         <table class="styled-table">
           <thead>
             <tr>
+              <th>Estudiante</th>
               <th>Fecha</th>
               <th>Hora</th>
               <th>Motivo</th>
@@ -71,118 +97,115 @@
             </tr>
           </thead>
           <tbody>
-            <!-- CITA 1 -->
-            <tr>
-              <td>2025-11-12</td>
-              <td>14:00</td>
-              <td>Ansiedad</td>
-              <td><span class="status pendiente">Pendiente</span></td>
-              <td class="actions">
-                <button class="btn-ver" onclick="openModal('modal-ver')">👁 Ver</button>
-                <button class="btn-editar" onclick="openModal('modal-reprogramar')">✏ Reprogramar</button>
-                <button class="btn-cancelar" onclick="openModal('modal-cancelar')">❌ Cancelar</button>
-              </td>
-            </tr>
-            <!-- CITA 2 -->
-            <tr>
-              <td>2025-10-27</td>
-              <td>09:00</td>
-              <td>Estrés académico</td>
-              <td><span class="status aprobado">Aprobada</span></td>
-              <td class="actions">
-                <button class="btn-ver" onclick="openModal('modal-ver')">👁 Ver</button>
-              </td>
-            </tr>
-            <!-- CITA 3 -->
-            <tr>
-              <td>2025-10-18</td>
-              <td>15:00</td>
-              <td>Duelo emocional</td>
-              <td><span class="status cancelado">Cancelada</span></td>
-              <td class="actions">
-                <button class="btn-ver" onclick="openModal('modal-ver')">👁 Ver</button>
-              </td>
-            </tr>
+            <!-- Las citas se cargarán dinámicamente aquí -->
           </tbody>
         </table>
       </div>
     </section>
   </main>
+
   <!-- FOOTER -->
   <footer>
     <p>&copy; Team Scrum 2 - SENA</p>
   </footer>
-  <!-- MODALES -->
-  <!-- Modal para nueva cita -->
-  <div class="modal" id="modal-crear">
-    <div class="modal-content crear-modal">
-      <span class="close" onclick="closeModal('modal-crear')">&times;</span>
-      <h2 class="modal-title">📅 Nueva Cita</h2>
-      <form id="formCrearCita" class="crear-form">
-        <div class="form-group">
-          <label for="fecha">Fecha <span class="required">*</span></label>
-          <input type="date" id="fecha" name="fecha" required>
-        </div>
-        <div class="form-group">
-          <label for="hora">Hora <span class="required">*</span></label>
-          <input type="time" id="hora" name="hora" required>
-        </div>
-        <div class="form-group">
-          <label for="motivo">Motivo <span class="required">*</span></label>
-          <textarea id="motivo" name="motivo" rows="4" required></textarea>
-        </div>
-        <div class="form-actions">
-          <button type="button" class="btn-close" onclick="closeModal('modal-crear')">Cancelar</button>
-          <button type="submit" class="btn-confirm">Guardar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-  <!-- Modal para reprogramar -->
-  <div class="modal" id="modal-reprogramar">
-    <div class="modal-content crear-modal">
-      <span class="close" onclick="closeModal('modal-reprogramar')">&times;</span>
-      <h2 class="modal-title">✏ Reprogramar Cita</h2>
-      <form id="formReprogramarCita" class="crear-form">
-        <div class="form-group">
-          <label for="fecha_reprogramar">Nueva Fecha <span class="required">*</span></label>
-          <input type="date" id="fecha_reprogramar" name="fecha" required>
-        </div>
-        <div class="form-group">
-          <label for="hora_reprogramar">Nueva Hora <span class="required">*</span></label>
-          <input type="time" id="hora_reprogramar" name="hora" required>
-        </div>
-        <div class="form-actions">
-          <button type="button" class="btn-close" onclick="closeModal('modal-reprogramar')">Cancelar</button>
-          <button type="submit" class="btn-confirm">Actualizar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-  <!-- Modal para cancelar -->
-  <div class="modal" id="modal-cancelar">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal('modal-cancelar')">&times;</span>
-      <h2 class="modal-title">❌ Cancelar Cita</h2>
-      <p class="modal-text">¿Seguro que deseas cancelar esta cita?</p>
-      <div class="modal-actions">
-        <button class="btn-close" onclick="closeModal('modal-cancelar')">No</button>
-        <button class="btn-confirm">Sí, cancelar</button>
+
+  <!-- MODAL: APROBAR CITAS -->
+  <div class="modal" id="modal-aprobar-orientador">
+    <div class="modal-content crear-modal" style="max-width: 900px;">
+      <span class="close" onclick="closeModal('modal-aprobar-orientador')">&times;</span>
+      <h2 class="modal-title">✓ Aprobar Citas Pendientes</h2>
+      <div class="table-container">
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th>Estudiante</th>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Motivo</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-pendientes-body">
+            <!-- Citas pendientes se cargarán aquí -->
+          </tbody>
+        </table>
+      </div>
+      <div class="form-actions" style="margin-top: 20px;">
+        <button type="button" class="btn-close" onclick="closeModal('modal-aprobar-orientador')">Cerrar</button>
       </div>
     </div>
   </div>
-  <!-- Modal para ver cita (ejemplo, puedes ajustar según necesidades) -->
+
+  <!-- MODAL: REPROGRAMAR CITA (ORIENTADOR) -->
+  <div class="modal" id="modal-reprogramar-orientador">
+    <div class="modal-content crear-modal">
+      <span class="close" onclick="closeModal('modal-reprogramar-orientador')">&times;</span>
+      <h2 class="modal-title">📅 Reprogramar Cita</h2>
+      <form id="formReprogramarOrientador" class="crear-form">
+        <div class="form-group">
+          <label>Selecciona la cita a reprogramar</label>
+          <select id="cita-reprogramar-select" required>
+            <option value="">Selecciona una cita</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="fecha_reprogramar_o">Nueva Fecha <span class="required">*</span></label>
+          <input type="date" id="fecha_reprogramar_o" required>
+        </div>
+        <div class="form-group">
+          <label for="hora_reprogramar_o">Nueva Hora <span class="required">*</span></label>
+          <select id="hora_reprogramar_o" required>
+            <option value="">Selecciona una hora</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-close" onclick="closeModal('modal-reprogramar-orientador')">Cancelar</button>
+          <button type="submit" class="btn-confirm">Reprogramar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CANCELAR CITA (ORIENTADOR) -->
+  <div class="modal" id="modal-cancelar-orientador">
+    <div class="modal-content crear-modal">
+      <span class="close" onclick="closeModal('modal-cancelar-orientador')">&times;</span>
+      <h2 class="modal-title">❌ Cancelar Cita</h2>
+      <form id="formCancelarOrientador" class="crear-form">
+        <div class="form-group">
+          <label>Selecciona la cita a cancelar</label>
+          <select id="cita-cancelar-select" required>
+            <option value="">Selecciona una cita</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="motivo-cancelacion">Motivo de cancelación (opcional)</label>
+          <textarea id="motivo-cancelacion" rows="3" placeholder="Describe el motivo..."></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-close" onclick="closeModal('modal-cancelar-orientador')">Cancelar</button>
+          <button type="submit" class="btn-confirm">Confirmar Cancelación</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: VER DETALLE -->
   <div class="modal" id="modal-ver">
     <div class="modal-content">
       <span class="close" onclick="closeModal('modal-ver')">&times;</span>
       <h2 class="modal-title">👁 Detalles de la Cita</h2>
-      <p class="modal-text">Aquí irían los detalles de la cita seleccionada.</p>
+      <div id="detalle-cita-content">
+        <!-- Contenido dinámico -->
+      </div>
       <button class="btn-close" onclick="closeModal('modal-ver')">Cerrar</button>
     </div>
   </div>
+
   <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema">
     <span id="theme-icon">🌙</span>
   </button>
+
   <script src="js/cambiarTema.js"></script>
   <script src="js/cita.js"></script>
 </body>

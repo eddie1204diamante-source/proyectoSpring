@@ -1,14 +1,17 @@
 package com.proyecto.spring.Entity;
 import java.util.Set;
 import jakarta.persistence.*;
+import lombok.*;
+
 @Entity
 @Table(name = "aprendiz")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class aprendiz {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Id_estudiante")
-    private int Id_estudiante;
+    private int idEstudiante;
 
     @Column(name = "tipo_problema", length = 100)
     private String tipo_problema;
@@ -40,11 +43,11 @@ public void setUsuario(Usuario usuario) {
     private Set<grupo_asignado> grupos_asignados;
 
     public int getId_estudiante() {
-        return Id_estudiante;
+        return idEstudiante;
     }
 
     public void setId_estudiante(int id_estudiante) {
-        Id_estudiante = id_estudiante;
+        idEstudiante = id_estudiante;
     }
 
     public String getTipo_problema() {

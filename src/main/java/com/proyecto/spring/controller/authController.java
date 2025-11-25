@@ -17,7 +17,6 @@ public class authController {
     @Autowired
     private authService authService;
 
-    // DTOs como clases internas (así no hay problema con records)
     public static class RegisterRequest {
         public String nombres;
         public String apellidos;
