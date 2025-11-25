@@ -1,9 +1,11 @@
 package com.proyecto.spring.services;
 
 import com.proyecto.spring.Entity.Usuario;
+import com.proyecto.spring.Entity.Aprendiz;
 import com.proyecto.spring.Entity.persona;
 import com.proyecto.spring.repository.personaRepository;
 import com.proyecto.spring.repository.usuarioRepository;
+import com.proyecto.spring.repository.aprendizRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,9 @@ public class authService {
 
     @Autowired
     private usuarioRepository usuarioRepository;
+
+    @Autowired
+    private aprendizRepository aprendizRepository;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -61,19 +66,35 @@ public class authService {
         persona.setP_apellido(p_apellido);
         persona.setS_apellido(s_apellido);
         persona.setDocumento(documento);
-        persona.setEdad(0); // por ahora null o 0
-        persona.setContrasena(passwordEncoder.encode(contrasena)); // opcional, si lo usas aquí también
+        persona.setEdad(0);
+        persona.setContrasena(passwordEncoder.encode(contrasena));
 
-        persona = personaRepository.save(persona); // Aquí ya tiene ID generado
+        persona = personaRepository.save(persona);
 
         // Crear usuario
         Usuario usuario = new Usuario();
         usuario.setPersona(persona);
         usuario.setCorreo(correo.toLowerCase().trim());
         usuario.setContrasena(passwordEncoder.encode(contrasena));
-        usuario.setRol_id(determinarRol(correo));
+        int rol = determinarRol(correo);
+        usuario.setRolId(rol);
 
-        return usuarioRepository.save(usuario);
+        usuario = usuarioRepository.save(usuario);
+
+        // ---------------------------------------
+        //  🔥 SI ES APRENDIZ, CREAR REGISTRO EN TABLA aprendiz
+        // ---------------------------------------
+        if (rol == 2) {
+            Aprendiz ap = new Aprendiz();
+            ap.setUsuario(usuario);         // relación con usuario
+            ap.setTipo_problema(null);
+            ap.setTrastorno(null);
+            ap.setId_trastorno_int(null);
+
+            aprendizRepository.save(ap);
+        }
+
+        return usuario;
     }
 
     // Método de login

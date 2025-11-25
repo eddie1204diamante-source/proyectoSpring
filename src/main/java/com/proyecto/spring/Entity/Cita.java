@@ -14,7 +14,7 @@ public class Cita {
 
     @ManyToOne
     @JoinColumn(name = "id_aprendiz")
-    private aprendiz aprendiz;
+    private Aprendiz aprendiz;
 
     @ManyToOne
     @JoinColumn(name = "id_psicologica")
@@ -30,8 +30,8 @@ public class Cita {
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
-    public aprendiz getAprendiz() { return aprendiz; }
-    public void setAprendiz(aprendiz aprendiz) { this.aprendiz = aprendiz; }
+    public Aprendiz getAprendiz() { return aprendiz; }
+    public void setAprendiz(Aprendiz aprendiz) { this.aprendiz = aprendiz; }
 
     public psicologica getpsicologica() { return psicologica; }
     public void setpsicologica(psicologica psicologica) { this.psicologica = psicologica; }

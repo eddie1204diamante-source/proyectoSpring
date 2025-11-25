@@ -1,53 +1,18 @@
-package com.proyecto.spring.Entity;
+package com.proyecto.spring.dto;
 
-import jakarta.persistence.*;
 import java.util.Date;
 
-@Entity
-@Table(name = "actividad_asignada")
-public class ActividadAsignada {
+public class ActividadAsignadaRequest {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idAsignada;
-
-    // 🔹 ID del aprendiz (sin relación)
-    @Column(name = "id_estudiante", nullable = false)
     private Integer idEstudiante;
-    
-    // 🔹 Datos independientes de la actividad
-    @Column(nullable = false, length = 150)
     private String titulo;
-
-    @Column(nullable = false, length = 500)
     private String descripcion;
-
-    @Temporal(TemporalType.DATE)
     private Date fechaAsignacion;
-
-    @Temporal(TemporalType.DATE)
     private Date fechaEntrega;
-
-    @Column(name = "url_actividad", length = 300)
     private String urlActividad;
-
-    @Column(length = 50)
     private String estado;
-
-    @Column(length = 300)
     private String observacion;
 
-    // ===============================
-    // Getters & Setters
-    // ===============================
-
-    public Integer getIdAsignada() {
-        return idAsignada;
-    }
-
-    public void setIdAsignada(Integer idAsignada) {
-        this.idAsignada = idAsignada;
-    }
 
     public Integer getIdEstudiante() {
         return idEstudiante;

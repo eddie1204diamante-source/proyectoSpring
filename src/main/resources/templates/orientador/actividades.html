@@ -47,44 +47,35 @@
       <div class="crear-actividad" id="abrirModalCrearBtn">
         <button class="Crear">Crear Actividad</button>
       </div>
+      <div class="modalCrearAsignada" id="abrirModalCrearAsignadaBtn">
+        <button class="Crear">Asignar Actividad</button>
+      </div>
       <div class="user-avatar">U</div>
       <button class="btn-sesion">Cerrar sesión</button>
     </div>
   </header>
-  <!-- MAIN CONTENT -->
   <main class="main-content">
-    <div class="split-container">
+  <div class="split-container">
+
       <!-- COLUMNA IZQUIERDA - ASIGNADAS POR ORIENTADOR -->
       <div class="column">
-        <h2>📘 Actividades Asignadas por tu Orientador</h2>
-        <div class="activity-card">
-          <h3>Ejercicio de Respiración</h3>
-          <p>Realiza respiración diafragmática 5 minutos antes de tu próxima sesión.</p>
-          <div class="activity-actions">
-            <button class="btn-ver" onclick="openModal('Ejercicio de Respiración', 'Instrucciones detalladas de respiración...')">Ver</button>
-            <button class="btn-done" onclick="openConfirmModal('Ejercicio de Respiración', '¿Deseas marcar esta actividad como completada?')">Marcar como hecho</button>
-            
-          </div>
-        </div>
-        <div class="activity-card">
-          <h3>Diario Emocional</h3>
-          <p>Anota al menos 3 situaciones que te generaron estrés esta semana.</p>
-          <div class="activity-actions">
-            <button class="btn-ver" onclick="openModal('Diario Emocional', 'Instrucciones del diario emocional...')">Ver</button>
-            <button class="btn-done" onclick="openConfirmModal('Diario Emocional', '¿Confirmas que completaste esta actividad?')">Marcar como hecho</button>
-          </div>
-        </div>
+          <h2 class="column-title">Actividades Asignadas</h2>
+
+          <!-- CONTENEDOR QUE ESPERA EL JS -->
+          <div id="contenedorAsignadas" class="lista-actividades"></div>
       </div>
+
       <!-- COLUMNA DERECHA - ACTIVIDADES INDEPENDIENTES -->
       <div class="column">
-        <h2>🧘 Actividades de Autoayuda (Opcionales)</h2>
-        <div class="activity-card">
-         
-          </div>
-        </div>
+          <h2 class="column-title">Actividades Opcionales</h2>
+
+          <!-- CONTENEDOR QUE ESPERA EL JS -->
+          <div id="contenedorOpcionales" class="lista-actividades"></div>
       </div>
-    </div>
-  </main>
+
+  </div>
+</main>
+
   <!-- FOOTER -->
   <footer>
     <p>&copy; Team Scrum 2 - SENA</p>
@@ -174,10 +165,134 @@
 
   </div>
 </div>
+<div class="modal" id="modalAsignadaInfo">
+  <div class="modal-content">
+    <h2 id="asignadaTitle"></h2>
+    <p id="asignadaDesc"></p>
+
+    <a id="asignadaUrl" href="#" target="_blank" style="display:none; color:blue;">
+      🔗 Ver recurso
+    </a>
+
+    <p><b>Estado:</b> <span id="asignadaEstado"></span></p>
+
+    <button class="btn-close" onclick="closeAsignadaModal()">Cerrar</button>
+  </div>
+</div>
+
+
+<!-- 
+     MODAL CONFIRMAR COMPLETADA
+ -->
+<div class="modal" id="modalConfirmAsignada">
+  <div class="modal-content">
+    <h2>Confirmar acción</h2>
+    <p id="confirmAsignadaText"></p>
+
+    <div class="modal-actions">
+      <button class="btn-close" onclick="closeConfirmAsignada()">Cancelar</button>
+      <button class="btn-confirm" id="btnConfirmAsignada">Confirmar</button>
+    </div>
+  </div>
+</div>
+<!-- 
+     MODAL CREAR ACTIVIDAD ASIGNADA
+ -->
+<div class="modal" id="modalCrearAsignada">
+  <div class="modal-content crear-modal">
+    <span class="close" onclick="closeCrearAsignada()">&times;</span>
+    <h2>Crear Actividad Asignada</h2>
+
+    <form id="formCrearAsignada">
+
+      <div class="form-group">
+        <label for="crearAsignadaIdEstudiante">Selecciona el Estudiante</label>
+        <select id="crearAsignadaIdEstudiante" required>
+          <option value="">Cargando estudiantes...</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="crearAsignadaTitulo">Título de la Actividad</label>
+        <input type="text" id="crearAsignadaTitulo" required maxlength="150">
+      </div>
+
+      <div class="form-group">
+        <label for="crearAsignadaDescripcion">Descripción</label>
+        <textarea id="crearAsignadaDescripcion" rows="4" required maxlength="500"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="crearAsignadaUrl">URL Recurso (opcional)</label>
+        <input type="text" id="crearAsignadaUrl" maxlength="300">
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-close" onclick="closeCrearAsignada()">Cancelar</button>
+        <button type="submit" class="btn-confirm">Guardar Actividad</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<!-- 
+     MODAL EDITAR ACTIVIDAD ASIGNADA
+ -->
+<div class="modal" id="modalEditarAsignada">
+  <div class="modal-content editar-modal">
+    <span class="close" onclick="closeEditAsignada()">&times;</span>
+    <h2>Editar Actividad Asignada</h2>
+
+    <form id="formEditarAsignada">
+
+      <input type="hidden" id="editarAsignadaId">
+
+      <div class="form-group">
+        <label for="editarAsignadaTitulo">Título</label>
+        <input type="text" id="editarAsignadaTitulo" required maxlength="150">
+      </div>
+
+      <div class="form-group">
+        <label for="editarAsignadaDescripcion">Descripción</label>
+        <textarea id="editarAsignadaDescripcion" rows="4" required maxlength="500"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="editarAsignadaUrl">URL Recurso</label>
+        <input type="text" id="editarAsignadaUrl" maxlength="300">
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-close" onclick="closeEditAsignada()">Cancelar</button>
+        <button type="submit" class="btn-confirm">Guardar Cambios</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+
+<!-- 
+     MODAL ELIMINAR ACTIVIDAD ASIGNADA
+ -->
+<div class="modal" id="modalDeleteAsignada">
+  <div class="modal-content">
+    <h2>Eliminar Actividad Asignada</h2>
+    <p>¿Estás seguro de eliminar esta actividad asignada?</p>
+
+    <div class="modal-actions">
+      <button class="btn-close" onclick="closeDeleteAsignada()">Cancelar</button>
+      <button class="btn-confirm" id="btnConfirmDeleteAsignada">Eliminar</button>
+    </div>
+  </div>
+</div>
+
 
   <!-- SCRIPT -->
+
 <script src="/js/actividadO.js"></script>
-<script src="/js/cambiarTema.js"></script>
+
 
 </body>
 </html>

@@ -24,7 +24,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         Usuario usuario = usuarioRepository.findByPersonaDocumento(documento)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
-        String rol = switch (usuario.getRol_id()) {
+        String rol = switch (usuario.getRolId()) {
             case 1 -> "ADMIN";
             case 2 -> "ESTUDIANTE";
             case 3 -> "ORIENTADOR";

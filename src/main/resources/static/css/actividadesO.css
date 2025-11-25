@@ -295,9 +295,108 @@ body {
   text-decoration: none;
   font-weight: 600;
 }
+/* ============================
+   MODALES NUEVOS
+============================ */
 
+/* Fondo oscuro */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
 
+/* Oculto por defecto */
+.hidden {
+    display: none !important;
+}
 
+/* Caja del modal */
+.modal-content {
+    background: #ffffff;
+    width: 430px;
+    max-width: 95%;
+    padding: 25px 30px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.25);
+    animation: fadeIn 0.25s ease-in-out;
+}
+
+/* Animación de entrada */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+/* Títulos */
+.modal-content h2 {
+    margin-top: 0;
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Inputs y selects */
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 18px;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+    background: #fbfbfb;
+}
+
+/* Textarea */
+.modal-content textarea {
+    height: 80px;
+    resize: none;
+}
+
+/* Contenedor de botones */
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+/* Botón base */
+.modal-buttons button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+/* Botón cancelar */
+.modal-buttons button:first-child {
+    background: #bbb;
+    color: white;
+}
+
+/* Botón acción */
+.modal-buttons button:last-child {
+    background: #007bff;
+    color: white;
+}
+
+/* Hover */
+.modal-buttons button:hover {
+    opacity: 0.9;
+}
 
 
 .Crear {

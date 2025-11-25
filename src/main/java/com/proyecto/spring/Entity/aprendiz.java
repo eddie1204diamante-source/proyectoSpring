@@ -3,28 +3,19 @@ import java.util.Set;
 import jakarta.persistence.*;
 @Entity
 @Table(name = "aprendiz")
-public class aprendiz {
+public class Aprendiz {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Id_estudiante")
-    private int Id_estudiante;
+    @Column(name = "idEstudiante")
+    private Integer idEstudiante;  // MISMO ID que el usuario
+
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "Id_usuario_int", referencedColumnName = "Id_usuario")
+    private Usuario usuario;
 
     @Column(name = "tipo_problema", length = 100)
     private String tipo_problema;
-
-   @OneToOne
-@JoinColumn(name = "Id_usuario_int", referencedColumnName = "Id_usuario", nullable = false)
-private Usuario usuario;
-
-public Usuario getUsuario() {
-    return usuario;
-}
-
-public void setUsuario(Usuario usuario) {
-    this.usuario = usuario;
-}
-
 
     @Column(name = "trastorno", length = 10)
     private String trastorno;
@@ -32,19 +23,23 @@ public void setUsuario(Usuario usuario) {
     @Column(name = "Id_trastorno_int", length = 1)
     private String Id_trastorno_int;
 
-    // Relaciones
-    //@OneToMany(mappedBy = "aprendiz")
-    //private Set<evaluacion_estres> evaluacion_estres;
-
     @OneToMany(mappedBy = "aprendiz")
     private Set<grupo_asignado> grupos_asignados;
 
-    public int getId_estudiante() {
-        return Id_estudiante;
+    public Integer getIdEstudiante() {
+        return idEstudiante;
     }
 
-    public void setId_estudiante(int id_estudiante) {
-        Id_estudiante = id_estudiante;
+    public void setIdEstudiante(Integer idEstudiante) {
+        this.idEstudiante = idEstudiante;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 
     public String getTipo_problema() {
@@ -71,14 +66,6 @@ public void setUsuario(Usuario usuario) {
         Id_trastorno_int = id_trastorno_int;
     }
 
-    //public Set<evaluacion_estres> getEvaluaciones_estres() {
-    //    return evaluaciones_estres;
-    //}
-    //
-    //public void setEvaluaciones_estres(Set<evaluacion_estres> evaluaciones_estres) {
-    //    this.evaluaciones_estres = evaluaciones_estres;
-    //}
-
     public Set<grupo_asignado> getGrupos_asignados() {
         return grupos_asignados;
     }
@@ -86,5 +73,4 @@ public void setUsuario(Usuario usuario) {
     public void setGrupos_asignados(Set<grupo_asignado> grupos_asignados) {
         this.grupos_asignados = grupos_asignados;
     }
-
-}   
+}
