@@ -1,13 +1,15 @@
 package com.proyecto.spring.controller;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
+import java.security.Principal;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,8 +21,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.proyecto.spring.Entity.*;
+import com.proyecto.spring.Entity.Cita;
+import com.proyecto.spring.Entity.Usuario;
 import com.proyecto.spring.Entity.persona;
+import com.proyecto.spring.repository.personaRepository;
+import com.proyecto.spring.repository.usuarioRepository;
 import com.proyecto.spring.services.CitaService;
 
 import jakarta.servlet.http.HttpSession;
@@ -38,7 +43,7 @@ public class CitaController {
     @PostMapping("/crear")
     public ResponseEntity<?> crearCita(@RequestBody Map<String, Object> payload, HttpSession session) {
         try {
-            Long idEstudiante = ((Number) payload.get("idEstudiante")).longValue();
+            Long idEstudiante = Long.valueOf(payload.get("idEstudiante").toString());
             Long idOrientador = Long.valueOf(payload.get("idOrientador").toString());
             LocalDate fecha = LocalDate.parse(payload.get("fecha").toString());
             LocalTime hora = LocalTime.parse(payload.get("hora").toString());
@@ -63,6 +68,8 @@ public class CitaController {
                     .body(Map.of("error", "Error interno del servidor: " + e.getMessage()));
         }
     }
+    
+    
 
     @GetMapping("/orientadores")
     public ResponseEntity<List<Map<String, Object>>> getOrientadores() {
@@ -263,4 +270,47 @@ public class CitaController {
         }
         return nombre.trim();
     }
+    // ==================== NUEVO ENDPOINT: DATOS DEL USUARIO LOGUEADO ====================
+@Autowired
+private personaRepository personaRepository;
+
+@Autowired
+private usuarioRepository usuarioRepository;
+
+@GetMapping("/api/auth/me")
+public ResponseEntity<?> getCurrentUser(Principal principal) {
+    if (principal == null) {
+        return ResponseEntity.status(401).body(Map.of("error", "No autenticado"));
+    }
+
+    try {
+        String documento = principal.getName(); // Spring Security guarda aquí el documento
+
+        persona persona = personaRepository.findByDocumento(documento)
+                .orElseThrow(() -> new RuntimeException("Persona no encontrada"));
+
+        Usuario usuario = usuarioRepository.findByPersonaDocumento(documento)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        String nombreCompleto = persona.getPNombre();
+        if (persona.getSNombre() != null && !persona.getSNombre().isEmpty()) {
+            nombreCompleto += " " + persona.getSNombre();
+        }
+        nombreCompleto += " " + persona.getPApellido();
+        if (persona.getSApellido() != null && !persona.getSApellido().isEmpty()) {
+            nombreCompleto += " " + persona.getSApellido();
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("idUsuario", usuario.getIdUsuario());
+        response.put("nombreCompleto", nombreCompleto.trim());
+        response.put("rol", usuario.getRolId()); // 2 = estudiante, 3 = orientador
+
+        return ResponseEntity.ok(response);
+
+    } catch (Exception e) {
+        return ResponseEntity.status(500).body(Map.of("error", "Error interno: " + e.getMessage()));
+    }
+}
+// ================================================================================
 }

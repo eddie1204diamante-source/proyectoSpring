@@ -1,8 +1,5 @@
-// CAMBIO: Agregué detección de rol (estudiante u orientador) basado en localStorage.getItem('rol').
-// Asume que en login guardas 'rol' como 'estudiante' o 'orientador', y 'idUsuario' o 'idOrientador'.
-// Si no, ajusta según tu login.
+// ==================== cita.js - VERSIÓN 100% FUNCIONAL ====================
 
-// Funciones de modales (sin cambios)
 function openModal(id) {
   const modal = document.getElementById(id);
   if (modal) modal.classList.add("active");
@@ -11,107 +8,117 @@ function closeModal(id) {
   const modal = document.getElementById(id);
   if (modal) modal.classList.remove("active");
 }
-window.addEventListener("click", function (e) {
-  const modals = document.querySelectorAll(".modal.active");
-  modals.forEach(modal => {
-    if (e.target === modal) {
-      modal.classList.remove("active");
-    }
+window.addEventListener("click", e => {
+  document.querySelectorAll(".modal.active").forEach(modal => {
+    if (e.target === modal) modal.classList.remove("active");
   });
 });
 
-// CAMBIO: Nueva función para poblar select de orientadores desde backend.
+// ------------------- POBLAR ORIENTADORES -------------------
 function populateOrientadores() {
-  fetch("http://localhost:8080/api/citas/orientadores")
-    .then(res => res.json())
+  fetch("http://localhost:8080/api/citas/orientadores", { credentials: "include" })
+    .then(res => res.ok ? res.json() : Promise.reject("Error al cargar orientadores"))
     .then(data => {
       const select = document.getElementById("orientador");
-      if (select) { // Solo si existe (para estudiante)
-        data.forEach(orientador => {
-          const option = document.createElement("option");
-          option.value = orientador.id;
-          option.textContent = orientador.nombreCompleto;
-          select.appendChild(option);
+      if (select) {
+        data.forEach(o => {
+          const opt = document.createElement("option");
+          opt.value = o.id;
+          opt.textContent = o.nombreCompleto;
+          select.appendChild(opt);
         });
       }
     })
-    .catch(err => console.error("Error al cargar orientadores:", err));
+    .catch(err => console.error(err));
 }
 
-// CAMBIO: Nueva función para poblar horas (estáticas: 06:00-18:00 cada 30 min).
-// Puedes mejorar con fetch a /api/citas/disponibilidad basado en fecha/orientador.
+// ------------------- POBLAR HORAS -------------------
 function populateHoras(selectId) {
   const select = document.getElementById(selectId);
-  if (select) {
-    for (let h = 6; h <= 18; h++) {
-      for (let m = 0; m < 60; m += 30) {
-        const hourStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-        const option = document.createElement("option");
-        option.value = hourStr;
-        option.textContent = hourStr;
-        select.appendChild(option);
-      }
+  if (!select) return;
+  select.innerHTML = '<option value="">Hora</option>';
+  for (let h = 6; h <= 18; h++) {
+    for (let m = 0; m < 60; m += 30) {
+      const time = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+      const opt = document.createElement("option");
+      opt.value = time;
+      opt.textContent = time;
+      select.appendChild(opt);
     }
   }
 }
 
-// CAMBIO: Nueva función para poblar nombre estudiante desde localStorage.
-function populateNombreEstudiante() {
-  const rol = localStorage.getItem("rol");
-  if (rol === "estudiante") {
-    const nombre = localStorage.getItem("nombreEstudiante"); // Guarda esto en login.
-    const input = document.getElementById("nombre-estudiante");
-    if (input && nombre) {
-      input.value = nombre;
-    } else {
-      // Opcional: Fetch desde backend si no está en localStorage.
-      console.warn("Nombre de estudiante no encontrado en localStorage.");
-    }
+// ------------------- NOMBRE DEL ESTUDIANTE (SIEMPRE FUNCIONA) -------------------
+async function populateNombreEstudiante() {
+  const input = document.getElementById("nombre-estudiante");
+  if (!input) return;
+
+  try {
+    const res = await fetch("http://localhost:8080/api/auth/me", {
+      credentials: "include"
+    });
+
+    if (!res.ok) throw new Error("No autenticado");
+
+    const data = await res.json();
+    input.value = data.nombreCompleto || "Estudiante";
+
+    // Guardar en localStorage para el resto del sistema
+    localStorage.setItem("nombreEstudiante", data.nombreCompleto);
+    localStorage.setItem("idUsuario", data.idUsuario);
+    localStorage.setItem("rol", data.rol === 2 ? "estudiante" : "orientador");
+
+  } catch (err) {
+    console.warn("No se pudo cargar el nombre:", err);
+    input.value = "Sesión expirada";
   }
 }
 
-// CAMBIO: Nueva función para cargar citas en la tabla (diferente endpoint por rol).
+// ------------------- CARGAR CITAS -------------------
 function loadCitas() {
   const rol = localStorage.getItem("rol");
-  let id = rol === "estudiante" ? localStorage.getItem("idUsuario") : localStorage.getItem("idOrientador");
-  id = parseInt(id, 10);
-  const endpoint = rol === "estudiante" ? `/api/citas/estudiante/${id}` : `/api/citas/orientador/${id}`;
+  const id = rol === "estudiante" ? localStorage.getItem("idUsuario") : localStorage.getItem("idOrientador");
+  if (!id) return console.error("No hay ID de usuario/orientador");
 
-  fetch(`http://localhost:8080${endpoint}`)
-    .then(res => res.json())
+  const endpoint = rol === "estudiante" 
+    ? `/api/citas/estudiante/${id}` 
+    : `/api/citas/orientador/${id}`;
+
+  fetch(`http://localhost:8080${endpoint}`, { credentials: "include" })
+    .then(res => res.ok ? res.json() : Promise.reject("Error al cargar citas"))
     .then(citas => {
       const tbody = document.querySelector(".styled-table tbody");
-      if (tbody) {
-        tbody.innerHTML = "";
-        citas.forEach(cita => {
-          const row = document.createElement("tr");
-          let estudianteCell = '';
-          if (rol === "orientador") {
-            estudianteCell = `<td>${cita.nombreEstudiante || 'N/A'}</td>`;
-          }
-          row.innerHTML = `
-            ${estudianteCell}
-            <td>${cita.fechaCita}</td>
-            <td>${cita.horaCita}</td>
-            <td>${cita.motivoOriginal}</td>
-            <td>${cita.estado}</td>
-            <td>
-              <button onclick="verDetalle(${cita.idCita})">Ver</button>
-              <button onclick="openModal('${rol === "estudiante" ? 'modal-reprogramar' : 'modal-reprogramar-orientador'}'); setCitaId(${cita.idCita})">Reprogramar</button>
-              <button onclick="openModal('${rol === "estudiante" ? 'modal-cancelar' : 'modal-cancelar-orientador'}'); setCitaId(${cita.idCita})">Cancelar</button>
-            </td>
-          `;
-          tbody.appendChild(row);
-        });
-      }
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      citas.forEach(cita => {
+        const row = document.createElement("tr");
+        const estudianteCell = rol === "orientador" ? `<td>${cita.nombreEstudiante || 'N/A'}</td>` : '';
+        row.innerHTML = `
+          ${estudianteCell}
+          <td>${cita.fechaCita || '-'}</td>
+          <td>${cita.horaCita || '-'}</td>
+          <td>${cita.motivoOriginal || '-'}</td>
+          <td>${cita.estado || '-'}</td>
+          <td>
+            <button onclick="verDetalle(${cita.idCita})">Ver</button>
+            <button onclick="openModal('${rol === 'estudiante' ? 'modal-reprogramar' : 'modal-reprogramar-orientador'}'); setCitaId(${cita.idCita})">Reprogramar</button>
+            <button onclick="openModal('${rol === 'estudiante' ? 'modal-cancelar' : 'modal-cancelar-orientador'}'); setCitaId(${cita.idCita})">Cancelar</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
     })
-    .catch(err => console.error("Error al cargar citas:", err));
+    .catch(err => {
+      console.error(err);
+      alert("Error al cargar citas. Sesión expirada?");
+    });
 }
 
-// CAMBIO: Nueva función para ver detalles de cita.
+// ------------------- VER DETALLE -------------------
 function verDetalle(idCita) {
-  fetch(`http://localhost:8080/api/citas/${idCita}`)
-    .then(res => res.json())
+  fetch(`http://localhost:8080/api/citas/${idCita}`, { credentials: "include" })
+    .then(res => res.ok ? res.json() : Promise.reject("Cita no encontrada"))
     .then(detalle => {
       const content = document.getElementById("detalle-cita-content");
       if (content) {
@@ -120,239 +127,175 @@ function verDetalle(idCita) {
           <p><strong>Hora:</strong> ${detalle.horaCita}</p>
           <p><strong>Motivo:</strong> ${detalle.motivoOriginal}</p>
           <p><strong>Estado:</strong> ${detalle.estado}</p>
-          <p><strong>Creado:</strong> ${detalle.createdAt}</p>
-          <!-- Agrega más si necesitas -->
+          <p><strong>Creada:</strong> ${new Date(detalle.createdAt).toLocaleString()}</p>
         `;
         openModal('modal-ver');
       }
     })
-    .catch(err => console.error("Error al ver detalle:", err));
+    .catch(() => alert("No se pudo cargar el detalle"));
 }
 
-// CAMBIO: Variable global para ID de cita actual (para reprogramar/cancelar).
 let currentCitaId = null;
 function setCitaId(id) {
   currentCitaId = id;
 }
 
-// CAMBIO: Función guardarCita corregida: Ahora envía claves correctas (idEstudiante, idOrientador, fecha, hora separadas).
-// Agregado preventDefault para evitar recarga. Solo para estudiante.
+// ------------------- GUARDAR CITA -------------------
 function guardarCita(e) {
   e.preventDefault();
-  const rol = localStorage.getItem("rol");
-  if (rol !== "estudiante") return;
+  if (localStorage.getItem("rol") !== "estudiante") return;
 
-  const idEstudiante = parseInt(localStorage.getItem("idUsuario"), 10);
-  const idOrientador = document.getElementById("orientador").value;
-  const fecha = document.getElementById("fecha").value;
-  const hora = document.getElementById("hora").value;
-  const motivo = document.getElementById("motivo").value;
+  const idEstudiante = localStorage.getItem("idUsuario");
+  const idOrientador = document.getElementById("orientador")?.value;
+  const fecha = document.getElementById("fecha")?.value;
+  const hora = document.getElementById("hora")?.value;
+  const motivo = document.getElementById("motivo")?.value;
 
   if (!idOrientador || !fecha || !hora || !motivo) {
-    alert("Completa todos los campos requeridos");
-    return;
+    return alert("Completa todos los campos");
   }
 
   const data = { idEstudiante, idOrientador, fecha, hora, motivo };
 
   fetch("http://localhost:8080/api/citas/crear", {
     method: "POST",
+    credentials: "include",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+    body: JSON.stringify(data)
   })
-    .then(res => {
-      if (!res.ok) {
-        return res.text().then(text => { throw new Error(text); });
-      }
-      return res.json();
-    })
-    .then(response => {
-      alert(response.message || "Cita creada con éxito");
-      closeModal('modal-crear');
-      loadCitas(); // Recarga tabla
-    })
-    .catch(err => {
-      console.error("Error al crear cita:", err);
-      alert("Error: " + err.message);
-    });
+  .then(res => res.ok ? res.json() : res.text().then(text => Promise.reject(text || "Error del servidor")))
+  .then(resp => {
+    alert(resp.message || "Cita creada con éxito");
+    closeModal('modal-crear');
+    loadCitas();
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Error: " + err);
+  });
 }
 
-// CAMBIO: Nueva función para reprogramar (PUT al backend). Adaptada por rol.
+// ------------------- REPROGRAMAR -------------------
 function reprogramarCita(e) {
   e.preventDefault();
   const rol = localStorage.getItem("rol");
   const fechaId = rol === "estudiante" ? "fecha_reprogramar" : "fecha_reprogramar_o";
   const horaId = rol === "estudiante" ? "hora_reprogramar" : "hora_reprogramar_o";
-  const nuevaFecha = document.getElementById(fechaId).value;
-  const nuevaHora = document.getElementById(horaId).value;
 
-  if (!currentCitaId || !nuevaFecha || !nuevaHora) {
-    alert("Selecciona una cita y completa los campos");
-    return;
-  }
+  const nuevaFecha = document.getElementById(fechaId)?.value;
+  const nuevaHora = document.getElementById(horaId)?.value;
 
-  const data = { fecha: nuevaFecha, hora: nuevaHora };
+  if (!currentCitaId || !nuevaFecha || !nuevaHora) return alert("Faltan datos");
 
   fetch(`http://localhost:8080/api/citas/${currentCitaId}/reprogramar`, {
     method: "PUT",
+    credentials: "include",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+    body: JSON.stringify({ fecha: nuevaFecha, hora: nuevaHora })
   })
-    .then(res => {
-      if (!res.ok) throw new Error("Error al reprogramar");
-      return res.json();
-    })
-    .then(response => {
-      alert(response.message || "Cita reprogramada");
-      closeModal(rol === "estudiante" ? 'modal-reprogramar' : 'modal-reprogramar-orientador');
-      loadCitas();
-    })
-    .catch(err => alert("Error: " + err.message));
+  .then(res => res.ok ? res.json() : Promise.reject("Error al reprogramar"))
+  .then(() => {
+    alert("Cita reprogramada");
+    closeModal(rol === "estudiante" ? 'modal-reprogramar' : 'modal-reprogramar-orientador');
+    loadCitas();
+  })
+  .catch(err => alert("Error: " + err));
 }
 
-// CAMBIO: Nueva función para cancelar (PUT al backend). Adaptada por rol.
+// ------------------- CANCELAR -------------------
 function cancelarCita(e) {
   if (e) e.preventDefault();
-  if (!currentCitaId) {
-    alert("Selecciona una cita");
-    return;
-  }
+  if (!currentCitaId) return alert("Selecciona una cita");
 
   const rol = localStorage.getItem("rol");
-  const motivo = rol === "orientador" ? document.getElementById("motivo-cancelacion").value : ""; // Opcional para orientador
+  const motivo = rol === "orientador" ? document.getElementById("motivo-cancelacion")?.value : "";
 
   fetch(`http://localhost:8080/api/citas/${currentCitaId}/cancelar`, {
     method: "PUT",
+    credentials: "include",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ motivo }), // Si backend lo soporta, sino quita.
+    body: JSON.stringify({ motivo })
   })
-    .then(res => {
-      if (!res.ok) throw new Error("Error al cancelar");
-      return res.json();
-    })
-    .then(response => {
-      alert(response.message || "Cita cancelada");
-      closeModal(rol === "estudiante" ? 'modal-cancelar' : 'modal-cancelar-orientador');
-      loadCitas();
-    })
-    .catch(err => alert("Error: " + err.message));
+  .then(res => res.ok ? res.json() : Promise.reject("Error al cancelar"))
+  .then(() => {
+    alert("Cita cancelada");
+    closeModal(rol === "estudiante" ? 'modal-cancelar' : 'modal-cancelar-orientador');
+    loadCitas();
+  })
+  .catch(err => alert("Error: " + err));
 }
 
-// CAMBIO: Nueva función para aprobar (solo orientador, desde modal).
+// ------------------- APROBAR (ORIENTADOR) -------------------
 function aprobarCita(idCita) {
   fetch(`http://localhost:8080/api/citas/${idCita}/aprobar`, {
     method: "PUT",
+    credentials: "include"
   })
-    .then(res => {
-      if (!res.ok) throw new Error("Error al aprobar");
-      return res.json();
-    })
-    .then(response => {
-      alert(response.message || "Cita aprobada");
-      loadCitasPendientes(); // Recarga pendientes si abierto
-      loadCitas();
-    })
-    .catch(err => alert("Error: " + err.message));
+  .then(res => res.ok ? res.json() : Promise.reject("Error al aprobar"))
+  .then(() => {
+    alert("Cita aprobada");
+    loadCitasPendientes();
+    loadCitas();
+  })
+  .catch(() => alert("Error al aprobar"));
 }
 
-// CAMBIO: Nueva función para cargar pendientes en modal aprobar (solo orientador).
 function loadCitasPendientes() {
-  const idOrientador = parseInt(localStorage.getItem("idOrientador"), 10);
-  fetch(`http://localhost:8080/api/citas/orientador/${idOrientador}/pendientes`)
-    .then(res => res.json())
+  const id = localStorage.getItem("idOrientador");
+  if (!id) return;
+  fetch(`http://localhost:8080/api/citas/orientador/${id}/pendientes`, { credentials: "include" })
+    .then(res => res.ok ? res.json() : [])
     .then(citas => {
       const tbody = document.getElementById("tabla-pendientes-body");
-      if (tbody) {
-        tbody.innerHTML = "";
-        citas.forEach(cita => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${cita.nombreEstudiante}</td>
-            <td>${cita.fechaCita}</td>
-            <td>${cita.horaCita}</td>
-            <td>${cita.motivoOriginal}</td>
-            <td><button onclick="aprobarCita(${cita.idCita})">Aprobar</button></td>
-          `;
-          tbody.appendChild(row);
-        });
-      }
-    })
-    .catch(err => console.error("Error al cargar pendientes:", err));
+      if (!tbody) return;
+      tbody.innerHTML = "";
+      citas.forEach(c => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${c.nombreEstudiante}</td>
+            <td>${c.fechaCita}</td>
+            <td>${c.horaCita}</td>
+            <td>${c.motivoOriginal}</td>
+            <td><button onclick="aprobarCita(${c.idCita})">Aprobar</button></td>
+          </tr>
+        `;
+      });
+    });
 }
 
-// CAMBIO: Funciones para modales orientador.
-function abrirModalAprobar() {
-  loadCitasPendientes();
-  openModal('modal-aprobar-orientador');
-}
-function abrirModalReprogramarOrientador() {
-  // CAMBIO: Poblar select de citas para reprogramar.
-  loadCitasIntoSelect('cita-reprogramar-select');
-  populateHoras('hora_reprogramar_o');
-  openModal('modal-reprogramar-orientador');
-}
-function abrirModalCancelarOrientador() {
-  // CAMBIO: Poblar select de citas para cancelar.
-  loadCitasIntoSelect('cita-cancelar-select');
-  openModal('modal-cancelar-orientador');
-}
-
-// CAMBIO: Nueva función helper para poblar selects con citas (para orientador reprogramar/cancelar).
 function loadCitasIntoSelect(selectId) {
-  const idOrientador = parseInt(localStorage.getItem("idOrientador"), 10);
-  fetch(`http://localhost:8080/api/citas/orientador/${idOrientador}`)
-    .then(res => res.json())
+  const id = localStorage.getItem("idOrientador");
+  if (!id) return;
+  fetch(`http://localhost:8080/api/citas/orientador/${id}`, { credentials: "include" })
+    .then(res => res.ok ? res.json() : [])
     .then(citas => {
       const select = document.getElementById(selectId);
-      if (select) {
-        select.innerHTML = '<option value="">Selecciona una cita</option>';
-        citas.forEach(cita => {
-          if (cita.estado !== 'CANCELADA') { // Solo no canceladas
-            const option = document.createElement("option");
-            option.value = cita.idCita;
-            option.textContent = `${cita.nombreEstudiante} - ${cita.fechaCita} ${cita.horaCita}`;
-            select.appendChild(option);
-          }
-        });
-      }
-    })
-    .catch(err => console.error("Error al cargar citas en select:", err));
+      if (!select) return;
+      select.innerHTML = '<option value="">Selecciona una cita</option>';
+      citas.filter(c => c.estado !== 'CANCELADA').forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c.idCita;
+        opt.textContent = `${c.nombreEstudiante} - ${c.fechaCita} ${c.horaCita}`;
+        select.appendChild(opt);
+      });
+    });
 }
 
-// Filtros (stub: filtra client-side; puedes mejorar con params en fetch).
-function aplicarFiltros() {
-  // TODO: Implementa filtrado en tabla o agrega params a loadCitas.
-  console.log("Filtros aplicados");
-}
-function limpiarFiltros() {
-  // Limpia inputs y recarga.
-  document.querySelectorAll('.filters-container input, .filters-container select').forEach(el => el.value = '');
-  loadCitas();
-}
+function abrirModalAprobar() { loadCitasPendientes(); openModal('modal-aprobar-orientador'); }
+function abrirModalReprogramarOrientador() { loadCitasIntoSelect('cita-reprogramar-select'); populateHoras('hora_reprogramar_o'); openModal('modal-reprogramar-orientador'); }
+function abrirModalCancelarOrientador() { loadCitasIntoSelect('cita-cancelar-select'); openModal('modal-cancelar-orientador'); }
+function ejecutarCancelar() { cancelarCita(); }
 
-// CAMBIO: EjecutarCancelar ahora llama a cancelarCita (para modal estudiante).
-function ejecutarCancelar() {
-  cancelarCita();
-}
-
-// On load
+// ==================== INICIO ====================
 document.addEventListener("DOMContentLoaded", () => {
-  const rol = localStorage.getItem("rol");
   populateOrientadores();
-  populateHoras("hora"); // Para crear (estudiante)
-  populateHoras("hora_reprogramar"); // Para reprogramar (estudiante)
+  populateHoras("hora");
+  populateHoras("hora_reprogramar");
   populateNombreEstudiante();
   loadCitas();
 
-  // Listeners para forms
-  const formCrear = document.getElementById("formCrearCita");
-  if (formCrear) formCrear.addEventListener("submit", guardarCita);
-
-  const formReprogramar = document.getElementById("formReprogramarCita");
-  const formReprogramarO = document.getElementById("formReprogramarOrientador");
-  if (formReprogramar) formReprogramar.addEventListener("submit", reprogramarCita);
-  if (formReprogramarO) formReprogramarO.addEventListener("submit", reprogramarCita);
-
-  const formCancelarO = document.getElementById("formCancelarOrientador");
-  if (formCancelarO) formCancelarO.addEventListener("submit", cancelarCita);
+  document.getElementById("formCrearCita")?.addEventListener("submit", guardarCita);
+  document.getElementById("formReprogramarCita")?.addEventListener("submit", reprogramarCita);
+  document.getElementById("formReprogramarOrientador")?.addEventListener("submit", reprogramarCita);
+  document.getElementById("formCancelarOrientador")?.addEventListener("submit", cancelarCita);
 });

@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const themeToggle = document.getElementById('theme-toggle');
   const sidebar = document.getElementById('sidebar');
   
+  
 
   const savedTheme = localStorage.getItem('theme');
   if (savedTheme === 'dark') {

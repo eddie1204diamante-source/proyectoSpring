@@ -9,7 +9,8 @@ import java.util.Set;
 public class psicologica {
 
     @Id
-    @Column(name = "Id_orientador")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_orientador")
     private Long idOrientador;        // ← CAMBIO AQUÍ: camelCase normal (sin guion bajo)
 
     @OneToOne

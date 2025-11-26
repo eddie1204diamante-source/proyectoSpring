@@ -716,3 +716,24 @@ footer {
   margin-top: 3rem;
   padding: 2.5rem;
 }
+
+/* Mejoras visuales solicitadas */
+#orientador, select, input[type="date"], input[type="time"] {
+  padding: 0.75rem !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--border-color) !important;
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+}
+
+.filters-container button {
+  padding: 0.7rem 1.2rem !important;
+  border-radius: 12px !important;
+}
+
+.status {
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  font-weight: 600;
+  text-transform: capitalize;
+}

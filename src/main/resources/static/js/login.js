@@ -17,6 +17,7 @@ let currentForm = 'login';
 const loginForm = document.getElementById('loginForm');
 const registerForm = document.getElementById('registerForm');
 
+// Toggle mostrar/ocultar contraseña
 document.querySelectorAll('.password-toggle').forEach(btn => {
   btn.addEventListener('click', function () {
     const targetId = this.getAttribute('data-target');
@@ -34,17 +35,13 @@ document.querySelectorAll('.password-toggle').forEach(btn => {
 function switchForm(targetForm) {
   const currentFormElement = currentForm === 'login' ? loginForm : registerForm;
   const targetFormElement = targetForm === 'login' ? loginForm : registerForm;
-
   currentFormElement.classList.add(targetForm === 'login' ? 'slide-out-right' : 'slide-out-left');
-
   setTimeout(() => {
     currentFormElement.classList.remove('active', 'slide-out-right', 'slide-out-left');
     targetFormElement.classList.add('active');
     currentForm = targetForm;
-
     const title = document.querySelector('.auth-title');
     const subtitle = document.querySelector('.auth-subtitle');
-
     if (targetForm === 'login') {
       title.textContent = 'Bienvenido de vuelta';
       subtitle.textContent = 'Inicia sesión en tu cuenta';
@@ -91,15 +88,6 @@ function showLoginOverlay() {
   const overlay = document.getElementById('loginOverlay');
   overlay.classList.remove('hidden');
   setTimeout(() => overlay.classList.add('visible'), 10);
-}
-
-function hideLoginOverlay(callback) {
-  const overlay = document.getElementById('loginOverlay');
-  overlay.classList.remove('visible');
-  setTimeout(() => {
-    overlay.classList.add('hidden');
-    if (callback) callback();
-  }, 300);
 }
 
 function showError(inputId, errorId, message) {
@@ -168,10 +156,7 @@ function validateContrasena(value, inputId, errorId) {
 
 // Validaciones en tiempo real
 document.getElementById('loginDocumento').addEventListener('input', (e) => validateDocumento(e.target.value, 'loginDocumento', 'loginDocumentoError'));
-document.getElementById('loginDocumento').addEventListener('blur', (e) => validateDocumento(e.target.value, 'loginDocumento', 'loginDocumentoError'));
 document.getElementById('loginContrasena').addEventListener('input', (e) => validateContrasena(e.target.value, 'loginContrasena', 'loginContrasenaError'));
-document.getElementById('loginContrasena').addEventListener('blur', (e) => validateContrasena(e.target.value, 'loginContrasena', 'loginContrasenaError'));
-
 document.getElementById('registerNombres').addEventListener('input', (e) => validateNombreApellido(e.target.value, 'registerNombres', 'registerNombresError'));
 document.getElementById('registerApellidos').addEventListener('input', (e) => validateNombreApellido(e.target.value, 'registerApellidos', 'registerApellidosError'));
 document.getElementById('registerDocumento').addEventListener('input', (e) => validateDocumento(e.target.value, 'registerDocumento', 'registerDocumentoError'));
@@ -194,75 +179,51 @@ document.getElementById('confirmContrasena').addEventListener('input', () => {
 document.getElementById('showRegister').addEventListener('click', (e) => { e.preventDefault(); switchForm('register'); });
 document.getElementById('showLogin').addEventListener('click', (e) => { e.preventDefault(); switchForm('login'); });
 
-// LOGIN 
-// LOGIN HÍBRIDO: Usa tu API + crea sesión real
+// ==================== LOGIN 100% FUNCIONAL ====================
 loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const documento = document.getElementById('loginDocumento').value.trim();
-    const contrasena = document.getElementById('loginContrasena').value;
+  e.preventDefault();
+  const documento = document.getElementById('loginDocumento').value.trim();
+  const contrasena = document.getElementById('loginContrasena').value;
 
-    let isValid = true;
-    if (!validateDocumento(documento, 'loginDocumento', 'loginDocumentoError')) isValid = false;
-    if (!validateContrasena(contrasena, 'loginContrasena', 'loginContrasenaError')) isValid = false;
-    if (!isValid) return;
+  if (!validateDocumento(documento, 'loginDocumento', 'loginDocumentoError')) return;
+  if (!validateContrasena(contrasena, 'loginContrasena', 'loginContrasenaError')) return;
 
-    const btn = loginForm.querySelector('.btn-primary');
-    btn.classList.add('loading');
-    btn.disabled = true;
+  try {
+    const res = await fetch('http://localhost:8080/api/v1/auth/login', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ documento, contrasena })
+    });
 
-    try {
-        // 1. Primero llamamos a tu API para obtener el redirect
-        const apiRes = await fetch('/api/v1/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ documento, contrasena })
-        });
-        const apiData = await apiRes.json();
-        // GUARDAR ID DEL USUARIO
-if (apiData.id) {
-    localStorage.setItem("idAprendiz", apiData.id);
-}
+    const data = await res.json();
 
-
-        if (!apiData.success) {
-            showError('loginContrasena', 'loginContrasenaError', apiData.message || 'Credenciales incorrectas');
-            btn.classList.remove('loading'); btn.disabled = false;
-            return;
-        }
-
-        // 2. Ahora autenticamos la sesión REAL con Spring Security
-        const form = new FormData();
-        form.append('username', documento);
-        form.append('password', contrasena);
-
-        const loginRes = await fetch('/login', {
-            method: 'POST',
-            body: form,
-            credentials: 'include'
-        });
-
-        if (loginRes.redirected || loginRes.ok) {
-            showLoginOverlay();
-            setTimeout(() => {
-                hideLoginOverlay(() => {
-                    window.location.href = apiData.redirect;  // Usa el redirect correcto por rol
-                });
-            }, 1200);
-        }
-    } catch (err) {
-        showError('loginContrasena', 'loginContrasenaError', 'Error del servidor');
-        console.error(err);
-    } finally {
-        btn.classList.remove('loading');
-        btn.disabled = false;
+    if (!res.ok || !data.success) {
+      showError('loginContrasena', 'loginContrasenaError', data.message || 'Credenciales incorrectas');
+      return;
     }
+
+    // Guardar datos del usuario
+    localStorage.setItem("idUsuario", data.idUsuario);
+    localStorage.setItem("nombreEstudiante", data.nombreCompleto);
+    localStorage.setItem("rol", data.rol === 2 ? "estudiante" : data.rol === 3 ? "orientador" : "administrador");
+
+    const redirectUrl = 'http://localhost:8080' + data.redirect;
+
+    showLoginOverlay();
+    setTimeout(() => {
+      window.location.href = redirectUrl; // ← LA CLAVE: redirección directa
+    }, 800);
+
+  } catch (err) {
+    console.error(err);
+    alert("Error de conexión con el servidor");
+  }
 });
 
-// REGISTRO REAL CON EL BACKEND
+// ==================== REGISTRO ====================
 registerForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-
   const nombres = document.getElementById('registerNombres').value.trim();
   const apellidos = document.getElementById('registerApellidos').value.trim();
   const documento = document.getElementById('registerDocumento').value.trim();
@@ -285,12 +246,11 @@ registerForm.addEventListener('submit', async (e) => {
   btn.disabled = true;
 
   try {
-    const res = await fetch('/api/v1/auth/register', {
+    const res = await fetch('http://localhost:8080/api/v1/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nombres, apellidos, documento, correo, contrasena })
     });
-
     const data = await res.json();
 
     if (data.success) {
@@ -310,7 +270,7 @@ registerForm.addEventListener('submit', async (e) => {
   }
 });
 
-// Animaciones y inicialización
+// Animaciones de inputs
 document.querySelectorAll('.form-input').forEach(input => {
   input.addEventListener('focus', () => {
     input.parentElement.style.transform = 'scale(1.02)';
@@ -324,7 +284,33 @@ document.querySelectorAll('.form-input').forEach(input => {
 
 document.getElementById('confirmContrasena').addEventListener('paste', (e) => e.preventDefault());
 
-document.addEventListener('DOMContentLoaded', () => {
+// ==================== VERIFICAR SI YA ESTÁ LOGUEADO AL CARGAR ====================
+document.addEventListener("DOMContentLoaded", () => {
   createStars();
-  setTimeout(() => document.getElementById('loginDocumento').focus(), 800);
+
+  fetch('http://localhost:8080/api/auth/me', { 
+    credentials: 'include' 
+  })
+  .then(r => {
+    if (r.ok) return r.json();
+    throw new Error("No autenticado");
+  })
+  .then(user => {
+    const rol = user.rol === 2 ? "estudiante" : user.rol === 3 ? "orientador" : "administrador";
+    localStorage.setItem("rol", rol);
+    localStorage.setItem("idUsuario", user.idUsuario);
+    localStorage.setItem("nombreEstudiante", user.nombreCompleto);
+
+    const redirectMap = {
+      estudiante: "/estudiante/dashboard",
+      orientador: "/orientador/dashboard",
+      administrador: "/administrador/dashboard"
+    };
+
+    window.location.href = "http://localhost:8080" + (redirectMap[rol] || "/estudiante/dashboard");
+  })
+  .catch(() => {
+    // No está logueado → se queda en login
+    setTimeout(() => document.getElementById('loginDocumento').focus(), 800);
+  });
 });

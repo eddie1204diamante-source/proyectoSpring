@@ -1,13 +1,22 @@
 package com.proyecto.spring.services;
 
-import com.proyecto.spring.Entity.*;
-import com.proyecto.spring.repository.*;
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import com.proyecto.spring.Entity.Usuario;
+import com.proyecto.spring.Entity.administrador;
+import com.proyecto.spring.Entity.aprendiz;
+import com.proyecto.spring.Entity.persona;
+import com.proyecto.spring.Entity.psicologica;
+import com.proyecto.spring.repository.administradorRepository;
+import com.proyecto.spring.repository.aprendizRepository;
+import com.proyecto.spring.repository.personaRepository;
+import com.proyecto.spring.repository.psicologicaRepository;
+import com.proyecto.spring.repository.usuarioRepository;
 
 @Service
 public class authService {
@@ -83,7 +92,7 @@ public class authService {
         nuevoUsuario.setPersona(nuevaPersona);
         nuevoUsuario.setCorreo(correo.toLowerCase().trim());
         nuevoUsuario.setContrasena(passwordEncoder.encode(contrasena));
-        nuevoUsuario.setRol_id(rolId); // Asegúrate de que el campo se llame exactamente así en la entidad
+        nuevoUsuario.setRolId(rolId);
         nuevoUsuario = usuarioRepository.save(nuevoUsuario);
 
         // 4. Crear registro en la tabla específica según el rol
