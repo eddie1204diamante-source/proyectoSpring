@@ -1,3 +1,11 @@
+// ======================== LIBRERÍAS NECESARIAS ========================
+// Añade estos CDN en tu HTML antes de este script:
+// <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+// <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+// <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+// <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+// <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 // ======================== MODALES ========================
 function openModal(id) {
   const modal = document.getElementById(id);
@@ -14,6 +22,67 @@ window.addEventListener("click", function (e) {
   });
 });
 
+// ======================== INICIALIZAR FLATPICKR ========================
+function initFlatpickr(inputId, isFilter = false) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  
+  const today = new Date();
+  const maxDate = new Date();
+  maxDate.setDate(today.getDate() + 60); // 60 días desde hoy
+  
+  const config = {
+    locale: "es",
+    dateFormat: "Y-m-d",
+    disableMobile: true,
+    theme: "dark"
+  };
+  
+  // Solo para formularios de crear/reprogramar (NO para filtros)
+  if (!isFilter) {
+    config.minDate = today;
+    config.maxDate = maxDate;
+  }
+  
+  flatpickr(input, config);
+}
+
+// ======================== AUTOCOMPLETADO MEJORADO PARA MOTIVO ========================
+function setupMotivoAutocomplete() {
+  const motivoInput = document.getElementById("motivo");
+  if (!motivoInput) return;
+  
+  const palabrasClave = [
+    "ansiedad", "estrés", "depresión", "angustia", "tristeza",
+    "preocupación", "miedo", "pánico", "inseguridad", "baja autoestima",
+    "problemas familiares", "problemas académicos", "dificultades de aprendizaje",
+    "bullying", "acoso", "violencia", "conflictos", "relaciones interpersonales",
+    "duelo", "pérdida", "trauma", "burnout", "agotamiento",
+    "insomnio", "problemas de sueño", "falta de concentración",
+    "orientación vocacional", "proyecto de vida", "toma de decisiones",
+    "adaptación", "cambios", "transición", "crisis", "emergencia",
+    "apoyo emocional", "manejo de emociones", "control de ira",
+    "soledad", "aislamiento", "desmotivación", "frustración"
+  ];
+  
+  // Crear datalist si no existe
+  let datalist = document.getElementById("motivo-sugerencias");
+  if (!datalist) {
+    datalist = document.createElement("datalist");
+    datalist.id = "motivo-sugerencias";
+    motivoInput.setAttribute("list", "motivo-sugerencias");
+    motivoInput.parentElement.appendChild(datalist);
+  }
+  
+  // Poblar datalist
+  datalist.innerHTML = "";
+  palabrasClave.forEach(palabra => {
+    const option = document.createElement("option");
+    option.value = palabra;
+    datalist.appendChild(option);
+  });
+}
+
 // ======================== CARGA DE DATOS DEL USUARIO ========================
 async function cargarDatosUsuario() {
   try {
@@ -21,22 +90,19 @@ async function cargarDatosUsuario() {
       credentials: "include"
     });
     if (!res.ok) throw new Error("No autenticado");
-
     const user = await res.json();
-
-    // Guardamos todo lo necesario
+    
     const rol = user.rol === 2 ? "estudiante" : "orientador";
     localStorage.setItem("rol", rol);
     localStorage.setItem("idUsuario", user.idUsuario);
     localStorage.setItem("nombreCompleto", user.nombreCompleto || "Usuario");
-
-    // Solo estudiante necesita nombre en el input
+    
     const inputNombre = document.getElementById("nombre-estudiante");
     if (inputNombre) {
       inputNombre.value = user.nombreCompleto;
     }
   } catch (err) {
-    console.warn("No se pudo cargar usuario (puede ser normal en login):", err);
+    console.warn("No se pudo cargar usuario:", err);
   }
 }
 
@@ -53,17 +119,44 @@ function populateOrientadores() {
           opt.textContent = o.nombreCompleto;
           select.appendChild(opt);
         });
+        
+        select.addEventListener("change", function() {
+          if (this.value) {
+            this.classList.add("selected-valid");
+          } else {
+            this.classList.remove("selected-valid");
+          }
+        });
       }
     })
     .catch(err => console.error("Error cargando orientadores:", err));
 }
 
-function populateHoras(selectId) {
+function populateHoras(selectId, fecha = null) {
   const select = document.getElementById(selectId);
   if (!select) return;
   select.innerHTML = '<option value="">Hora</option>';
-  for (let h = 6; h <= 18; h++) {
+  
+  const ahora = new Date();
+  const horaActual = ahora.getHours();
+  const minutoActual = ahora.getMinutes();
+  
+  // Verificar si la fecha seleccionada es hoy
+  const esHoy = fecha && fecha === ahora.toISOString().split('T')[0];
+  
+  // Calcular hora mínima (si es hoy, +2 horas desde ahora)
+  let horaMinima = 6;
+  if (esHoy) {
+    horaMinima = Math.max(horaActual + 2, 6);
+  }
+  
+  for (let h = horaMinima; h <= 18; h++) {
     for (let m = 0; m < 60; m += 30) {
+      // Si es hoy y la hora es igual a horaMinima, validar minutos
+      if (esHoy && h === horaMinima && m <= minutoActual) {
+        continue;
+      }
+      
       const time = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
       const opt = document.createElement("option");
       opt.value = time;
@@ -73,7 +166,51 @@ function populateHoras(selectId) {
   }
 }
 
-// ======================== CARGAR CITAS (ESTUDIANTE Y ORIENTADOR) ========================
+// ======================== VALIDACIÓN DE FECHA Y HORA ========================
+async function validarFechaHora(fecha, hora) {
+  const fechaSeleccionada = new Date(fecha + "T00:00:00");
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  
+  // Si es el mismo día
+  if (fechaSeleccionada.getTime() === hoy.getTime()) {
+    const ahora = new Date();
+    const [horaSeleccionada, minutoSeleccionado] = hora.split(':').map(Number);
+    const horaActual = ahora.getHours();
+    const minutoActual = ahora.getMinutes();
+    
+    const minutosSeleccionados = horaSeleccionada * 60 + minutoSeleccionado;
+    const minutosActuales = horaActual * 60 + minutoActual;
+    
+    if (minutosSeleccionados <= minutosActuales) {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Hora no válida',
+        text: 'La hora seleccionada ya pasó. Por favor, selecciona una hora futura.',
+        confirmButtonColor: '#007bff'
+      });
+      return false;
+    }
+    
+    // Alerta de confirmación para el mismo día
+    const result = await Swal.fire({
+      icon: 'warning',
+      title: '⚠️ Cita para hoy',
+      html: 'Estás solicitando una cita para <strong>hoy</strong>.<br><br>No te podemos garantizar que el orientador esté disponible.<br><br>¿Deseas continuar?',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, continuar',
+      cancelButtonText: 'No, cambiar fecha',
+      confirmButtonColor: '#28a745',
+      cancelButtonColor: '#6c757d'
+    });
+    
+    return result.isConfirmed;
+  }
+  
+  return true;
+}
+
+// ======================== CARGAR CITAS ========================
 let currentCitaId = null;
 function setCitaId(id) {
   currentCitaId = id;
@@ -82,16 +219,16 @@ function setCitaId(id) {
 function loadCitas() {
   const rol = localStorage.getItem("rol");
   const idUsuario = localStorage.getItem("idUsuario");
-
+  
   if (!rol || !idUsuario) {
     console.error("Falta rol o idUsuario en localStorage");
     return;
   }
-
+  
   const endpoint = rol === "estudiante"
     ? `/api/citas/estudiante/${idUsuario}`
     : `/api/citas/orientador/${idUsuario}`;
-
+  
   fetch(`http://localhost:8080${endpoint}`, { credentials: "include" })
     .then(res => {
       if (!res.ok) throw new Error("Error en endpoint de citas");
@@ -101,22 +238,32 @@ function loadCitas() {
       const tbody = document.querySelector(".styled-table tbody");
       if (!tbody) return;
       tbody.innerHTML = "";
-
+      
+      if (citas.length === 0) {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td colspan="${rol === 'orientador' ? '6' : '5'}" class="no-citas-message">No hay citas registradas en este momento</td>`;
+        tbody.appendChild(row);
+        return;
+      }
+      
       citas.forEach(cita => {
         const row = document.createElement("tr");
-
         const estudianteCell = rol === "orientador"
           ? `<td>${cita.nombreEstudiante || "Sin nombre"}</td>`
           : "";
-
-        const acciones = `
-          <button class="btn-ver" onclick="verDetalle(${cita.idCita})">Ver</button>
-          ${cita.estado !== "CANCELADA" && cita.estado !== "FINALIZADA" ? `
-            <button class="btn-reprogramar" onclick="abrirReprogramar(${cita.idCita})">Reprogramar</button>
-            <button class="btn-cancelar" onclick="setCitaId(${cita.idCita}); openModal('${rol === 'estudiante' ? 'modal-cancelar' : 'modal-cancelar-orientador'}')">Cancelar</button>
-          ` : ""}
-        `;
-
+        
+        let acciones = `<button class="btn-ver" onclick="verDetalle(${cita.idCita})">Ver</button>`;
+        
+        if (cita.estado !== "CANCELADA" && cita.estado !== "FINALIZADA") {
+          acciones += `<button class="btn-reprogramar" onclick="abrirReprogramar(${cita.idCita})">Reprogramar</button>`;
+          
+          if (rol === "orientador" && cita.estado === "APROBADA") {
+            acciones += `<button class="btn-finalizar" onclick="setCitaId(${cita.idCita}); openModal('modal-finalizar')">Finalizar</button>`;
+          }
+          
+          acciones += `<button class="btn-cancelar" onclick="setCitaId(${cita.idCita}); openModal('${rol === 'estudiante' ? 'modal-cancelar' : 'modal-cancelar-orientador'}')">Cancelar</button>`;
+        }
+        
         row.innerHTML = `
           ${estudianteCell}
           <td>${cita.fechaCita}</td>
@@ -130,7 +277,12 @@ function loadCitas() {
     })
     .catch(err => {
       console.error("Error cargando citas:", err);
-      alert("Error al cargar citas. Revisa la consola.");
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudieron cargar las citas. Intenta nuevamente.',
+        confirmButtonColor: '#007bff'
+      });
     });
 }
 
@@ -142,11 +294,13 @@ function verDetalle(idCita) {
       const content = document.getElementById("detalle-cita-content");
       if (content) {
         content.innerHTML = `
-          <p><strong>Fecha:</strong> ${detalle.fechaCita}</p>
-          <p><strong>Hora:</strong> ${detalle.horaCita}</p>
-          <p><strong>Motivo:</strong> ${detalle.motivoOriginal}</p>
-          <p><strong>Estado:</strong> ${detalle.estado}</p>
-          <p><strong>Creada:</strong> ${new Date(detalle.createdAt).toLocaleString()}</p>
+          <div style="text-align: left; padding: 1rem;">
+            <p style="margin-bottom: 1rem;"><strong>📅 Fecha:</strong> ${detalle.fechaCita}</p>
+            <p style="margin-bottom: 1rem;"><strong>🕐 Hora:</strong> ${detalle.horaCita}</p>
+            <p style="margin-bottom: 1rem;"><strong>📝 Motivo:</strong> ${detalle.motivoOriginal}</p>
+            <p style="margin-bottom: 1rem;"><strong>📊 Estado:</strong> <span class="estado estado-${detalle.estado.toLowerCase()}">${detalle.estado}</span></p>
+            <p style="margin-bottom: 1rem;"><strong>📆 Creada:</strong> ${new Date(detalle.createdAt).toLocaleString()}</p>
+          </div>
         `;
         openModal("modal-ver");
       }
@@ -154,21 +308,32 @@ function verDetalle(idCita) {
 }
 
 // ======================== CREAR CITA (ESTUDIANTE) ========================
-function guardarCita(e) {
+async function guardarCita(e) {
   e.preventDefault();
+  
   if (localStorage.getItem("rol") !== "estudiante") return;
-
+  
   const idEstudiante = localStorage.getItem("idUsuario");
   const idOrientador = document.getElementById("orientador").value;
   const fecha = document.getElementById("fecha").value;
   const hora = document.getElementById("hora").value;
-  const motivo = document.getElementById("motivo").value;
-
+  const motivo = document.getElementById("motivo").value.trim();
+  
   if (!idOrientador || !fecha || !hora || !motivo) {
-    alert("Completa todos los campos");
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Campos incompletos',
+      text: 'Por favor, completa todos los campos obligatorios',
+      confirmButtonColor: '#007bff'
+    });
     return;
   }
-
+  
+  const validacionFechaHora = await validarFechaHora(fecha, hora);
+  if (!validacionFechaHora) {
+    return;
+  }
+  
   fetch("http://localhost:8080/api/citas/crear", {
     method: "POST",
     credentials: "include",
@@ -177,34 +342,74 @@ function guardarCita(e) {
   })
     .then(res => res.ok ? res.json() : Promise.reject("Error al crear"))
     .then(() => {
-      alert("Cita solicitada con éxito");
+      Swal.fire({
+        icon: 'success',
+        title: '¡Éxito!',
+        text: 'Cita solicitada con éxito',
+        confirmButtonColor: '#28a745',
+        timer: 2000
+      });
       closeModal("modal-crear");
+      document.getElementById("formCrearCita").reset();
+      document.getElementById("orientador").classList.remove("selected-valid");
       loadCitas();
     })
-    .catch(err => alert("Error: " + err.message || err));
+    .catch(err => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: err.message || 'No se pudo crear la cita',
+        confirmButtonColor: '#dc3545'
+      });
+    });
 }
 
 // ======================== REPROGRAMAR (AMBOS ROLES) ========================
 function abrirReprogramar(idCita) {
   setCitaId(idCita);
   const rol = localStorage.getItem("rol");
-  populateHoras(rol === "estudiante" ? "hora_reprogramar" : "hora_reprogramar_o");
+  const horaSelectId = rol === "estudiante" ? "hora_reprogramar" : "hora_reprogramar_o";
+  populateHoras(horaSelectId);
   openModal(rol === "estudiante" ? "modal-reprogramar" : "modal-reprogramar-orientador");
 }
 
-function reprogramarCita(e) {
+async function reprogramarCita(e) {
   e.preventDefault();
-  if (!currentCitaId) return alert("No hay cita seleccionada");
-
+  
+  if (!currentCitaId) {
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Sin selección',
+      text: 'No hay cita seleccionada',
+      confirmButtonColor: '#007bff'
+    });
+    return;
+  }
+  
   const rol = localStorage.getItem("rol");
   const fechaInput = rol === "estudiante" ? "fecha_reprogramar" : "fecha_reprogramar_o";
   const horaInput = rol === "estudiante" ? "hora_reprogramar" : "hora_reprogramar_o";
-
+  
   const fecha = document.getElementById(fechaInput).value;
   const hora = document.getElementById(horaInput).value;
-
-  if (!fecha || !hora) return alert("Selecciona fecha y hora");
-
+  
+  if (!fecha || !hora) {
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Campos incompletos',
+      text: 'Selecciona fecha y hora',
+      confirmButtonColor: '#007bff'
+    });
+    return;
+  }
+  
+  if (rol === "estudiante") {
+    const validacionFechaHora = await validarFechaHora(fecha, hora);
+    if (!validacionFechaHora) {
+      return;
+    }
+  }
+  
   fetch(`http://localhost:8080/api/citas/${currentCitaId}/reprogramar`, {
     method: "PUT",
     credentials: "include",
@@ -213,21 +418,81 @@ function reprogramarCita(e) {
   })
     .then(res => res.ok ? res.json() : Promise.reject("Error"))
     .then(() => {
-      alert("Cita reprogramada");
+      Swal.fire({
+        icon: 'success',
+        title: '¡Reprogramada!',
+        text: 'Cita reprogramada exitosamente',
+        confirmButtonColor: '#28a745',
+        timer: 2000
+      });
       closeModal(rol === "estudiante" ? "modal-reprogramar" : "modal-reprogramar-orientador");
       loadCitas();
     })
-    .catch(() => alert("Error al reprogramar"));
+    .catch(() => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo reprogramar la cita',
+        confirmButtonColor: '#dc3545'
+      });
+    });
+}
+
+// ======================== FINALIZAR CITA (ORIENTADOR) ========================
+function finalizarCita() {
+  if (!currentCitaId) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Sin selección',
+      text: 'No hay cita seleccionada',
+      confirmButtonColor: '#007bff'
+    });
+    return;
+  }
+  
+  fetch(`http://localhost:8080/api/citas/${currentCitaId}/finalizar`, {
+    method: "PUT",
+    credentials: "include"
+  })
+    .then(res => res.ok ? res.json() : Promise.reject())
+    .then(() => {
+      Swal.fire({
+        icon: 'success',
+        title: '¡Finalizada!',
+        text: 'Cita finalizada exitosamente',
+        confirmButtonColor: '#28a745',
+        timer: 2000
+      });
+      closeModal("modal-finalizar");
+      loadCitas();
+    })
+    .catch(() => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo finalizar la cita',
+        confirmButtonColor: '#dc3545'
+      });
+    });
 }
 
 // ======================== CANCELAR (AMBOS ROLES) ========================
 function cancelarCita(e) {
   if (e) e.preventDefault();
-  if (!currentCitaId) return alert("Selecciona una cita");
-
+  
+  if (!currentCitaId) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Sin selección',
+      text: 'Selecciona una cita',
+      confirmButtonColor: '#007bff'
+    });
+    return;
+  }
+  
   const rol = localStorage.getItem("rol");
   const motivo = rol === "orientador" ? document.getElementById("motivo-cancelacion")?.value : "";
-
+  
   fetch(`http://localhost:8080/api/citas/${currentCitaId}/cancelar`, {
     method: "PUT",
     credentials: "include",
@@ -236,11 +501,27 @@ function cancelarCita(e) {
   })
     .then(res => res.ok ? res.json() : Promise.reject())
     .then(() => {
-      alert("Cita cancelada");
+      Swal.fire({
+        icon: 'success',
+        title: '¡Cancelada!',
+        text: 'Cita cancelada exitosamente',
+        confirmButtonColor: '#28a745',
+        timer: 2000
+      });
       closeModal(rol === "estudiante" ? "modal-cancelar" : "modal-cancelar-orientador");
+      if (rol === "orientador") {
+        document.getElementById("motivo-cancelacion").value = "";
+      }
       loadCitas();
     })
-    .catch(() => alert("Error al cancelar"));
+    .catch(() => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo cancelar la cita',
+        confirmButtonColor: '#dc3545'
+      });
+    });
 }
 
 function ejecutarCancelar() {
@@ -255,21 +536,43 @@ function aprobarCita(idCita) {
   })
     .then(res => res.ok ? res.json() : Promise.reject())
     .then(() => {
-      alert("Cita aprobada");
+      Swal.fire({
+        icon: 'success',
+        title: '¡Aprobada!',
+        text: 'Cita aprobada exitosamente',
+        confirmButtonColor: '#28a745',
+        timer: 2000
+      });
       loadCitasPendientes();
       loadCitas();
     })
-    .catch(() => alert("Error al aprobar"));
+    .catch(() => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo aprobar la cita',
+        confirmButtonColor: '#dc3545'
+      });
+    });
 }
 
 function loadCitasPendientes() {
   const idUsuario = localStorage.getItem("idUsuario");
+  
   fetch(`http://localhost:8080/api/citas/orientador/${idUsuario}/pendientes`, { credentials: "include" })
     .then(res => res.json())
     .then(citas => {
       const tbody = document.getElementById("tabla-pendientes-body");
       if (!tbody) return;
       tbody.innerHTML = "";
+      
+      if (citas.length === 0) {
+        const row = document.createElement("tr");
+        row.innerHTML = '<td colspan="5" class="no-citas-message">✅ No hay citas pendientes para aprobar en este momento</td>';
+        tbody.appendChild(row);
+        return;
+      }
+      
       citas.forEach(cita => {
         const row = document.createElement("tr");
         row.innerHTML = `
@@ -290,27 +593,47 @@ function abrirModalAprobar() {
 }
 
 // ======================== REPROGRAMAR/CANCELAR ORIENTADOR CON SELECT ========================
-function loadCitasIntoSelect(selectId) {
+function loadCitasIntoSelect(selectId, filtroEstado = null) {
   const idUsuario = localStorage.getItem("idUsuario");
+  
   fetch(`http://localhost:8080/api/citas/orientador/${idUsuario}`, { credentials: "include" })
     .then(res => res.json())
     .then(citas => {
       const select = document.getElementById(selectId);
       if (!select) return;
       select.innerHTML = '<option value="">Selecciona una cita</option>';
-      citas.forEach(cita => {
-        if (cita.estado !== "CANCELADA") {
-          const opt = document.createElement("option");
-          opt.value = cita.idCita;
-          opt.textContent = `${cita.nombreEstudiante} - ${cita.fechaCita} ${cita.horaCita}`;
-          select.appendChild(opt);
-        }
+      
+      let citasFiltradas = citas;
+      
+      if (filtroEstado) {
+        citasFiltradas = citas.filter(cita => cita.estado === filtroEstado);
+      } else {
+        citasFiltradas = citas.filter(cita => 
+          cita.estado !== "CANCELADA" && cita.estado !== "FINALIZADA"
+        );
+      }
+      
+      if (citasFiltradas.length === 0) {
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.textContent = filtroEstado 
+          ? `No hay citas ${filtroEstado.toLowerCase()}s disponibles`
+          : "No hay citas disponibles";
+        select.appendChild(opt);
+        return;
+      }
+      
+      citasFiltradas.forEach(cita => {
+        const opt = document.createElement("option");
+        opt.value = cita.idCita;
+        opt.textContent = `${cita.nombreEstudiante} - ${cita.fechaCita} ${cita.horaCita} (${cita.estado})`;
+        select.appendChild(opt);
       });
     });
 }
 
 function abrirModalReprogramarOrientador() {
-  loadCitasIntoSelect("cita-reprogramar-select");
+  loadCitasIntoSelect("cita-reprogramar-select", "APROBADA");
   populateHoras("hora_reprogramar_o");
   openModal("modal-reprogramar-orientador");
 }
@@ -320,29 +643,174 @@ function abrirModalCancelarOrientador() {
   openModal("modal-cancelar-orientador");
 }
 
-// Escuchar cambio en selects del orientador
-document.getElementById("cita-reprogramar-select")?.addEventListener("change", e => setCitaId(e.target.value));
-document.getElementById("cita-cancelar-select")?.addEventListener("change", e => setCitaId(e.target.value));
-
 // ======================== FILTROS ========================
-function aplicarFiltros() { console.log("Filtros (implementar)"); }
+function aplicarFiltros() {
+  const rol = localStorage.getItem("rol");
+  const idUsuario = localStorage.getItem("idUsuario");
+  
+  const filtroEstudiante = document.getElementById("filtro-estudiante")?.value.toLowerCase() || "";
+  const filtroFecha = document.getElementById("filtro-fecha")?.value || "";
+  const filtroHora = document.getElementById("filtro-hora")?.value || "";
+  const filtroEstado = document.getElementById("filtro-estado")?.value || "";
+  
+  const endpoint = rol === "estudiante"
+    ? `/api/citas/estudiante/${idUsuario}`
+    : `/api/citas/orientador/${idUsuario}`;
+  
+  fetch(`http://localhost:8080${endpoint}`, { credentials: "include" })
+    .then(res => res.json())
+    .then(citas => {
+      let citasFiltradas = citas;
+      
+      if (filtroEstudiante && rol === "orientador") {
+        citasFiltradas = citasFiltradas.filter(cita => 
+          (cita.nombreEstudiante || "").toLowerCase().includes(filtroEstudiante)
+        );
+      }
+      
+      if (filtroFecha) {
+        citasFiltradas = citasFiltradas.filter(cita => cita.fechaCita === filtroFecha);
+      }
+      
+      if (filtroHora) {
+        citasFiltradas = citasFiltradas.filter(cita => cita.horaCita === filtroHora);
+      }
+      
+      if (filtroEstado) {
+        citasFiltradas = citasFiltradas.filter(cita => cita.estado === filtroEstado);
+      }
+      
+      const tbody = document.querySelector(".styled-table tbody");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+      
+      if (citasFiltradas.length === 0) {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td colspan="${rol === 'orientador' ? '6' : '5'}" class="no-citas-message">No se encontraron citas con los filtros aplicados</td>`;
+        tbody.appendChild(row);
+        return;
+      }
+      
+      citasFiltradas.forEach(cita => {
+        const row = document.createElement("tr");
+        const estudianteCell = rol === "orientador"
+          ? `<td>${cita.nombreEstudiante || "Sin nombre"}</td>`
+          : "";
+        
+        let acciones = `<button class="btn-ver" onclick="verDetalle(${cita.idCita})">Ver</button>`;
+        
+        if (cita.estado !== "CANCELADA" && cita.estado !== "FINALIZADA") {
+          acciones += `<button class="btn-reprogramar" onclick="abrirReprogramar(${cita.idCita})">Reprogramar</button>`;
+          
+          if (rol === "orientador" && cita.estado === "APROBADA") {
+            acciones += `<button class="btn-finalizar" onclick="setCitaId(${cita.idCita}); openModal('modal-finalizar')">Finalizar</button>`;
+          }
+          
+          acciones += `<button class="btn-cancelar" onclick="setCitaId(${cita.idCita}); openModal('${rol === 'estudiante' ? 'modal-cancelar' : 'modal-cancelar-orientador'}')">Cancelar</button>`;
+        }
+        
+        row.innerHTML = `
+          ${estudianteCell}
+          <td>${cita.fechaCita}</td>
+          <td>${cita.horaCita}</td>
+          <td>${cita.motivoOriginal}</td>
+          <td><span class="estado estado-${cita.estado.toLowerCase()}">${cita.estado}</span></td>
+          <td class="acciones">${acciones}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    });
+}
+
 function limpiarFiltros() {
   document.querySelectorAll('.filters-container input, .filters-container select').forEach(el => el.value = '');
   loadCitas();
+}
+
+// ======================== SIDEBAR TOGGLE ========================
+function toggleSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  if (sidebar) {
+    sidebar.classList.toggle("closed");
+  }
+}
+
+// ======================== LISTENERS PARA ACTUALIZAR HORAS AL CAMBIAR FECHA ========================
+function setupFechaChangeListeners() {
+  // Para crear cita (estudiante)
+  const fechaCrear = document.getElementById("fecha");
+  const horaCrear = document.getElementById("hora");
+  if (fechaCrear && horaCrear) {
+    fechaCrear.addEventListener("change", function() {
+      populateHoras("hora", this.value);
+    });
+  }
+  
+  // Para reprogramar estudiante
+  const fechaReprogramar = document.getElementById("fecha_reprogramar");
+  const horaReprogramar = document.getElementById("hora_reprogramar");
+  if (fechaReprogramar && horaReprogramar) {
+    fechaReprogramar.addEventListener("change", function() {
+      populateHoras("hora_reprogramar", this.value);
+    });
+  }
+  
+  // Para reprogramar orientador
+  const fechaReprogramarO = document.getElementById("fecha_reprogramar_o");
+  const horaReprogramarO = document.getElementById("hora_reprogramar_o");
+  if (fechaReprogramarO && horaReprogramarO) {
+    fechaReprogramarO.addEventListener("change", function() {
+      populateHoras("hora_reprogramar_o", this.value);
+    });
+  }
 }
 
 // ======================== ON LOAD ========================
 document.addEventListener("DOMContentLoaded", () => {
   cargarDatosUsuario();
   populateOrientadores();
+  
+  // Inicializar Flatpickr para todos los campos de fecha
+  initFlatpickr("fecha", false); // Crear cita - con restricciones
+  initFlatpickr("fecha_reprogramar", false); // Reprogramar estudiante - con restricciones
+  initFlatpickr("fecha_reprogramar_o", false); // Reprogramar orientador - con restricciones
+  initFlatpickr("filtro-fecha", true); // Filtro - sin restricciones
+  
+  // Inicializar autocompletado de motivo
+  setupMotivoAutocomplete();
+  
+  // Poblar horas inicialmente
   populateHoras("hora");
   populateHoras("hora_reprogramar");
   populateHoras("hora_reprogramar_o");
+  populateHoras("filtro-hora"); // Para filtros
+  
+  // Configurar listeners para actualizar horas según fecha
+  setupFechaChangeListeners();
+  
+  // Cargar citas
   loadCitas();
-
+  
+  // Listeners para selects de orientador (cancelar/reprogramar)
+  const citaReprogramarSelect = document.getElementById("cita-reprogramar-select");
+  const citaCancelarSelect = document.getElementById("cita-cancelar-select");
+  
+  if (citaReprogramarSelect) {
+    citaReprogramarSelect.addEventListener("change", e => setCitaId(e.target.value));
+  }
+  
+  if (citaCancelarSelect) {
+    citaCancelarSelect.addEventListener("change", e => setCitaId(e.target.value));
+  }
+  
   // Forms
-  document.getElementById("formCrearCita")?.addEventListener("submit", guardarCita);
-  document.getElementById("formReprogramarCita")?.addEventListener("submit", reprogramarCita);
-  document.getElementById("formReprogramarOrientador")?.addEventListener("submit", reprogramarCita);
-  document.getElementById("formCancelarOrientador")?.addEventListener("submit", cancelarCita);
+  const formCrear = document.getElementById("formCrearCita");
+  const formReprogramar = document.getElementById("formReprogramarCita");
+  const formReprogramarO = document.getElementById("formReprogramarOrientador");
+  const formCancelarO = document.getElementById("formCancelarOrientador");
+  
+  if (formCrear) formCrear.addEventListener("submit", guardarCita);
+  if (formReprogramar) formReprogramar.addEventListener("submit", reprogramarCita);
+  if (formReprogramarO) formReprogramarO.addEventListener("submit", reprogramarCita);
+  if (formCancelarO) formCancelarO.addEventListener("submit", cancelarCita);
 });

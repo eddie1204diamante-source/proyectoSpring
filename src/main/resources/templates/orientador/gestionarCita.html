@@ -8,6 +8,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
   <!-- sidebar -->
@@ -202,6 +206,19 @@
       <button class="btn-close" onclick="closeModal('modal-ver')">Cerrar</button>
     </div>
   </div>
+
+  <!-- MODAL: FINALIZAR CITA -->
+<div class="modal" id="modal-finalizar">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('modal-finalizar')">&times;</span>
+    <h2 class="modal-title">✅ Finalizar Cita</h2>
+    <p class="modal-text">¿Estás seguro de que deseas marcar esta cita como finalizada?</p>
+    <div class="modal-actions">
+      <button class="btn-close" onclick="closeModal('modal-finalizar')">Cancelar</button>
+      <button class="btn-confirm" onclick="finalizarCita()">Sí, Finalizar</button>
+    </div>
+  </div>
+</div>
 
   <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema">
     <span id="theme-icon">🌙</span>
