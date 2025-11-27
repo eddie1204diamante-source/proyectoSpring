@@ -175,17 +175,24 @@ public class CitaService {
     /**
      * Obtener citas del orientador
      */
-    public List<Cita> getCitasOrientador(Long idOrientador) {
-        return citaRepository.findByOrientadorIdOrientador(idOrientador);
+    public List<Cita> getCitasOrientador(Long idUsuario) {
+    // 1. Primero buscamos el psicologica (orientador) usando el id_usuario
+    psicologica orientador = psicologicaRepository.findByIdUsuario(idUsuario)
+        .orElseThrow(() -> new RuntimeException("Orientador no encontrado con idUsuario: " + idUsuario));
+
+    // 2. Ahora sí buscamos las citas usando el id_orientador real
+    return citaRepository.findByOrientadorIdOrientador(orientador.getIdOrientador());
     }
 
     /**
      * Obtener citas pendientes del orientador
      */
-    public List<Cita> getCitasPendientesOrientador(Long idOrientador) {
-        return citaRepository.findByOrientadorIdOrientadorAndEstado(
-            idOrientador, EstadoCita.PENDIENTE
-        );
+    public List<Cita> getCitasPendientesOrientador(Long idUsuario) {
+    psicologica orientador = psicologicaRepository.findByIdUsuario(idUsuario)
+        .orElseThrow(() -> new RuntimeException("Orientador no encontrado con idUsuario: " + idUsuario));
+
+    return citaRepository.findByOrientadorIdOrientadorAndEstado(
+        orientador.getIdOrientador(), EstadoCita.PENDIENTE);
     }
 
     /**

@@ -7,19 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.security.Principal;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.proyecto.spring.Entity.Cita;
 import com.proyecto.spring.Entity.Usuario;
@@ -38,8 +29,13 @@ public class CitaController {
     @Autowired
     private CitaService citaService;
 
-    // ====================== ENDPOINTS ======================
+    @Autowired
+    private personaRepository personaRepository;
 
+    @Autowired
+    private usuarioRepository usuarioRepository;
+
+    // ====================== CREAR CITA ======================
     @PostMapping("/crear")
     public ResponseEntity<?> crearCita(@RequestBody Map<String, Object> payload, HttpSession session) {
         try {
@@ -55,12 +51,11 @@ public class CitaController {
             }
 
             Cita cita = citaService.crearCita(idEstudiante, idOrientador, fecha, hora, motivo);
-
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Cita creada exitosamente");
             response.put("cita", convertirCitaAMap(cita));
-
             return ResponseEntity.ok(response);
+
         } catch (RuntimeException e) {
             return ResponseEntity.status(409).body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
@@ -68,9 +63,8 @@ public class CitaController {
                     .body(Map.of("error", "Error interno del servidor: " + e.getMessage()));
         }
     }
-    
-    
 
+    // ====================== ORIENTADORES DISPONIBLES ======================
     @GetMapping("/orientadores")
     public ResponseEntity<List<Map<String, Object>>> getOrientadores() {
         try {
@@ -78,7 +72,6 @@ public class CitaController {
                 .map(p -> {
                     Map<String, Object> map = new HashMap<>();
                     map.put("id", p.getIdOrientador());
-
                     String nombre = p.getPersona().getPNombre();
                     if (p.getPersona().getSNombre() != null && !p.getPersona().getSNombre().isEmpty()) {
                         nombre += " " + p.getPersona().getSNombre();
@@ -87,18 +80,17 @@ public class CitaController {
                     if (p.getPersona().getSApellido() != null && !p.getPersona().getSApellido().isEmpty()) {
                         nombre += " " + p.getPersona().getSApellido();
                     }
-
                     map.put("nombreCompleto", nombre.trim());
                     return map;
                 })
                 .collect(Collectors.toList());
-
             return ResponseEntity.ok(orientadores);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(null);
         }
     }
 
+    // ====================== VERIFICAR DISPONIBILIDAD ======================
     @GetMapping("/disponibilidad")
     public ResponseEntity<Boolean> verificarDisponibilidad(
             @RequestParam Long orientador_id,
@@ -114,6 +106,7 @@ public class CitaController {
         }
     }
 
+    // ====================== CITAS DEL ESTUDIANTE ======================
     @GetMapping("/estudiante/{idUsuario}")
     public ResponseEntity<List<Map<String, Object>>> getCitasEstudiante(@PathVariable Long idUsuario) {
         try {
@@ -127,10 +120,11 @@ public class CitaController {
         }
     }
 
-    @GetMapping("/orientador/{idOrientador}")
-    public ResponseEntity<List<Map<String, Object>>> getCitasOrientador(@PathVariable Long idOrientador) {
+    // ====================== CITAS DEL ORIENTADOR (CORREGIDO) ======================
+    @GetMapping("/orientador/{idUsuario}")
+    public ResponseEntity<List<Map<String, Object>>> getCitasOrientador(@PathVariable("idUsuario") Long idOrientador) {
         try {
-            List<Cita> citas = citaService.getCitasOrientador(idOrientador);
+            List<Cita> citas = citaService.getCitasOrientador(idOrientador); // ← idUsuario = id_orientador
             List<Map<String, Object>> citasMap = citas.stream()
                 .map(cita -> {
                     Map<String, Object> map = convertirCitaAMap(cita);
@@ -143,13 +137,15 @@ public class CitaController {
                 .collect(Collectors.toList());
             return ResponseEntity.ok(citasMap);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(500).body(null);
         }
     }
 
-    @GetMapping("/orientador/{idOrientador}/pendientes")
+    // ====================== CITAS PENDIENTES DEL ORIENTADOR (CORREGIDO) ======================
+    @GetMapping("/orientador/{idUsuario}/pendientes")
     public ResponseEntity<List<Map<String, Object>>> getCitasPendientesOrientador(
-            @PathVariable Long idOrientador) {
+            @PathVariable("idUsuario") Long idOrientador) {
         try {
             List<Cita> citas = citaService.getCitasPendientesOrientador(idOrientador);
             List<Map<String, Object>> citasMap = citas.stream()
@@ -164,10 +160,12 @@ public class CitaController {
                 .collect(Collectors.toList());
             return ResponseEntity.ok(citasMap);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(500).body(null);
         }
     }
 
+    // ====================== APROBAR, REPROGRAMAR, CANCELAR, FINALIZAR ======================
     @PutMapping("/{idCita}/aprobar")
     public ResponseEntity<?> aprobarCita(@PathVariable Long idCita) {
         try {
@@ -229,14 +227,12 @@ public class CitaController {
         try {
             Cita cita = citaService.getCitaPorId(idCita);
             Map<String, Object> detalle = convertirCitaAMap(cita);
-
             detalle.put("nombreEstudiante", obtenerNombreCompleto(
                 cita.getAprendiz().getUsuario().getPersona()
             ));
             detalle.put("nombreOrientador", obtenerNombreCompleto(
                 cita.getOrientador().getPersona()
             ));
-
             return ResponseEntity.ok(detalle);
         } catch (RuntimeException e) {
             return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
@@ -244,7 +240,6 @@ public class CitaController {
     }
 
     // ====================== MÉTODOS AUXILIARES ======================
-
     private Map<String, Object> convertirCitaAMap(Cita cita) {
         Map<String, Object> map = new HashMap<>();
         map.put("idCita", cita.getIdCita());
@@ -258,8 +253,7 @@ public class CitaController {
         return map;
     }
 
-    
-    private String obtenerNombreCompleto(persona persona) { 
+    private String obtenerNombreCompleto(persona persona) {
         String nombre = persona.getPNombre();
         if (persona.getSNombre() != null && !persona.getSNombre().isEmpty()) {
             nombre += " " + persona.getSNombre();
@@ -270,47 +264,29 @@ public class CitaController {
         }
         return nombre.trim();
     }
-    // ==================== NUEVO ENDPOINT: DATOS DEL USUARIO LOGUEADO ====================
-@Autowired
-private personaRepository personaRepository;
 
-@Autowired
-private usuarioRepository usuarioRepository;
-
-@GetMapping("/api/auth/me")
-public ResponseEntity<?> getCurrentUser(Principal principal) {
-    if (principal == null) {
-        return ResponseEntity.status(401).body(Map.of("error", "No autenticado"));
-    }
-
-    try {
-        String documento = principal.getName(); // Spring Security guarda aquí el documento
-
-        persona persona = personaRepository.findByDocumento(documento)
-                .orElseThrow(() -> new RuntimeException("Persona no encontrada"));
-
-        Usuario usuario = usuarioRepository.findByPersonaDocumento(documento)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        String nombreCompleto = persona.getPNombre();
-        if (persona.getSNombre() != null && !persona.getSNombre().isEmpty()) {
-            nombreCompleto += " " + persona.getSNombre();
+    // ====================== /api/auth/me (MANTENIDO EN EL MISMO CONTROLADOR) ======================
+    @GetMapping("/api/auth/me")
+    public ResponseEntity<?> getCurrentUser(Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(401).body(Map.of("error", "No autenticado"));
         }
-        nombreCompleto += " " + persona.getPApellido();
-        if (persona.getSApellido() != null && !persona.getSApellido().isEmpty()) {
-            nombreCompleto += " " + persona.getSApellido();
+        try {
+            String documento = principal.getName();
+            persona persona = personaRepository.findByDocumento(documento)
+                    .orElseThrow(() -> new RuntimeException("Persona no encontrada"));
+            Usuario usuario = usuarioRepository.findByPersonaDocumento(documento)
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+            String nombreCompleto = obtenerNombreCompleto(persona);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("idUsuario", usuario.getIdUsuario());
+            response.put("nombreCompleto", nombreCompleto);
+            response.put("rol", usuario.getRolId());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", "Error interno: " + e.getMessage()));
         }
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("idUsuario", usuario.getIdUsuario());
-        response.put("nombreCompleto", nombreCompleto.trim());
-        response.put("rol", usuario.getRolId()); // 2 = estudiante, 3 = orientador
-
-        return ResponseEntity.ok(response);
-
-    } catch (Exception e) {
-        return ResponseEntity.status(500).body(Map.of("error", "Error interno: " + e.getMessage()));
     }
-}
-// ================================================================================
 }

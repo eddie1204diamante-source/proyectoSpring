@@ -1,5 +1,4 @@
-// ==================== cita.js - VERSIÓN 100% FUNCIONAL ====================
-
+// ======================== MODALES ========================
 function openModal(id) {
   const modal = document.getElementById(id);
   if (modal) modal.classList.add("active");
@@ -8,16 +7,43 @@ function closeModal(id) {
   const modal = document.getElementById(id);
   if (modal) modal.classList.remove("active");
 }
-window.addEventListener("click", e => {
-  document.querySelectorAll(".modal.active").forEach(modal => {
+window.addEventListener("click", function (e) {
+  const modals = document.querySelectorAll(".modal.active");
+  modals.forEach(modal => {
     if (e.target === modal) modal.classList.remove("active");
   });
 });
 
-// ------------------- POBLAR ORIENTADORES -------------------
+// ======================== CARGA DE DATOS DEL USUARIO ========================
+async function cargarDatosUsuario() {
+  try {
+    const res = await fetch("http://localhost:8080/api/auth/me", {
+      credentials: "include"
+    });
+    if (!res.ok) throw new Error("No autenticado");
+
+    const user = await res.json();
+
+    // Guardamos todo lo necesario
+    const rol = user.rol === 2 ? "estudiante" : "orientador";
+    localStorage.setItem("rol", rol);
+    localStorage.setItem("idUsuario", user.idUsuario);
+    localStorage.setItem("nombreCompleto", user.nombreCompleto || "Usuario");
+
+    // Solo estudiante necesita nombre en el input
+    const inputNombre = document.getElementById("nombre-estudiante");
+    if (inputNombre) {
+      inputNombre.value = user.nombreCompleto;
+    }
+  } catch (err) {
+    console.warn("No se pudo cargar usuario (puede ser normal en login):", err);
+  }
+}
+
+// ======================== POBLAR ORIENTADORES Y HORAS ========================
 function populateOrientadores() {
-  fetch("http://localhost:8080/api/citas/orientadores", { credentials: "include" })
-    .then(res => res.ok ? res.json() : Promise.reject("Error al cargar orientadores"))
+  fetch("http://localhost:8080/api/citas/orientadores")
+    .then(res => res.json())
     .then(data => {
       const select = document.getElementById("orientador");
       if (select) {
@@ -29,10 +55,9 @@ function populateOrientadores() {
         });
       }
     })
-    .catch(err => console.error(err));
+    .catch(err => console.error("Error cargando orientadores:", err));
 }
 
-// ------------------- POBLAR HORAS -------------------
 function populateHoras(selectId) {
   const select = document.getElementById(selectId);
   if (!select) return;
@@ -48,44 +73,30 @@ function populateHoras(selectId) {
   }
 }
 
-// ------------------- NOMBRE DEL ESTUDIANTE (SIEMPRE FUNCIONA) -------------------
-async function populateNombreEstudiante() {
-  const input = document.getElementById("nombre-estudiante");
-  if (!input) return;
-
-  try {
-    const res = await fetch("http://localhost:8080/api/auth/me", {
-      credentials: "include"
-    });
-
-    if (!res.ok) throw new Error("No autenticado");
-
-    const data = await res.json();
-    input.value = data.nombreCompleto || "Estudiante";
-
-    // Guardar en localStorage para el resto del sistema
-    localStorage.setItem("nombreEstudiante", data.nombreCompleto);
-    localStorage.setItem("idUsuario", data.idUsuario);
-    localStorage.setItem("rol", data.rol === 2 ? "estudiante" : "orientador");
-
-  } catch (err) {
-    console.warn("No se pudo cargar el nombre:", err);
-    input.value = "Sesión expirada";
-  }
+// ======================== CARGAR CITAS (ESTUDIANTE Y ORIENTADOR) ========================
+let currentCitaId = null;
+function setCitaId(id) {
+  currentCitaId = id;
 }
 
-// ------------------- CARGAR CITAS -------------------
 function loadCitas() {
   const rol = localStorage.getItem("rol");
-  const id = rol === "estudiante" ? localStorage.getItem("idUsuario") : localStorage.getItem("idOrientador");
-  if (!id) return console.error("No hay ID de usuario/orientador");
+  const idUsuario = localStorage.getItem("idUsuario");
 
-  const endpoint = rol === "estudiante" 
-    ? `/api/citas/estudiante/${id}` 
-    : `/api/citas/orientador/${id}`;
+  if (!rol || !idUsuario) {
+    console.error("Falta rol o idUsuario en localStorage");
+    return;
+  }
+
+  const endpoint = rol === "estudiante"
+    ? `/api/citas/estudiante/${idUsuario}`
+    : `/api/citas/orientador/${idUsuario}`;
 
   fetch(`http://localhost:8080${endpoint}`, { credentials: "include" })
-    .then(res => res.ok ? res.json() : Promise.reject("Error al cargar citas"))
+    .then(res => {
+      if (!res.ok) throw new Error("Error en endpoint de citas");
+      return res.json();
+    })
     .then(citas => {
       const tbody = document.querySelector(".styled-table tbody");
       if (!tbody) return;
@@ -93,32 +104,40 @@ function loadCitas() {
 
       citas.forEach(cita => {
         const row = document.createElement("tr");
-        const estudianteCell = rol === "orientador" ? `<td>${cita.nombreEstudiante || 'N/A'}</td>` : '';
+
+        const estudianteCell = rol === "orientador"
+          ? `<td>${cita.nombreEstudiante || "Sin nombre"}</td>`
+          : "";
+
+        const acciones = `
+          <button class="btn-ver" onclick="verDetalle(${cita.idCita})">Ver</button>
+          ${cita.estado !== "CANCELADA" && cita.estado !== "FINALIZADA" ? `
+            <button class="btn-reprogramar" onclick="abrirReprogramar(${cita.idCita})">Reprogramar</button>
+            <button class="btn-cancelar" onclick="setCitaId(${cita.idCita}); openModal('${rol === 'estudiante' ? 'modal-cancelar' : 'modal-cancelar-orientador'}')">Cancelar</button>
+          ` : ""}
+        `;
+
         row.innerHTML = `
           ${estudianteCell}
-          <td>${cita.fechaCita || '-'}</td>
-          <td>${cita.horaCita || '-'}</td>
-          <td>${cita.motivoOriginal || '-'}</td>
-          <td>${cita.estado || '-'}</td>
-          <td>
-            <button onclick="verDetalle(${cita.idCita})">Ver</button>
-            <button onclick="openModal('${rol === 'estudiante' ? 'modal-reprogramar' : 'modal-reprogramar-orientador'}'); setCitaId(${cita.idCita})">Reprogramar</button>
-            <button onclick="openModal('${rol === 'estudiante' ? 'modal-cancelar' : 'modal-cancelar-orientador'}'); setCitaId(${cita.idCita})">Cancelar</button>
-          </td>
+          <td>${cita.fechaCita}</td>
+          <td>${cita.horaCita}</td>
+          <td>${cita.motivoOriginal}</td>
+          <td><span class="estado estado-${cita.estado.toLowerCase()}">${cita.estado}</span></td>
+          <td class="acciones">${acciones}</td>
         `;
         tbody.appendChild(row);
       });
     })
     .catch(err => {
-      console.error(err);
-      alert("Error al cargar citas. Sesión expirada?");
+      console.error("Error cargando citas:", err);
+      alert("Error al cargar citas. Revisa la consola.");
     });
 }
 
-// ------------------- VER DETALLE -------------------
+// ======================== DETALLE DE CITA ========================
 function verDetalle(idCita) {
   fetch(`http://localhost:8080/api/citas/${idCita}`, { credentials: "include" })
-    .then(res => res.ok ? res.json() : Promise.reject("Cita no encontrada"))
+    .then(res => res.json())
     .then(detalle => {
       const content = document.getElementById("detalle-cita-content");
       if (content) {
@@ -129,80 +148,79 @@ function verDetalle(idCita) {
           <p><strong>Estado:</strong> ${detalle.estado}</p>
           <p><strong>Creada:</strong> ${new Date(detalle.createdAt).toLocaleString()}</p>
         `;
-        openModal('modal-ver');
+        openModal("modal-ver");
       }
-    })
-    .catch(() => alert("No se pudo cargar el detalle"));
+    });
 }
 
-let currentCitaId = null;
-function setCitaId(id) {
-  currentCitaId = id;
-}
-
-// ------------------- GUARDAR CITA -------------------
+// ======================== CREAR CITA (ESTUDIANTE) ========================
 function guardarCita(e) {
   e.preventDefault();
   if (localStorage.getItem("rol") !== "estudiante") return;
 
   const idEstudiante = localStorage.getItem("idUsuario");
-  const idOrientador = document.getElementById("orientador")?.value;
-  const fecha = document.getElementById("fecha")?.value;
-  const hora = document.getElementById("hora")?.value;
-  const motivo = document.getElementById("motivo")?.value;
+  const idOrientador = document.getElementById("orientador").value;
+  const fecha = document.getElementById("fecha").value;
+  const hora = document.getElementById("hora").value;
+  const motivo = document.getElementById("motivo").value;
 
   if (!idOrientador || !fecha || !hora || !motivo) {
-    return alert("Completa todos los campos");
+    alert("Completa todos los campos");
+    return;
   }
-
-  const data = { idEstudiante, idOrientador, fecha, hora, motivo };
 
   fetch("http://localhost:8080/api/citas/crear", {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
+    body: JSON.stringify({ idEstudiante, idOrientador, fecha, hora, motivo })
   })
-  .then(res => res.ok ? res.json() : res.text().then(text => Promise.reject(text || "Error del servidor")))
-  .then(resp => {
-    alert(resp.message || "Cita creada con éxito");
-    closeModal('modal-crear');
-    loadCitas();
-  })
-  .catch(err => {
-    console.error(err);
-    alert("Error: " + err);
-  });
+    .then(res => res.ok ? res.json() : Promise.reject("Error al crear"))
+    .then(() => {
+      alert("Cita solicitada con éxito");
+      closeModal("modal-crear");
+      loadCitas();
+    })
+    .catch(err => alert("Error: " + err.message || err));
 }
 
-// ------------------- REPROGRAMAR -------------------
+// ======================== REPROGRAMAR (AMBOS ROLES) ========================
+function abrirReprogramar(idCita) {
+  setCitaId(idCita);
+  const rol = localStorage.getItem("rol");
+  populateHoras(rol === "estudiante" ? "hora_reprogramar" : "hora_reprogramar_o");
+  openModal(rol === "estudiante" ? "modal-reprogramar" : "modal-reprogramar-orientador");
+}
+
 function reprogramarCita(e) {
   e.preventDefault();
+  if (!currentCitaId) return alert("No hay cita seleccionada");
+
   const rol = localStorage.getItem("rol");
-  const fechaId = rol === "estudiante" ? "fecha_reprogramar" : "fecha_reprogramar_o";
-  const horaId = rol === "estudiante" ? "hora_reprogramar" : "hora_reprogramar_o";
+  const fechaInput = rol === "estudiante" ? "fecha_reprogramar" : "fecha_reprogramar_o";
+  const horaInput = rol === "estudiante" ? "hora_reprogramar" : "hora_reprogramar_o";
 
-  const nuevaFecha = document.getElementById(fechaId)?.value;
-  const nuevaHora = document.getElementById(horaId)?.value;
+  const fecha = document.getElementById(fechaInput).value;
+  const hora = document.getElementById(horaInput).value;
 
-  if (!currentCitaId || !nuevaFecha || !nuevaHora) return alert("Faltan datos");
+  if (!fecha || !hora) return alert("Selecciona fecha y hora");
 
   fetch(`http://localhost:8080/api/citas/${currentCitaId}/reprogramar`, {
     method: "PUT",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ fecha: nuevaFecha, hora: nuevaHora })
+    body: JSON.stringify({ fecha, hora })
   })
-  .then(res => res.ok ? res.json() : Promise.reject("Error al reprogramar"))
-  .then(() => {
-    alert("Cita reprogramada");
-    closeModal(rol === "estudiante" ? 'modal-reprogramar' : 'modal-reprogramar-orientador');
-    loadCitas();
-  })
-  .catch(err => alert("Error: " + err));
+    .then(res => res.ok ? res.json() : Promise.reject("Error"))
+    .then(() => {
+      alert("Cita reprogramada");
+      closeModal(rol === "estudiante" ? "modal-reprogramar" : "modal-reprogramar-orientador");
+      loadCitas();
+    })
+    .catch(() => alert("Error al reprogramar"));
 }
 
-// ------------------- CANCELAR -------------------
+// ======================== CANCELAR (AMBOS ROLES) ========================
 function cancelarCita(e) {
   if (e) e.preventDefault();
   if (!currentCitaId) return alert("Selecciona una cita");
@@ -216,84 +234,113 @@ function cancelarCita(e) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ motivo })
   })
-  .then(res => res.ok ? res.json() : Promise.reject("Error al cancelar"))
-  .then(() => {
-    alert("Cita cancelada");
-    closeModal(rol === "estudiante" ? 'modal-cancelar' : 'modal-cancelar-orientador');
-    loadCitas();
-  })
-  .catch(err => alert("Error: " + err));
+    .then(res => res.ok ? res.json() : Promise.reject())
+    .then(() => {
+      alert("Cita cancelada");
+      closeModal(rol === "estudiante" ? "modal-cancelar" : "modal-cancelar-orientador");
+      loadCitas();
+    })
+    .catch(() => alert("Error al cancelar"));
 }
 
-// ------------------- APROBAR (ORIENTADOR) -------------------
+function ejecutarCancelar() {
+  cancelarCita();
+}
+
+// ======================== APROBAR CITAS (ORIENTADOR) ========================
 function aprobarCita(idCita) {
   fetch(`http://localhost:8080/api/citas/${idCita}/aprobar`, {
     method: "PUT",
     credentials: "include"
   })
-  .then(res => res.ok ? res.json() : Promise.reject("Error al aprobar"))
-  .then(() => {
-    alert("Cita aprobada");
-    loadCitasPendientes();
-    loadCitas();
-  })
-  .catch(() => alert("Error al aprobar"));
+    .then(res => res.ok ? res.json() : Promise.reject())
+    .then(() => {
+      alert("Cita aprobada");
+      loadCitasPendientes();
+      loadCitas();
+    })
+    .catch(() => alert("Error al aprobar"));
 }
 
 function loadCitasPendientes() {
-  const id = localStorage.getItem("idOrientador");
-  if (!id) return;
-  fetch(`http://localhost:8080/api/citas/orientador/${id}/pendientes`, { credentials: "include" })
-    .then(res => res.ok ? res.json() : [])
+  const idUsuario = localStorage.getItem("idUsuario");
+  fetch(`http://localhost:8080/api/citas/orientador/${idUsuario}/pendientes`, { credentials: "include" })
+    .then(res => res.json())
     .then(citas => {
       const tbody = document.getElementById("tabla-pendientes-body");
       if (!tbody) return;
       tbody.innerHTML = "";
-      citas.forEach(c => {
-        tbody.innerHTML += `
-          <tr>
-            <td>${c.nombreEstudiante}</td>
-            <td>${c.fechaCita}</td>
-            <td>${c.horaCita}</td>
-            <td>${c.motivoOriginal}</td>
-            <td><button onclick="aprobarCita(${c.idCita})">Aprobar</button></td>
-          </tr>
+      citas.forEach(cita => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${cita.nombreEstudiante}</td>
+          <td>${cita.fechaCita}</td>
+          <td>${cita.horaCita}</td>
+          <td>${cita.motivoOriginal}</td>
+          <td><button class="btn-aprobar" onclick="aprobarCita(${cita.idCita})">Aprobar</button></td>
         `;
+        tbody.appendChild(row);
       });
     });
 }
 
+function abrirModalAprobar() {
+  loadCitasPendientes();
+  openModal("modal-aprobar-orientador");
+}
+
+// ======================== REPROGRAMAR/CANCELAR ORIENTADOR CON SELECT ========================
 function loadCitasIntoSelect(selectId) {
-  const id = localStorage.getItem("idOrientador");
-  if (!id) return;
-  fetch(`http://localhost:8080/api/citas/orientador/${id}`, { credentials: "include" })
-    .then(res => res.ok ? res.json() : [])
+  const idUsuario = localStorage.getItem("idUsuario");
+  fetch(`http://localhost:8080/api/citas/orientador/${idUsuario}`, { credentials: "include" })
+    .then(res => res.json())
     .then(citas => {
       const select = document.getElementById(selectId);
       if (!select) return;
       select.innerHTML = '<option value="">Selecciona una cita</option>';
-      citas.filter(c => c.estado !== 'CANCELADA').forEach(c => {
-        const opt = document.createElement("option");
-        opt.value = c.idCita;
-        opt.textContent = `${c.nombreEstudiante} - ${c.fechaCita} ${c.horaCita}`;
-        select.appendChild(opt);
+      citas.forEach(cita => {
+        if (cita.estado !== "CANCELADA") {
+          const opt = document.createElement("option");
+          opt.value = cita.idCita;
+          opt.textContent = `${cita.nombreEstudiante} - ${cita.fechaCita} ${cita.horaCita}`;
+          select.appendChild(opt);
+        }
       });
     });
 }
 
-function abrirModalAprobar() { loadCitasPendientes(); openModal('modal-aprobar-orientador'); }
-function abrirModalReprogramarOrientador() { loadCitasIntoSelect('cita-reprogramar-select'); populateHoras('hora_reprogramar_o'); openModal('modal-reprogramar-orientador'); }
-function abrirModalCancelarOrientador() { loadCitasIntoSelect('cita-cancelar-select'); openModal('modal-cancelar-orientador'); }
-function ejecutarCancelar() { cancelarCita(); }
+function abrirModalReprogramarOrientador() {
+  loadCitasIntoSelect("cita-reprogramar-select");
+  populateHoras("hora_reprogramar_o");
+  openModal("modal-reprogramar-orientador");
+}
 
-// ==================== INICIO ====================
+function abrirModalCancelarOrientador() {
+  loadCitasIntoSelect("cita-cancelar-select");
+  openModal("modal-cancelar-orientador");
+}
+
+// Escuchar cambio en selects del orientador
+document.getElementById("cita-reprogramar-select")?.addEventListener("change", e => setCitaId(e.target.value));
+document.getElementById("cita-cancelar-select")?.addEventListener("change", e => setCitaId(e.target.value));
+
+// ======================== FILTROS ========================
+function aplicarFiltros() { console.log("Filtros (implementar)"); }
+function limpiarFiltros() {
+  document.querySelectorAll('.filters-container input, .filters-container select').forEach(el => el.value = '');
+  loadCitas();
+}
+
+// ======================== ON LOAD ========================
 document.addEventListener("DOMContentLoaded", () => {
+  cargarDatosUsuario();
   populateOrientadores();
   populateHoras("hora");
   populateHoras("hora_reprogramar");
-  populateNombreEstudiante();
+  populateHoras("hora_reprogramar_o");
   loadCitas();
 
+  // Forms
   document.getElementById("formCrearCita")?.addEventListener("submit", guardarCita);
   document.getElementById("formReprogramarCita")?.addEventListener("submit", reprogramarCita);
   document.getElementById("formReprogramarOrientador")?.addEventListener("submit", reprogramarCita);
