@@ -81,9 +81,9 @@ public class authService {
 
         usuario = usuarioRepository.save(usuario);
 
-        // ---------------------------------------
+     
         //  🔥 SI ES APRENDIZ, CREAR REGISTRO EN TABLA aprendiz
-        // ---------------------------------------
+     
         if (rol == 2) {
             Aprendiz ap = new Aprendiz();
             ap.setUsuario(usuario);         // relación con usuario

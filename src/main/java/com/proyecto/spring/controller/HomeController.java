@@ -48,4 +48,8 @@ public String dashboardOrientador() {
 public String resultadosdOrientador() {
     return "orientador/resultados";
 }
+@GetMapping("/administrador/dashboard")
+public String dashboardAdministrador() {
+    return "admin/dashboard";
+}
 }
