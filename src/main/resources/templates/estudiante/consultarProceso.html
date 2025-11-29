@@ -10,6 +10,8 @@
 </head>
 <body>
   <!-- Sidebar -->
+   
+
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="sidebar-logo">🧠</div>
@@ -40,20 +42,31 @@
     </ul>
   </div>
   <!-- header -->
+   
   <header class="header">
-    <div class="header-title">Actividades y Ejercicios</div>
+       <div class="header-title">Actividades y Ejercicios</div>
     <div class="user-info">
-      <div class="crear-actividad" id="abrirModalCrearBtn">
 
-      </div>
-      <div class="modalCrearAsignada" id="abrirModalCrearAsignadaBtn">
   
-      </div>
+     
       <div class="user-avatar">U</div>
    <button class="btn-sesion" id="btn-sesion">Cerrar sesión</button>
     </div>
   </header>
   <main class="main-content">
+  <div id="filtros" class="filtro-box">
+  <input type="text" id="filtroTexto" placeholder="Buscar actividades...">
+
+  <select id="filtroEstado">
+    <option value="">Todos</option>
+    <option value="Pendiente">Pendiente</option>
+    <option value="Completada">Completada</option>
+  </select>
+
+  
+</div>
+
+
   <div class="split-container">
 
       <!-- COLUMNA IZQUIERDA - ASIGNADAS POR ORIENTADOR -->
@@ -67,8 +80,6 @@
       <!-- COLUMNA DERECHA - ACTIVIDADES INDEPENDIENTES -->
       <div class="column">
           <h2 class="column-title">Actividades Opcionales</h2>
-
-          <!-- CONTENEDOR QUE ESPERA EL JS -->
           <div id="contenedorOpcionales" class="lista-actividades"></div>
       </div>
 
@@ -90,41 +101,6 @@
     </div>
   </div>
   
-<!-- Modal para crear recurso/actividad -->
-<div id="crearModal" class="modal">
-  <div class="modal-content crear-modal">
-    <span id="cerrarModalCrearBtn" class="close">&times;</span>
-    <h2 class="modal-title">Crear Nuevo Recurso</h2>
-    <form id="formCrearRecurso" class="crear-form">
-      <div class="form-group">
-        <label for="nombre_recurso">Nombre del Recurso <span class="required">*</span></label>
-        <input type="text" id="nombre_recurso" name="nombre_recurso" maxlength="100" required>
-      </div>
-      <div class="form-group">
-        <label for="tipo_recurso"><u>Url recurso</u> <span class="required">*</span></label>
-        <input type="text" id="tipo_recurso" name="tipo_recurso" maxlength="100" required>
-      </div>
-      <div class="form-group">
-        <label for="objetivo_recurso">Objetivo del Recurso</label>
-        <input type="text" id="objetivo_recurso" name="objetivo_recurso" maxlength="100">
-      </div>
- 
-      <div class="form-group">
-        <label for="descripcion_recurso">Descripción del Recurso <span class="required">*</span></label>
-        <textarea id="descripcion_recurso" name="descripcion_recurso" maxlength="400" rows="4" required></textarea>
-      </div>
-      <div class="form-group">
-        <label for="fecha_creacion_recurso">Fecha de Creación</label>
-        <input type="date" id="fecha_creacion_recurso" name="fecha_creacion_recurso">
-      </div>
-      <div class="form-actions">
-        <button type="button" class="btn-close" onclick="closeCrearModal()">Cancelar</button>
-        <button type="submit" class="btn-confirm">Crear Recurso</button>
-      </div>
-    </form>
-  </div>
-</div>
-
   <!--  MODAL DE CONFIRMACIÓN -->
   <div class="modal" id="modalConfirm">
     <div class="modal-content">
@@ -136,31 +112,6 @@
       </div>
     </div>
   </div>
-  <!-- MODAL EDITAR ACTIVIDAD -->
-<div id="modalEditar" class="modal">
-  <div class="modal-content editar-modal">
-
-    <span class="close" onclick="closeEditModal()">&times;</span>
-    <h2>Editar Actividad</h2>
-
-    <form id="formEditarActividad">
-      <input type="hidden" id="editar_id">
-
-      <div class="form-group">
-        <label for="editar_titulo">Título</label>
-        <input type="text" id="editar_titulo" required>
-      </div>
-
-      <div class="form-group">
-        <label for="editar_descripcion">Descripción</label>
-        <textarea id="editar_descripcion" rows="4" required></textarea>
-      </div>
-
-      <div class="form-actions">
-        <button type="button" class="btn-close" onclick="closeEditModal()">Cancelar</button>
-        <button type="submit" class="btn-confirm">Guardar cambios</button>
-      </div>
-    </form>
 
   </div>
 </div>
@@ -194,99 +145,6 @@
     </div>
   </div>
 </div>
-<!-- 
-     MODAL CREAR ACTIVIDAD ASIGNADA
- -->
-<div class="modal" id="modalCrearAsignada">
-  <div class="modal-content crear-modal">
-    <span class="close" onclick="closeCrearAsignada()">&times;</span>
-    <h2>Crear Actividad Asignada</h2>
-
-    <form id="formCrearAsignada">
-
-      <div class="form-group">
-        <label for="crearAsignadaIdEstudiante">Selecciona el Estudiante</label>
-        <select id="crearAsignadaIdEstudiante" required>
-          <option value="">Cargando estudiantes...</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="crearAsignadaTitulo">Título de la Actividad</label>
-        <input type="text" id="crearAsignadaTitulo" required maxlength="150">
-      </div>
-
-      <div class="form-group">
-        <label for="crearAsignadaDescripcion">Descripción</label>
-        <textarea id="crearAsignadaDescripcion" rows="4" required maxlength="500"></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="crearAsignadaUrl">URL Recurso (opcional)</label>
-        <input type="text" id="crearAsignadaUrl" maxlength="300">
-      </div>
-
-      <div class="form-actions">
-        <button type="button" class="btn-close" onclick="closeCrearAsignada()">Cancelar</button>
-        <button type="submit" class="btn-confirm">Guardar Actividad</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-
-<!-- 
-     MODAL EDITAR ACTIVIDAD ASIGNADA
- -->
-<div class="modal" id="modalEditarAsignada">
-  <div class="modal-content editar-modal">
-    <span class="close" onclick="closeEditAsignada()">&times;</span>
-    <h2>Editar Actividad Asignada</h2>
-
-    <form id="formEditarAsignada">
-
-      <input type="hidden" id="editarAsignadaId">
-
-      <div class="form-group">
-        <label for="editarAsignadaTitulo">Título</label>
-        <input type="text" id="editarAsignadaTitulo" required maxlength="150">
-      </div>
-
-      <div class="form-group">
-        <label for="editarAsignadaDescripcion">Descripción</label>
-        <textarea id="editarAsignadaDescripcion" rows="4" required maxlength="500"></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="editarAsignadaUrl">URL Recurso</label>
-        <input type="text" id="editarAsignadaUrl" maxlength="300">
-      </div>
-
-      <div class="form-actions">
-        <button type="button" class="btn-close" onclick="closeEditAsignada()">Cancelar</button>
-        <button type="submit" class="btn-confirm">Guardar Cambios</button>
-      </div>
-
-    </form>
-  </div>
-</div>
-
-
-<!-- 
-     MODAL ELIMINAR ACTIVIDAD ASIGNADA
- -->
-<div class="modal" id="modalDeleteAsignada">
-  <div class="modal-content">
-    <h2>Eliminar Actividad Asignada</h2>
-    <p>¿Estás seguro de eliminar esta actividad asignada?</p>
-
-    <div class="modal-actions">
-      <button class="btn-close" onclick="closeDeleteAsignada()">Cancelar</button>
-      <button class="btn-confirm" id="btnConfirmDeleteAsignada">Eliminar</button>
-    </div>
-  </div>
-</div>
-
 
   <!-- SCRIPT -->
 

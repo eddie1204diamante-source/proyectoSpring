@@ -84,27 +84,46 @@ public class authService {
         nuevaPersona.setEdad(0); // Puedes pedir la edad después o en otro formulario
         nuevaPersona = personaRepository.save(nuevaPersona); // Ya tiene ID generado
 
-        // Crear usuario
-        Usuario usuario = new Usuario();
-        usuario.setPersona(persona);
-        usuario.setCorreo(correo.toLowerCase().trim());
-        usuario.setContrasena(passwordEncoder.encode(contrasena));
-        int rol = determinarRol(correo);
-        usuario.setRolId(rol);
+        // 2. Determinar el rol
+        int rolId = determinarRol(correo);
 
-        usuario = usuarioRepository.save(usuario);
+        // 3. Crear y guardar el usuario (aquí sí va la contraseña)
+        Usuario nuevoUsuario = new Usuario();
+        nuevoUsuario.setPersona(nuevaPersona);
+        nuevoUsuario.setCorreo(correo.toLowerCase().trim());
+        nuevoUsuario.setContrasena(passwordEncoder.encode(contrasena));
+        nuevoUsuario.setRolId(rolId);
+        nuevoUsuario = usuarioRepository.save(nuevoUsuario);
 
-        // ---------------------------------------
-        //  🔥 SI ES APRENDIZ, CREAR REGISTRO EN TABLA aprendiz
-        // ---------------------------------------
-        if (rol == 2) {
-            Aprendiz ap = new Aprendiz();
-            ap.setUsuario(usuario);         // relación con usuario
-            ap.setTipo_problema(null);
-            ap.setTrastorno(null);
-            ap.setId_trastorno_int(null);
+        // 4. Crear registro en la tabla específica según el rol
+        switch (rolId) {
+            case 1: // ADMINISTRADOR
+                administrador admin = new administrador();
+                admin.setPersona(nuevaPersona);
+                // Si la tabla administrador comparte PK con persona:
+                // admin.setId_administrador(nuevaPersona.getId_persona());
+                administradorRepository.save(admin);
+                break;
 
-            aprendizRepository.save(ap);
+            case 3: // ORIENTADOR / PSICOLÓGICA
+                psicologica orientador = new psicologica();
+                orientador.setPersona(nuevaPersona);
+                orientador.setSociedad("SENA");
+                orientador.setFechaContratacion(new Date());
+                // Si comparte PK:
+                // orientador.setIdOrientador(nuevaPersona.getId_persona());
+                psicologicaRepository.save(orientador);
+                break;
+
+            case 2: // APRENDIZ (por defecto también entra aquí)
+            default:
+                aprendiz nuevoAprendiz = new aprendiz();
+                nuevoAprendiz.setUsuario(nuevoUsuario); // Relación obligatoria
+                nuevoAprendiz.setTipo_problema(null);
+                nuevoAprendiz.setTrastorno(null);
+                nuevoAprendiz.setId_trastorno_int(null);
+                aprendizRepository.save(nuevoAprendiz);
+                break;
         }
 
         return nuevoUsuario; // Devuelve el usuario creado con su ID y todo

@@ -1,7 +1,11 @@
 package com.proyecto.spring.Entity;
 
-import jakarta.persistence.*;
-import java.util.Date;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "actividad")
@@ -28,9 +32,7 @@ public class Actividad {
         this.urlActividad = urlActividad;
     }
 
-    @Temporal(TemporalType.DATE)
-    private Date fechaCreacion;
-
+ 
     public Integer getIdActividad() {
         return idActividad;
     }
@@ -53,14 +55,6 @@ public class Actividad {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
-    }
-
-    public Date getFechaCreacion() {
-        return fechaCreacion;
-    }
-
-    public void setFechaCreacion(Date fechaCreacion) {
-        this.fechaCreacion = fechaCreacion;
     }
 
 
