@@ -19,7 +19,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // ESTE BEAN ES EL QUE TE FALTABA
+   
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -34,7 +34,6 @@ public class SecurityConfig {
                 .requestMatchers("/", "/index", "/login", "/css/**", "/js/**", "/img/**", 
                                  "/api/v1/auth/**", "/api/auth/me").permitAll()
 
-                // AHORA SÍ FUNCIONA: USANDO AuthorizationDecision
                 .requestMatchers("/estudiante/**").access((authentication, context) -> 
                     new AuthorizationDecision(
                         authentication.get().getAuthorities().stream()
@@ -62,7 +61,7 @@ public class SecurityConfig {
             .securityContext(securityContext -> securityContext.requireExplicitSave(false))
             .logout(logout -> logout
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout")
+                .logoutSuccessUrl("/index")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
             );

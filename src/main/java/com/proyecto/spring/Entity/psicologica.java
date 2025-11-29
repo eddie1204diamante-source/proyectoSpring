@@ -11,7 +11,7 @@ public class psicologica {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_orientador")
-    private Long idOrientador;        // ← CAMBIO AQUÍ: camelCase normal (sin guion bajo)
+    private Long idOrientador;        
 
     @OneToOne
     @JoinColumn(name = "Id_persona", referencedColumnName = "Id_persona")
@@ -26,7 +26,7 @@ public class psicologica {
     @OneToMany(mappedBy = "psicologica")
     private Set<area_trabajo> areas_trabajo;
 
-    // ========= GETTERS & SETTERS =========
+    // GETTERS & SETTERS
     public Long getIdOrientador() {
         return idOrientador;
     }

@@ -42,9 +42,9 @@ main {
   --shadow-sm: 0 2px 10px rgba(0,0,0,0.05);
 }
 
-/* =============================
+/* =
    MODO OSCURO
-============================= */
+= */
 [data-theme="dark"] {
   --primary-color: #00C389;
   --secondary-color: #00966C;
@@ -267,23 +267,6 @@ body {
   margin-left: var(--sidebar-collapsed);
 }
 
-/* 
-   TARJETA NUEVA CITA
- */
-.new-appointment-card {
-  background: var(--bg-secondary);
-  padding: 2rem;
-  border-radius: 20px;
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow);
-  margin-bottom: 2rem;
-}
-
-.new-appointment-card h2 {
-  margin-bottom: 1rem;
-  font-size: 1.4rem;
-  color: var(--text-primary);
-}
 
 .btn-primary {
   display: inline-block;
@@ -295,28 +278,9 @@ body {
   text-decoration: none;
   font-weight: 600;
 }
-/* ============================
+/* 
    MODALES NUEVOS
-============================ */
-
-/* Fondo oscuro */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.55);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-}
-
-/* Oculto por defecto */
-.hidden {
-    display: none !important;
-}
+ */
 
 /* Caja del modal */
 .modal-content {
@@ -477,7 +441,7 @@ footer {
   }
 }
 
-/* ===== MODALES ===== */
+/*  MODALES  */
 .modal {
   display: none;
   position: fixed;
@@ -535,10 +499,10 @@ footer {
   cursor: pointer;
 }
 
-/* =============================
+/* 
    ESTILOS PARA MODAL DE CREAR RECURSO
-   ============================= */
-/* ------------ MODAL -------------- */
+   
+/*  MODAL  */
 .crear-modal {
   max-width: 550px;
   max-height: 90vh;
@@ -568,7 +532,7 @@ footer {
   letter-spacing: 0.5px;
 }
 
-/* ------------ INPUTS -------------- */
+/*  INPUTS  */
 .crear-modal input,
 .crear-modal textarea,
 .crear-modal select {
@@ -590,7 +554,7 @@ footer {
   color: #94a3b8;
 }
 
-/* Hover y focus PRO */
+/* Hover y focus  */
 .crear-modal input:focus,
 .crear-modal textarea:focus,
 .crear-modal select:focus {
@@ -599,14 +563,14 @@ footer {
   box-shadow: 0 0 6px rgba(99, 102, 241, 0.4);
 }
 
-/* ------------ LABELS -------------- */
+/*  LABELS  */
 .crear-modal label {
   font-size: 14px;
   font-weight: 600;
   color: #cbd5e1;
 }
 
-/* ------------ BOTÓN DE CERRAR -------------- */
+/*  BOTÓN DE CERRAR  */
 .close-btn {
   position: absolute;
   top: 14px;
@@ -621,7 +585,7 @@ footer {
   color: #f87171;
 }
 
-/* ------------ SCROLLBAR PRO -------------- */
+/*  SCROLLBAR PRO -- */
 .crear-modal::-webkit-scrollbar {
   width: 10px;
 }
@@ -737,27 +701,7 @@ footer {
   box-shadow: 0 6px 20px rgba(0, 150, 108, 0.4);
 }
 
-/* =============================
-   AJUSTES PARA MODO OSCURO EN FORMULARIO
-   ============================= */
-[data-theme="dark"] .form-group input,
-[data-theme="dark"] .form-group textarea {
-  background: var(--bg-primary);
-  border-color: var(--border-color);
-}
 
-[data-theme="dark"] .form-group input:focus,
-[data-theme="dark"] .form-group textarea:focus {
-  box-shadow: 0 0 0 3px rgba(0, 195, 137, 0.2);
-}
-
-[data-theme="dark"] .form-actions {
-  border-top-color: var(--border-color);
-}
-
-[data-theme="dark"] .crear-form .btn-close {
-  background: var(--border-color) !important;
-}
 
 .split-container {
   display: flex;
@@ -864,81 +808,9 @@ footer {
   cursor: pointer;
 }
 
-/* =============================
-   BOTÓN CAMBIO DE TEMA
-   ============================= */
-.theme-toggle {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
-  transition: all 0.3s ease;
-}
-
-.theme-toggle:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-}
-
-/* =============================
-   AJUSTES PARA MODO OSCURO
-   ============================= */
-[data-theme="dark"] .pendiente {
-  background: #4C3A00;
-  color: #FFE08A;
-}
-
-[data-theme="dark"] .aprobado {
-  background: #134E4A;
-  color: #A7F3D0;
-}
-
-[data-theme="dark"] .cancelado {
-  background: #7F1D1D;
-  color: #FECACA;
-}
-
-[data-theme="dark"] .btn-ver {
-  background: #E0F2FE;
-  color: #0C4A6E;
-}
-
-[data-theme="dark"] .btn-editar {
-  background: #713F12;
-  color: #FEF3C7;
-}
-
-[data-theme="dark"] .btn-cancelar {
-  background: #7F1D1D;
-  color: #FECACA;
-}
-
-[data-theme="dark"] footer {
-  color: white;
-}
-
-[data-theme="dark"] .header-title {
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .toggle-btn {
-  color: var(--primary-color);
-}
-
-/* =============================
+/* =
    MEJORAS DE ESPACIADO Y DISTRIBUCIÓN
-   ============================= */
+   = */
 /* Espaciado general entre bloques principales */
 .main-content > * {
   margin-bottom: 2.5rem; /* separa secciones verticales */
@@ -1033,3 +905,177 @@ footer {
     width: 90%;
     animation: fadeIn 0.3s;
   }
+
+/*  BOTONES  */
+.assigned-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.assigned-actions button {
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: .2s;
+}
+/* LISTA IZQUIERDA  */
+
+#contenedorAsignadas {
+    padding: 10px;
+}
+
+/* contenedor de tarjetas */
+.assigned-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
+}
+
+/* TARJETA */
+.assigned-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 15px;
+    border: 1px solid #dfe6e9;
+    box-shadow: 0px 3px 10px rgba(0,0,0,.08);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+/* hover bonito */
+.assigned-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 6px 16px rgba(0,0,0,.12);
+}
+
+/* título */
+.assigned-card h3 {
+    font-size: 18px;
+    margin-bottom: 6px;
+    font-weight: 700;
+}
+
+/* descripción */
+.assigned-card p {
+    font-size: 14px;
+    opacity: .85;
+}
+
+/* botones alineados */
+.assigned-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* botón básico */
+.assigned-actions button {
+    border: none;
+    padding: 7px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    transition: 0.2s ease;
+}
+
+/* ver recurso */
+.assigned-actions button[data-action="ver"] {
+    background: #5e72e4;
+    color: white;
+}
+.assigned-actions button[data-action="ver"]:hover {
+    background: #3d4cc4;
+}
+
+/* completar */
+.assigned-actions button[data-action="completar"] {
+    background: #00b894;
+    color: white;
+}
+.assigned-actions button[data-action="completar"]:hover {
+    background: #00997a;
+}
+
+/* si ya está completada */
+.assigned-card.completada {
+    border-left: 6px solid #00b894;
+    opacity: .78;
+}
+.done-label {
+    font-size: 13px;
+    font-weight: bold;
+    color: #00b894;
+}
+
+/* LISTA DERECHA (Opcionales)  */
+
+#contenedorOpcionales {
+    padding: 10px;
+}
+
+/* contenedor de tarjetas opcionales */
+.optional-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
+}
+
+/* TARJETA */
+.activity-card {
+    background: #f7f9fc;
+    border-radius: 14px;
+    padding: 15px;
+    border: 1px solid #d1d8e0;
+    box-shadow: 0px 3px 10px rgba(0,0,0,.06);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+/* hover */
+.activity-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 6px 16px rgba(0,0,0,.12);
+}
+
+/* título */
+.activity-card h3 {
+    font-size: 18px;
+    margin-bottom: 6px;
+    font-weight: 700;
+}
+
+/* descripción */
+.activity-card p {
+    font-size: 14px;
+    opacity: .85;
+}
+
+/* botones alineados */
+.activity-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* botón ver */
+.activity-actions button[data-action="ver"] {
+    background: #5e72e4; /* rosa para diferenciar del verde de completada */
+    color: white;
+    border: none;
+    padding: 7px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    transition: 0.2s ease;
+}
+.activity-actions button[data-action="ver"]:hover {
+    background: #5e72e4;
+}

@@ -4,173 +4,152 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Actividades - MindWell</title>
-  <link rel="stylesheet" href="css/actividades.css">
+  <link rel="stylesheet" href="/css/actividades.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
 </head>
-
 <body>
-
   <!-- Sidebar -->
+   
+
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="sidebar-logo">🧠</div>
       <h1 class="sidebar-title">MINDWELL</h1>
     </div>
     <div class="toggle-btn" onclick="toggleSidebar()">▶</div>
-
-       <ul>
-    <li data-icon="🏠" >
-        <a href="/dashboard">
-          <span>Inicio</span> 
+    <ul>
+      <li data-icon="🏠">
+        <a href="/estudiante/dashboard">
+          <span>Inicio</span>
         </a>
       </li>
-      <li data-icon="📅" >
+        <li data-icon="📅" class="">
         <a href="/gestionCita">
-          <span>Gesiona tus citas</span> 
+          <span>Gestiona tus citas</span>
         </a>
       </li>
-      <li data-icon="🎓" >
-          <span>Talleres </span>
+      <li data-icon="🎓" class="">
+        <a href="/actividades">
+          <span>Talleres</span>
         </a>
-      </li>   <li data-icon="📈" >
+      </li>
+      <li data-icon="📈">
         <a href="*">
           <span>Resultados</span>
         </a>
       </li>
-        </a>
-      </li>
     </ul>
   </div>
+  <!-- header -->
+   
+  <header class="header">
+       <div class="header-title">Actividades y Ejercicios</div>
+    <div class="user-info">
 
-<!-- header-->
-<header class="header">
-  <div class="header-title">Actividades y Ejercicios</div>
-  <div class="user-info">
-    <div class="user-avatar">U</div>
-    <button class="btn-sesion">Cerrar sesión</button>
-  </div>
-</header>
+  
+     
+      <div class="user-avatar">U</div>
+   <button class="btn-sesion" id="btn-sesion">Cerrar sesión</button>
+    </div>
+  </header>
+  <main class="main-content">
+  <div id="filtros" class="filtro-box">
+  <input type="text" id="filtroTexto" placeholder="Buscar actividades...">
 
-<!-- MAIN CONTENT -->
-<main class="main-content">
+  <select id="filtroEstado">
+    <option value="">Todos</option>
+    <option value="Pendiente">Pendiente</option>
+    <option value="Completada">Completada</option>
+  </select>
+
+  
+</div>
+
 
   <div class="split-container">
 
-    <!-- COLUMNA IZQUIERDA - ASIGNADAS POR ORIENTADOR -->
-    <div class="column">
-      <h2>📘 Actividades Asignadas por tu Orientador</h2>
+      <!-- COLUMNA IZQUIERDA - ASIGNADAS POR ORIENTADOR -->
+      <div class="column">
+          <h2 class="column-title">Actividades Asignadas</h2>
 
-      <div class="activity-card">
-        <h3>Ejercicio de Respiración</h3>
-        <p>Realiza respiración diafragmática 5 minutos antes de tu próxima sesión.</p>
-        <div class="activity-actions">
-          <button class="btn-ver" onclick="openModal('Ejercicio de Respiración', 'Instrucciones detalladas de respiración...')">Ver</button>
-          <button class="btn-done" onclick="openConfirmModal('Ejercicio de Respiración', '¿Deseas marcar esta actividad como completada?')">Marcar como hecho</button>
-        </div>
+          <!-- CONTENEDOR QUE ESPERA EL JS -->
+          <div id="contenedorAsignadas" class="lista-actividades"></div>
       </div>
 
-      <div class="activity-card">
-        <h3>Diario Emocional</h3>
-        <p>Anota al menos 3 situaciones que te generaron estrés esta semana.</p>
-        <div class="activity-actions">
-          <button class="btn-ver" onclick="openModal('Diario Emocional', 'Instrucciones del diario emocional...')">Ver</button>
-          <button class="btn-done" onclick="openConfirmModal('Diario Emocional', '¿Confirmas que completaste esta actividad?')">Marcar como hecho</button>
-        </div>
+      <!-- COLUMNA DERECHA - ACTIVIDADES INDEPENDIENTES -->
+      <div class="column">
+          <h2 class="column-title">Actividades Opcionales</h2>
+          <div id="contenedorOpcionales" class="lista-actividades"></div>
       </div>
-
-    </div>
-
-    <!-- COLUMNA DERECHA - ACTIVIDADES INDEPENDIENTES -->
-    <div class="column">
-      <h2>🧘 Actividades de Autoayuda (Opcionales)</h2>
-
-      <div class="activity-card">
-        <h3>Meditación guiada</h3>
-        <p>Reproduce esta meditación para reducir la tensión emocional.</p>
-        <div class="activity-actions">
-          <button class="btn-ver" onclick="openModal('Meditación Guiada', 'Aquí iría tu video o guía de meditación.')">Ver</button>
-
-        </div>
-      </div>
-
-      <div class="activity-card">
-        <h3>Caminata consciente</h3>
-        <p>Realiza una caminata de 10 minutos enfocándote en tus sentidos.</p>
-        <div class="activity-actions">
-          <button class="btn-ver" onclick="openModal('Caminata consciente', 'Explicación de la caminata consciente...')">Ver</button>
-        </div>
-      </div>
-
-    </div>
 
   </div>
-
 </main>
 
-<!-- FOOTER -->
-<footer>
-  <p>&copy; Team Scrum 2 - SENA</p>
-</footer>
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; Team Scrum 2 - SENA</p>
+  </footer>
+  <!--  MODAL GENERAL PARA VER ACTIVIDADES -->
+  <div class="modal" id="modalInfo">
+    <div class="modal-content">
+      <h2 class="modal-title" id="modalTitle"></h2>
+      <p class="modal-text" id="modalText"></p>
+      <button class="btn-close" onclick="closeModal()">Cerrar</button>
+   
 
+    </div>
+  </div>
+  
+  <!--  MODAL DE CONFIRMACIÓN -->
+  <div class="modal" id="modalConfirm">
+    <div class="modal-content">
+      <h2 class="modal-title" id="confirmTitle"></h2>
+      <p class="modal-text" id="confirmText"></p>
+      <div class="modal-actions">
+        <button class="btn-close" onclick="closeConfirmModal()">Cancelar</button>
+        <button class="btn-confirm" onclick="confirmAction()">Confirmar</button>
+      </div>
+    </div>
+  </div>
 
-<!-- 🔥 MODAL GENERAL PARA VER ACTIVIDADES -->
-<div class="modal" id="modalInfo">
+  </div>
+</div>
+<div class="modal" id="modalAsignadaInfo">
   <div class="modal-content">
-    <h2 class="modal-title" id="modalTitle"></h2>
-    <p class="modal-text" id="modalText"></p>
-    <button class="btn-close" onclick="closeModal()">Cerrar</button>
+    <h2 id="asignadaTitle"></h2>
+    <p id="asignadaDesc"></p>
+
+    <a id="asignadaUrl" href="#" target="_blank" style="display:none; color:blue;">
+      🔗 Ver recurso
+    </a>
+
+    <p><b>Estado:</b> <span id="asignadaEstado"></span></p>
+
+    <button class="btn-close" onclick="closeAsignadaModal()">Cerrar</button>
   </div>
 </div>
 
-<!-- 🔥 MODAL DE CONFIRMACIÓN -->
-<div class="modal" id="modalConfirm">
+
+<!-- 
+     MODAL CONFIRMAR COMPLETADA
+ -->
+<div class="modal" id="modalConfirmAsignada">
   <div class="modal-content">
-    <h2 class="modal-title" id="confirmTitle"></h2>
-    <p class="modal-text" id="confirmText"></p>
+    <h2>Confirmar acción</h2>
+    <p id="confirmAsignadaText"></p>
 
     <div class="modal-actions">
-      <button class="btn-close" onclick="closeConfirmModal()">Cancelar</button>
-      <button class="btn-confirm" onclick="confirmAction()">Confirmar</button>
+      <button class="btn-close" onclick="closeConfirmAsignada()">Cancelar</button>
+      <button class="btn-confirm" id="btnConfirmAsignada">Confirmar</button>
     </div>
   </div>
 </div>
 
+  <!-- SCRIPT -->
 
-<!-- SCRIPT -->
-<script>
-function openModal(title, text) {
-  document.getElementById("modalTitle").innerText = title;
-  document.getElementById("modalText").innerText = text;
-  document.getElementById("modalInfo").classList.add("active");
-}
-
-function closeModal() {
-  document.getElementById("modalInfo").classList.remove("active");
-}
-
-let confirmCallback = null;
-
-function openConfirmModal(title, text) {
-  document.getElementById("confirmTitle").innerText = title;
-  document.getElementById("confirmText").innerText = text;
-
-  document.getElementById("modalConfirm").classList.add("active");
-
-  // Aquí en el futuro puedes agregar peticiones a Spring (fetch)
-  confirmCallback = () => alert("Acción confirmada para: " + title);
-}
-
-function closeConfirmModal() {
-  document.getElementById("modalConfirm").classList.remove("active");
-}
-
-function confirmAction() {
-  if (confirmCallback) confirmCallback();
-  closeConfirmModal();
-}
-</script>
+<script src="/js/actividad.js"></script>
+ <script src="/js/logout.js"></script>
 
 </body>
 </html>

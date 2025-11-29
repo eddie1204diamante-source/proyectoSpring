@@ -1,11 +1,7 @@
-/* actividadO.fixed.js
-   Versión corregida: unifica y hace CRUD completo y robusto
-   Reemplaza /js/actividadO.js por este archivo.
-*/
 
-/* -----------------------
+/* 
    1. UTILIDADES
-   ----------------------- */
+    */
 function isValidId(id) { return Number.isInteger(id) && id > 0; }
 
 function esc(s) {
@@ -30,15 +26,13 @@ async function safeFetch(url, opts = {}) {
   }
 }
 
-/* -----------------------
-   2. CACHE / MAPS
-   ----------------------- */
-const actividadesMap = new Map(); // idActividad -> { titulo, descripcion }
+
+const actividadesMap = new Map(); 
 let selectsListenerAttached = false;
 
-/* -----------------------
-   3. CARGAR SELECTS (Actividades y Estudiantes)
-   ----------------------- */
+/* 
+   CARGAR SELECTS (Actividades y Estudiantes)
+    */
 async function cargarSelectsParaCrear() {
   const selAct = document.getElementById("crearAsignadaActividad");
   const selApr = document.getElementById("crearAsignadaIdEstudiante");
@@ -55,6 +49,7 @@ async function cargarSelectsParaCrear() {
       data.forEach(a => {
         const id = a.idActividad ?? a.id;
         const titulo = a.titulo ?? a.nombre ?? "Actividad";
+         const url = a.urlActividad ?? '';
         const descripcion = a.descripcion ?? "";
         if (id != null) {
           actividadesMap.set(Number(id), { titulo, descripcion });
@@ -83,7 +78,6 @@ async function cargarSelectsParaCrear() {
     if (selApr) selApr.innerHTML = `<option value="">Error cargando estudiantes</option>`;
   }
 
-  // Attach change listener once to show custom inputs and autofill
   const chosen = document.getElementById("crearAsignadaActividad");
   if (chosen && !selectsListenerAttached) {
     chosen.addEventListener("change", () => {
@@ -105,9 +99,9 @@ async function cargarSelectsParaCrear() {
   }
 }
 
-/* -----------------------
-   4. CARGAR ACTIVIDADES ASIGNADAS (Columna Izquierda)
-   ----------------------- */
+/* 
+    CARGAR ACTIVIDADES ASIGNADAS (Columna Izquierda)
+    */
 async function cargarAsignadas() {
   const cont = document.getElementById("contenedorAsignadas");
   if (!cont) return;
@@ -157,9 +151,9 @@ async function cargarAsignadas() {
   cont.appendChild(list);
 }
 
-/* -----------------------
-   5. MODALES
-   ----------------------- */
+/* 
+    MODALES
+    */
 function openModal(title, text) {
   const m = document.getElementById("modalInfo"); if (!m) return;
   document.getElementById("modalTitle").innerText = title || "";
@@ -193,7 +187,7 @@ function closeCrearAsignada() { document.getElementById("modalCrearAsignada")?.c
 
 function openEditAsignada(id) {
   editAsignadaId = id;
-  // get full data and populate fields
+
   getAsignadaFull(id).then(full => {
     if (!full) { alert('No se pudo recuperar la actividad (ver consola)'); return; }
     document.getElementById('editarAsignadaId')?.setAttribute('value', id);
@@ -219,9 +213,9 @@ window.addEventListener("click", (e) => {
   }
 });
 
-/* -----------------------
-   6. CRUD ASIGNADAS
-   ----------------------- */
+/* 
+   CRUD ASIGNADAS
+    */
 let editAsignadaId = null;
 
 async function getAsignadaFull(id) {
@@ -232,7 +226,7 @@ async function getAsignadaFull(id) {
 
 async function eliminarAsignada(id) {
   if (!isValidId(Number(id))) return { ok: false, error: 'ID no válido' };
-  // Try common endpoints: first /eliminar/{id}, then /{id}
+
   let res = await safeFetch(`/api/actividad-asignada/eliminar/${id}`, { method: 'DELETE' });
   if (res.ok) return res;
   res = await safeFetch(`/api/actividad-asignada/${id}`, { method: 'DELETE' });
@@ -250,9 +244,9 @@ async function completarAsignada(id) {
   return res;
 }
 
-/* -----------------------
-   7. ACTIVIDADES OPCIONALES (columna derecha)
-   ----------------------- */
+/* 
+    ACTIVIDADES OPCIONALES (columna derecha)
+    */
 async function cargarActividadesDerecha() {
   const cont = document.getElementById('contenedorOpcionales');
   if (!cont) return;
@@ -262,26 +256,33 @@ async function cargarActividadesDerecha() {
   if (!res.ok) { cont.innerHTML += `<p>Error al cargar actividades</p>`; return; }
   const data = Array.isArray(res.json) ? res.json : [];
   if (!data.length) { cont.innerHTML += `<p style="opacity:.8">No hay actividades opcionales.</p>`; return; }
+const list = document.createElement('div'); 
+list.className = 'optional-list';
 
-  const list = document.createElement('div'); list.className = 'optional-list';
-  data.forEach(a => {
-    const id = a.idActividad ?? a.id;
-    const titulo = a.titulo ?? a.nombre ?? 'Actividad';
-    const desc = a.descripcion ?? '';
-    const card = document.createElement('div');
-    card.className = 'activity-card';
-    card.dataset.id = id;
-    card.innerHTML = `
-      <h3>${esc(titulo)}</h3>
-      <p>${esc(desc)}</p>
-      <div class="activity-actions">
-        <button class="btn-ver" data-action="ver" data-id="${id}" data-title="${esc(titulo)}" data-desc="${esc(desc)}">Ver</button>
-        <button class="btn-edit" data-action="editar" data-id="${id}" data-title="${esc(titulo)}" data-desc="${esc(desc)}">Editar</button>
-        <button class="btn-delete" data-action="borrar" data-id="${id}">Borrar</button>
-      </div>`;
-    list.appendChild(card);
-  });
-  cont.appendChild(list);
+data.forEach(a => {
+  const id = a.idActividad ?? a.id;
+  const titulo = a.titulo ?? a.nombre ?? 'Actividad';
+  const desc = a.descripcion ?? '';
+  const url = a.urlActividad ?? a.url_actividad ?? "";
+
+  const card = document.createElement('div');
+  card.className = 'activity-card';
+  card.dataset.id = id;
+  card.innerHTML = `
+    <h3>${esc(titulo)}</h3>
+    <p>${esc(desc)}</p>
+    ${url ? `<p><a href="${esc(url)}" target="_blank">Ver recurso</a></p>` : ""}
+    <div class="activity-actions">
+      <button class="btn-ver" data-action="ver" data-id="${id}" data-title="${esc(titulo)}" data-desc="${esc(desc)}" data-url="${esc(url)}">Ver</button>
+      <button class="btn-edit" data-action="editar" data-id="${id}" data-title="${esc(titulo)}" data-desc="${esc(desc)}" data-url="${esc(url)}">Editar</button>
+      <button class="btn-delete" data-action="borrar" data-id="${id}">Borrar</button>
+    </div>
+  `;
+  list.appendChild(card);
+});
+
+cont.appendChild(list);
+
 }
 
 async function borrarActividadOpcional(id) {
@@ -291,18 +292,15 @@ async function borrarActividadOpcional(id) {
   else alert('Error eliminando actividad (ver consola)');
 }
 
-/* -----------------------
-   8. FORM HANDLERS y EVENT DELEGATION
-   ----------------------- */
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Header buttons
+
   const btnCrear = document.getElementById('abrirModalCrearBtn');
   const btnAsignar = document.getElementById('abrirModalCrearAsignadaBtn');
   if (btnCrear) btnCrear.addEventListener('click', openCrearModal);
   if (btnAsignar) btnAsignar.addEventListener('click', openCrearAsignada);
 
-  // Delegation: acciones en asignadas
+  
   const contAsign = document.getElementById('contenedorAsignadas');
   if (contAsign) {
     contAsign.addEventListener('click', (e) => {
@@ -323,7 +321,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Delegation: acciones en opcionales
+
   const contOpc = document.getElementById('contenedorOpcionales');
   if (contOpc) {
     contOpc.addEventListener('click', (e) => {
@@ -486,7 +484,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   await cargarActividadesDerecha();
 });
 
-// Export some helpers to global scope if HTML uses inline onclick
 window.openModal = openModal;
 window.closeModal = closeModal;
 window.openCrearModal = openCrearModal;
@@ -495,10 +492,9 @@ window.openCrearAsignada = openCrearAsignada;
 window.closeCrearAsignada = closeCrearAsignada;
 window.openAsignadaModal = openAsignadaModal;
 window.closeAsignadaModal = closeAsignadaModal;
-window.openEditAsignada = openEditAsignada; // used by some legacy inline calls
+window.openEditAsignada = openEditAsignada; 
 window.openDeleteAsignada = openDeleteAsignada;
 window.openConfirmAsignada = openConfirmAsignada;
 window.cargarAsignadas = cargarAsignadas;
 window.cargarActividadesDerecha = cargarActividadesDerecha;
 
-/* FIN archivo */

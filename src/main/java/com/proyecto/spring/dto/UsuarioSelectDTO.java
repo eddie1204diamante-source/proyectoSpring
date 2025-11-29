@@ -5,7 +5,7 @@ import com.proyecto.spring.Entity.Usuario;
 public class UsuarioSelectDTO {
     private Integer idEstudiante;
     private String nombre;
-    private String apellido;
+    private  String apellido;
 
     public UsuarioSelectDTO(Usuario u) {
         this.idEstudiante = u.getIdUsuario();

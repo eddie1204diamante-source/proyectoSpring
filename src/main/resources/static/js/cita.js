@@ -1,4 +1,4 @@
-// ======================== LIBRERÍAS NECESARIAS ========================
+//  LIBRERÍAS NECESARIAS 
 // Añade estos CDN en tu HTML antes de este script:
 // <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 // <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -6,7 +6,7 @@
 // <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 // <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-// ======================== MODALES ========================
+//  MODALES 
 function openModal(id) {
   const modal = document.getElementById(id);
   if (modal) modal.classList.add("active");
@@ -22,7 +22,7 @@ window.addEventListener("click", function (e) {
   });
 });
 
-// ======================== INICIALIZAR FLATPICKR ========================
+//  INICIALIZAR FLATPICKR 
 function initFlatpickr(inputId, isFilter = false) {
   const input = document.getElementById(inputId);
   if (!input) return;
@@ -47,7 +47,7 @@ function initFlatpickr(inputId, isFilter = false) {
   flatpickr(input, config);
 }
 
-// ======================== AUTOCOMPLETADO MEJORADO PARA MOTIVO ========================
+//  AUTOCOMPLETADO MEJORADO PARA MOTIVO 
 function setupMotivoAutocomplete() {
   const motivoInput = document.getElementById("motivo");
   if (!motivoInput) return;
@@ -83,7 +83,7 @@ function setupMotivoAutocomplete() {
   });
 }
 
-// ======================== CARGA DE DATOS DEL USUARIO ========================
+//  CARGA DE DATOS DEL USUARIO 
 async function cargarDatosUsuario() {
   try {
     const res = await fetch("http://localhost:8080/api/auth/me", {
@@ -106,7 +106,7 @@ async function cargarDatosUsuario() {
   }
 }
 
-// ======================== POBLAR ORIENTADORES Y HORAS ========================
+//  POBLAR ORIENTADORES Y HORAS 
 function populateOrientadores() {
   fetch("http://localhost:8080/api/citas/orientadores")
     .then(res => res.json())
@@ -166,7 +166,7 @@ function populateHoras(selectId, fecha = null) {
   }
 }
 
-// ======================== VALIDACIÓN DE FECHA Y HORA ========================
+//  VALIDACIÓN DE FECHA Y HORA 
 async function validarFechaHora(fecha, hora) {
   const fechaSeleccionada = new Date(fecha + "T00:00:00");
   const hoy = new Date();
@@ -210,7 +210,7 @@ async function validarFechaHora(fecha, hora) {
   return true;
 }
 
-// ======================== CARGAR CITAS ========================
+//  CARGAR CITAS 
 let currentCitaId = null;
 function setCitaId(id) {
   currentCitaId = id;
@@ -286,7 +286,7 @@ function loadCitas() {
     });
 }
 
-// ======================== DETALLE DE CITA ========================
+//  DETALLE DE CITA 
 function verDetalle(idCita) {
   fetch(`http://localhost:8080/api/citas/${idCita}`, { credentials: "include" })
     .then(res => res.json())
@@ -307,7 +307,7 @@ function verDetalle(idCita) {
     });
 }
 
-// ======================== CREAR CITA (ESTUDIANTE) ========================
+//  CREAR CITA (ESTUDIANTE) 
 async function guardarCita(e) {
   e.preventDefault();
   
@@ -364,7 +364,7 @@ async function guardarCita(e) {
     });
 }
 
-// ======================== REPROGRAMAR (AMBOS ROLES) ========================
+//  REPROGRAMAR (AMBOS ROLES) 
 function abrirReprogramar(idCita) {
   setCitaId(idCita);
   const rol = localStorage.getItem("rol");
@@ -438,7 +438,7 @@ async function reprogramarCita(e) {
     });
 }
 
-// ======================== FINALIZAR CITA (ORIENTADOR) ========================
+//  FINALIZAR CITA (ORIENTADOR) 
 function finalizarCita() {
   if (!currentCitaId) {
     Swal.fire({
@@ -476,7 +476,7 @@ function finalizarCita() {
     });
 }
 
-// ======================== CANCELAR (AMBOS ROLES) ========================
+//  CANCELAR (AMBOS ROLES) 
 function cancelarCita(e) {
   if (e) e.preventDefault();
   
@@ -528,7 +528,7 @@ function ejecutarCancelar() {
   cancelarCita();
 }
 
-// ======================== APROBAR CITAS (ORIENTADOR) ========================
+//  APROBAR CITAS (ORIENTADOR) 
 function aprobarCita(idCita) {
   fetch(`http://localhost:8080/api/citas/${idCita}/aprobar`, {
     method: "PUT",
@@ -592,7 +592,7 @@ function abrirModalAprobar() {
   openModal("modal-aprobar-orientador");
 }
 
-// ======================== REPROGRAMAR/CANCELAR ORIENTADOR CON SELECT ========================
+//  REPROGRAMAR/CANCELAR ORIENTADOR CON SELECT 
 function loadCitasIntoSelect(selectId, filtroEstado = null) {
   const idUsuario = localStorage.getItem("idUsuario");
   
@@ -643,7 +643,7 @@ function abrirModalCancelarOrientador() {
   openModal("modal-cancelar-orientador");
 }
 
-// ======================== FILTROS ========================
+//  FILTROS 
 function aplicarFiltros() {
   const rol = localStorage.getItem("rol");
   const idUsuario = localStorage.getItem("idUsuario");
@@ -727,7 +727,7 @@ function limpiarFiltros() {
   loadCitas();
 }
 
-// ======================== SIDEBAR TOGGLE ========================
+//  SIDEBAR TOGGLE 
 function toggleSidebar() {
   const sidebar = document.getElementById("sidebar");
   if (sidebar) {
@@ -735,7 +735,7 @@ function toggleSidebar() {
   }
 }
 
-// ======================== LISTENERS PARA ACTUALIZAR HORAS AL CAMBIAR FECHA ========================
+//  LISTENERS PARA ACTUALIZAR HORAS AL CAMBIAR FECHA 
 function setupFechaChangeListeners() {
   // Para crear cita (estudiante)
   const fechaCrear = document.getElementById("fecha");
@@ -765,7 +765,7 @@ function setupFechaChangeListeners() {
   }
 }
 
-// ======================== ON LOAD ========================
+//  ON LOAD 
 document.addEventListener("DOMContentLoaded", () => {
   cargarDatosUsuario();
   populateOrientadores();
