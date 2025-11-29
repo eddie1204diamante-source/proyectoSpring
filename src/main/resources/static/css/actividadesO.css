@@ -700,6 +700,9 @@ footer {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 150, 108, 0.4);
 }
+
+
+
 .split-container {
   display: flex;
   gap: 2rem;
@@ -803,78 +806,6 @@ footer {
   border: none;
   color: white;
   cursor: pointer;
-}
-
-/* =
-   BOTÓN CAMBIO DE TEMA
-   = */
-.theme-toggle {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
-  transition: all 0.3s ease;
-}
-
-.theme-toggle:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-}
-
-/* =
-   AJUSTES PARA MODO OSCURO
-   = */
-[data-theme="dark"] .pendiente {
-  background: #4C3A00;
-  color: #FFE08A;
-}
-
-[data-theme="dark"] .aprobado {
-  background: #134E4A;
-  color: #A7F3D0;
-}
-
-[data-theme="dark"] .cancelado {
-  background: #7F1D1D;
-  color: #FECACA;
-}
-
-[data-theme="dark"] .btn-ver {
-  background: #E0F2FE;
-  color: #0C4A6E;
-}
-
-[data-theme="dark"] .btn-editar {
-  background: #713F12;
-  color: #FEF3C7;
-}
-
-[data-theme="dark"] .btn-cancelar {
-  background: #7F1D1D;
-  color: #FECACA;
-}
-
-[data-theme="dark"] footer {
-  color: white;
-}
-
-[data-theme="dark"] .header-title {
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .toggle-btn {
-  color: var(--primary-color);
 }
 
 /* =
