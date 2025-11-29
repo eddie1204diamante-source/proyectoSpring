@@ -25,7 +25,7 @@ public class Usuario {
 private int rolId;
 
 
-    // === GETTERS Y SETTERS CORRECTOS ===
+    // GETTERS Y SETTERS CORRECTOS
     public Integer getIdUsuario() {
         return idUsuario;
     }

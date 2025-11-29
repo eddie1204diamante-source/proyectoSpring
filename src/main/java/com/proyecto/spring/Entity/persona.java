@@ -54,9 +54,6 @@ public class persona {
     private Usuario Usuario;
 
     @OneToOne(mappedBy = "persona")
-    private bienestar bienestar;
-
-    @OneToOne(mappedBy = "persona")
     private psicologica psicologica;
 
     @OneToOne(mappedBy = "persona")
@@ -140,13 +137,6 @@ public class persona {
         this.Usuario = Usuario;
     }
 
-    public bienestar getBienestar() {
-        return bienestar;
-    }
-
-    public void setBienestar(bienestar bienestar) {
-        this.bienestar = bienestar;
-    }
 
     public psicologica getPsicologica() {
         return psicologica;
