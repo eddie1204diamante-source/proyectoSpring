@@ -1,6 +1,8 @@
 package com.proyecto.spring.Entity;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.LocalDateTime;
 
 @Entity
@@ -10,38 +12,79 @@ public class Cita {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_cita")
-    private int id;
+    private Long idCita;
 
-    @ManyToOne
-    @JoinColumn(name = "id_aprendiz")
-    private Aprendiz aprendiz;
 
-    @ManyToOne
-    @JoinColumn(name = "id_psicologica")
-    private psicologica psicologica;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_estudiante", nullable = false)
+    private aprendiz aprendiz;
 
-    private LocalDateTime fecha;
 
-    private String motivo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_orientador", nullable = false)
+    private psicologica orientador;
 
-    private String estado; // Pendiente / Aprobada / Cancelada
+    @Column(name = "fecha_cita", nullable = false)
+    private LocalDate fechaCita;
 
-    // GETTERS Y SETTERS
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    @Column(name = "hora_cita", nullable = false)
+    private LocalTime horaCita;
 
-    public Aprendiz getAprendiz() { return aprendiz; }
-    public void setAprendiz(Aprendiz aprendiz) { this.aprendiz = aprendiz; }
+    @Column(name = "motivo_original", length = 255, nullable = false)
+    private String motivoOriginal;
 
-    public psicologica getpsicologica() { return psicologica; }
-    public void setpsicologica(psicologica psicologica) { this.psicologica = psicologica; }
+    @Column(name = "motivo_clasificado", length = 100)
+    private String motivoClasificado;
 
-    public LocalDateTime getFecha() { return fecha; }
-    public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado", nullable = false)
+    private EstadoCita estado = EstadoCita.PENDIENTE;
 
-    public String getMotivo() { return motivo; }
-    public void setMotivo(String motivo) { this.motivo = motivo; }
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    // Getters y Setters
+    public Long getIdCita() { return idCita; }
+    public void setIdCita(Long idCita) { this.idCita = idCita; }
+
+    public aprendiz getAprendiz() { return aprendiz; }
+    public void setAprendiz(aprendiz aprendiz) { this.aprendiz = aprendiz; }
+
+    public psicologica getOrientador() { return orientador; }
+    public void setOrientador(psicologica orientador) { this.orientador = orientador; }
+
+    public LocalDate getFechaCita() { return fechaCita; }
+    public void setFechaCita(LocalDate fechaCita) { this.fechaCita = fechaCita; }
+
+    public LocalTime getHoraCita() { return horaCita; }
+    public void setHoraCita(LocalTime horaCita) { this.horaCita = horaCita; }
+
+    public String getMotivoOriginal() { return motivoOriginal; }
+    public void setMotivoOriginal(String motivoOriginal) { this.motivoOriginal = motivoOriginal; }
+
+    public String getMotivoClasificado() { return motivoClasificado; }
+    public void setMotivoClasificado(String motivoClasificado) { this.motivoClasificado = motivoClasificado; }
+
+    public EstadoCita getEstado() { return estado; }
+    public void setEstado(EstadoCita estado) { this.estado = estado; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

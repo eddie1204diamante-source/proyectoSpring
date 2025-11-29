@@ -11,11 +11,11 @@ public class ActividadAsignada {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idAsignada;
 
-    // 🔹 ID del aprendiz (sin relación)
+    //  ID del aprendiz 
     @Column(name = "id_estudiante", nullable = false)
     private Integer idEstudiante;
     
-    // 🔹 Datos independientes de la actividad
+    //  Datos independientes de la actividad
     @Column(nullable = false, length = 150)
     private String titulo;
 
@@ -37,9 +37,9 @@ public class ActividadAsignada {
     @Column(length = 300)
     private String observacion;
 
-    // ===============================
+    // 
     // Getters & Setters
-    // ===============================
+    // 
 
     public Integer getIdAsignada() {
         return idAsignada;
