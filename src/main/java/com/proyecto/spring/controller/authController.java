@@ -1,13 +1,13 @@
 package com.proyecto.spring.controller;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.proyecto.spring.Entity.Usuario;
+import com.proyecto.spring.config.UserDetailsServiceImpl;
 import com.proyecto.spring.dto.LoginRequest;
 import com.proyecto.spring.services.authService;
 
@@ -23,19 +24,19 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-@CrossOrigin(origins = "*")// IMPORTANTE
+@CrossOrigin(origins = "*")
 public class authController {
 
     @Autowired
     private authService authService;
 
-    // === DTOs internos (más simple que crear clases separadas) ===
+    @Autowired
+    private AuthenticationManager authenticationManager; // ← NUEVO: clave para que funcione todo
+
+    // === DTO interno para registro ===
     public static class RegisterRequest {
         public String nombres, apellidos, documento, correo, contrasena;
     }
-
-    // Ya no usamos el interno, usamos el del paquete dto
-    // public static class LoginRequest { ... }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
@@ -56,38 +57,43 @@ public class authController {
     }
 
     @PostMapping("/login")
-public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
-    try {
-        Usuario usuario = authService.login(request.getDocumento(), request.getContrasena());
+    public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
+        try {
+            // ← AQUÍ ESTÁ LA MAGIA: usamos AuthenticationManager → pasa por UserDetailsServiceImpl
+            Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                    request.getDocumento(),
+                    request.getContrasena()
+                )
+            );
 
-        // USAMOS EL rol_id DIRECTO COMO STRING
-        String rolId = String.valueOf(usuario.getRolId());
+            // Guardamos la autenticación (ahora el principal es UsuarioDetailsCustom)
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        var auth = new UsernamePasswordAuthenticationToken(
-            usuario.getPersona().getDocumento(),
-            null,
-            List.of(new SimpleGrantedAuthority(rolId))
-        );
+            // Forzamos creación de sesión (como antes)
+            httpRequest.getSession();
 
-        SecurityContextHolder.getContext().setAuthentication(auth);
-        httpRequest.getSession(); // Crea la sesión
+            // Obtenemos el usuario desde nuestro UserDetails personalizado
+            UserDetailsServiceImpl.UsuarioDetailsCustom userDetails =
+                (UserDetailsServiceImpl.UsuarioDetailsCustom) authentication.getPrincipal();
 
-        String nombreCompleto = usuario.getPersona().getNombreCompleto();
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("message", "Login exitoso");
-        response.put("rol", usuario.getRolId());
-        response.put("idUsuario", usuario.getIdUsuario());
-        response.put("nombreCompleto", nombreCompleto);
-        response.put("redirect", getRedirectUrl(usuario.getRolId()));
+            Usuario usuario = userDetails.getUsuario();
 
-        return ResponseEntity.ok(response);
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Login exitoso");
+            response.put("rol", usuario.getRolId());
+            response.put("idUsuario", usuario.getIdUsuario());
+            response.put("nombreCompleto", usuario.getPersona().getNombreCompleto());
+            response.put("redirect", getRedirectUrl(usuario.getRolId()));
 
-    } catch (Exception e) {
-        return ResponseEntity.status(401)
-                .body(Map.of("success", false, "message", e.getMessage()));
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(401)
+                    .body(Map.of("success", false, "message", "Documento o contraseña incorrectos"));
+        }
     }
-}
 
     private String getRedirectUrl(int rol) {
         return switch (rol) {

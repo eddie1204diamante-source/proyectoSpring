@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mis Resultados - MindWell Aprendiz</title>
+  <link rel="stylesheet" th:href="">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">🧠</div>
+      <h1 class="sidebar-title">MINDWELL</h1>
+    </div>
+    <div class="toggle-btn" onclick="toggleSidebar()">▶</div>
+    <ul>
+      <li data-icon="🏠">
+        <a href="/estudiante/dashboard">
+          <span>Inicio</span>
+        </a>
+      </li>
+      <li data-icon="📅">
+        <a href="#">
+          <span>Gestiona tus citas</span>
+        </a>
+      </li>
+      <li data-icon="🎓">
+        <a href="/actividades">
+          <span>Talleres</span>
+        </a>
+      </li>
+      <li data-icon="📈">
+        <a href="*">
+          <span>Resultados</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-title">📊 Mis Resultados y Progreso</div>
+    <div class="user-info">
+      <div class="user-avatar">A</div>
+      <button class="btn-sesion" onclick="window.location.href='/logout'">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    
+    <!-- MENSAJE INFORMATIVO -->
+    <section class="info-card">
+      <h2>👋 Bienvenido a tu panel de estadísticas</h2>
+      <p>Aquí podrás visualizar tu progreso personal, tus citas agendadas y los niveles de estrés y ansiedad evaluados por tu orientador en los últimos 12 meses.</p>
+    </section>
+
+    <!-- GRÁFICAS EN GRID -->
+    <section class="charts-grid">
+      
+      <!-- Gráfica 1: Mis Citas por Mes -->
+      <div class="chart-card">
+        <h3>📅 Mis Citas por Mes</h3>
+        <div class="chart-container">
+          <img th:src="${graficaCitasMes}" alt="Mis Citas por Mes" class="chart-image">
+        </div>
+      </div>
+
+      <!-- Gráfica 2: Motivos de Mis Citas -->
+      <div class="chart-card">
+        <h3>🧩 Motivos de Mis Consultas</h3>
+        <div class="chart-container">
+          <img th:src="${graficaMotivos}" alt="Motivos" class="chart-image">
+        </div>
+      </div>
+
+      <!-- Gráfica 3: Mi Nivel de Estrés -->
+      <div class="chart-card">
+        <h3>📊 Mi Nivel de Estrés y Ansiedad</h3>
+        <div class="chart-container">
+          <img th:src="${graficaNivelEstres}" alt="Nivel de Estrés" class="chart-image">
+        </div>
+      </div>
+
+      <!-- Gráfica 4: Horario de Mis Citas -->
+      <div class="chart-card">
+        <h3>🕐 Horario de Mis Citas</h3>
+        <div class="chart-container">
+          <img th:src="${graficaHora}" alt="Horario" class="chart-image">
+        </div>
+      </div>
+
+      <!-- Gráfica 5: Días que Agendo Citas -->
+      <div class="chart-card">
+        <h3>📆 Días de la Semana</h3>
+        <div class="chart-container">
+          <img th:src="${graficaDia}" alt="Día de la Semana" class="chart-image">
+        </div>
+      </div>
+
+    </section>
+
+    <!-- TABLA DE MIS EVALUACIONES -->
+    <section class="appointments-section">
+      <h2 class="section-title">📋 Historial de Mis Evaluaciones</h2>
+      <div class="table-container">
+        <table class="styled-table">
+          <thead>
+            <tr>
+              <th>Fecha Cita</th>
+              <th>Orientador</th>
+              <th>Puntuación</th>
+              <th>Nivel</th>
+              <th>Observaciones</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-evaluaciones">
+            <tr th:each="eval : ${evaluaciones}">
+              <td th:text="${#temporals.format(eval.cita.fechaCita, 'dd/MM/yyyy')}">Fecha</td>
+              <td th:text="${eval.cita.orientador.persona.nombreCompleto}">Orientador</td>
+              <td th:text="${eval.puntuacion}">45</td>
+              <td>
+                <span class="nivel-badge" 
+                      th:classappend="${eval.nivelDetectado == 'BAJO' ? 'nivel-bajo' : (eval.nivelDetectado == 'MEDIO' ? 'nivel-medio' : 'nivel-alto')}" 
+                      th:text="${eval.nivelDetectado}">MEDIO</span>
+              </td>
+              <td th:text="${eval.observaciones != null ? eval.observaciones : 'Sin observaciones'}">Observaciones</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; Team Scrum 2 - SENA</p>
+  </footer>
+
+  <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema">
+    <span id="theme-icon">🌙</span>
+  </button>
+
+  <script th:src="@{/js/cambiarTema.js}"></script>
+  <script th:src="@{/js/resultados.js}"></script>
+</body>
+</html>
