@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard - Actividades</title>
+  <title>Dashboard - Resultados y Estadísticas</title>
   <link rel="stylesheet" href="/css/dashboardO.css" />
+  <link rel="stylesheet" href="/css/resultados.css" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
   <!-- Sidebar -->
@@ -15,24 +18,26 @@
     </div>
     <div class="toggle-btn" onclick="toggleSidebar()">▶</div>
     <ul>
-      <li data-icon="🏠">
-        <a href="#">
+      <li data-icon="🏠" class="">
+        <a href="/orientador/dashboard">
           <span>Inicio</span>
         </a>
       </li>
-      <li data-icon="📅">
-        <a href="#">
-          <span>Calendario</span>
+      <li data-icon="📅" class="">
+       <a href="/orientador/gestionarCita">
+
+          <span>Gestiona tus citas</span>
         </a>
       </li>
-      <li data-icon="🎓">
-        <a href="#">
+      <li data-icon="🎓" class="">
+        <a href="/orientador/actividades">
+
           <span>Talleres</span>
         </a>
       </li>
-      <li data-icon="📈" class="active">
-        <a href="#">
-          <span>Reportes</span>
+      <li data-icon="📈" class="">
+        <a href="/orientador/resultados">
+          <span>Resultados</span>
         </a>
       </li>
     </ul>
@@ -40,73 +45,176 @@
 
   <!-- Header -->
   <header class="header">
-    <div class="header-title">Dashboard</div>
+    <div class="header-title">Dashboard - Resultados y Estadísticas</div>
     <div class="user-info">
-      <div class="user-avatar">U</div>
-    <button class="btn-sesion" id="btn-sesion">Cerrar sesión</button>
+      <div class="user-avatar">O</div>
+      <button class="btn-sesion" id="btn-sesion">Cerrar sesión</button>
     </div>
   </header>
 
   <!-- Main Content -->
   <main class="main-content">
+    
     <!-- Estadísticas rápidas -->
-      <div class="stat-card">
-        <span class="stat-icon">📝</span>
-        <div class="stat-value">25</div>
-        <div class="stat-label">Reportes Generados</div>
-      </div>
+    <div id="estadisticas-rapidas" class="stats-grid">
+      <!-- Se llenan dinámicamente con JavaScript -->
     </div>
 
-    <!-- Botón generar PDF -->
+    <!-- Botones de Acción -->
     <div class="quick-actions">
-      <a href="/reporte/actividades" target="_blank" class="action-btn">
+      <button class="action-btn btn-primary" id="btn-crear-resultado">
+        ➕ <span>Crear Resultado</span>
+      </button>
+      <a href="/reporte/actividades" target="_blank" class="action-btn btn-secondary">
         📄 <span>Generar Reporte PDF</span>
       </a>
     </div>
 
-    <!-- Gráficas de ejemplo -->
-    <div class="dashboard-grid">
-      <div class="chart-container">
-        <div class="chart-title">📊 Distribución de Actividades</div>
-        <canvas id="pieChart" style="max-height: 300px;"></canvas>
-        <p class="chart-desc">Distribución de actividades por tipo</p>
-      </div>
-      <div class="chart-container">
-        <div class="chart-title">📈 Tendencia Mensual</div>
-        <canvas id="lineChart" style="max-height: 300px;"></canvas>
-        <p class="chart-desc">Evolución de actividades registradas por mes</p>
+    <!-- Filtros (Solo Orientador) -->
+    <div class="filters-container">
+      <div class="filter-group">
+        <label for="filtro-estudiante">Filtrar por estudiante:</label>
+        <select id="filtro-estudiante" class="filter-select">
+          <option value="">Todos los estudiantes</option>
+          <!-- Se llenan dinámicamente -->
+        </select>
       </div>
     </div>
 
-    <!-- Actividad reciente -->
-    <div class="recent-activity">
-      <div class="chart-title">🕒 Actividad Reciente</div>
-      <div class="activity-item">
-        <div class="activity-icon" style="background: #dbeafe; color: #3b82f6;">📅</div>
-        <div class="activity-content">
-          <h4>Nueva actividad creada</h4>
-          <p>Clase de yoga</p>
+    <!-- Grid de Gráficas -->
+    <div class="charts-grid">
+      
+      <!-- Gráfica 1: Citas por Mes -->
+      <div class="chart-container large">
+        <div class="chart-wrapper">
+          <canvas id="chartCitasMes"></canvas>
         </div>
-        <div class="activity-time">Hace 10 min</div>
+        <p class="chart-desc">Evolución de citas agendadas en los últimos 12 meses</p>
       </div>
-      <div class="activity-item">
-        <div class="activity-icon" style="background: #dcfce7; color: #16a34a;">✅</div>
-        <div class="activity-content">
-          <h4>Reporte generado</h4>
-          <p>PDF de actividades descargado</p>
+
+      <!-- Gráfica 2: Nivel de Estrés -->
+      <div class="chart-container medium">
+        <div class="chart-wrapper">
+          <canvas id="chartNivelEstres"></canvas>
         </div>
-        <div class="activity-time">Hace 1 hora</div>
+        <p class="chart-desc">Distribución de niveles de estrés y ansiedad detectados</p>
+      </div>
+
+      <!-- Gráfica 3: Motivos Clasificados -->
+      <div class="chart-container medium">
+        <div class="chart-wrapper">
+          <canvas id="chartMotivos"></canvas>
+        </div>
+        <p class="chart-desc">Categorización de motivos de consulta</p>
+      </div>
+
+      <!-- Gráfica 4: Horarios Más Frecuentes -->
+      <div class="chart-container medium">
+        <div class="chart-wrapper">
+          <canvas id="chartHorarios"></canvas>
+        </div>
+        <p class="chart-desc">Horarios con mayor demanda de citas</p>
+      </div>
+
+      <!-- Gráfica 5: Días de la Semana -->
+      <div class="chart-container medium">
+        <div class="chart-wrapper">
+          <canvas id="chartDiasSemana"></canvas>
+        </div>
+        <p class="chart-desc">Distribución de citas por día de la semana</p>
+      </div>
+
+    </div>
+
+    <!-- Tabla de Evaluaciones Recientes -->
+    <div class="recent-evaluations">
+      <div class="section-title">
+        <h3>📋 Evaluaciones Recientes</h3>
+      </div>
+      <div class="table-container">
+        <table class="evaluations-table" id="tabla-evaluaciones">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Estudiante</th>
+              <th>Puntuación</th>
+              <th>Nivel</th>
+              <th>Observaciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Se llena dinámicamente -->
+          </tbody>
+        </table>
       </div>
     </div>
+
   </main>
+
+  <!-- Modal para Crear Resultado -->
+  <div id="modal-crear-resultado" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>➕ Crear Nueva Evaluación</h2>
+        <button class="btn-close" id="btn-cerrar-modal">&times;</button>
+      </div>
+      
+      <form id="form-crear-resultado">
+        <div class="form-group">
+          <label for="select-cita">Seleccionar Cita <span class="required">*</span></label>
+          <select id="select-cita" name="idCita" required class="form-control">
+            <option value="">Cargando citas...</option>
+          </select>
+          <small class="form-hint">Solo se muestran citas sin evaluación previa</small>
+        </div>
+
+        <div class="form-group">
+          <label for="input-puntuacion">Puntuación (0-99) <span class="required">*</span></label>
+          <input 
+            type="number" 
+            id="input-puntuacion" 
+            name="puntuacion" 
+            min="0" 
+            max="99" 
+            required 
+            class="form-control"
+            placeholder="Ingrese la puntuación"
+          />
+          <small class="form-hint">
+            • 0-33: Nivel Bajo | • 34-66: Nivel Medio | • 67-99: Nivel Alto
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="input-observaciones">Observaciones</label>
+          <textarea 
+            id="input-observaciones" 
+            name="observaciones" 
+            rows="4" 
+            class="form-control"
+            placeholder="Ingrese observaciones adicionales (opcional)"
+          ></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="btn-cancelar">Cancelar</button>
+          <button type="submit" class="btn btn-primary">💾 Guardar Evaluación</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- Footer -->
   <footer>
-    <p>&copy; Team Scrum 2 Sena</p>
+    <p>&copy; Team Scrum 2 Sena - Sistema de Resultados y Estadísticas</p>
   </footer>
 
- <script src="/js/logout.js"></script>
- 
-  </script>
+  <!-- Scripts -->
+  <script src="/js/logout.js"></script>
+  <script src="/js/cambiarTema.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="/js/resultados-charts.js"></script>
+  
+  <script></script>
 </body>
 </html>
