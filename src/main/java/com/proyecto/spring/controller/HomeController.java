@@ -34,11 +34,6 @@ public class HomeController {
         return "estudiante/consultarProceso";  // ¿Estás seguro de que el HTML se llama "consultarProceso.html"?
     }
 
-    @GetMapping("/estudiante/resultado")
-    public String resultadoEstudiante() {
-        return "estudiante/resultado";
-    }
-
     // ==================== ORIENTADOR ====================
     @GetMapping("/orientador/dashboard")
     public String dashboardOrientador() {

@@ -104,7 +104,7 @@ class ChartManager {
         const path = window.location.pathname;
         if (path.includes('/orientador/')) {
             this.rol = 'orientador';
-        } else if (path.includes('/aprendiz/')) {
+        } else if (path.includes('/estudiante/') || path.includes('/aprendiz/')) {
             this.rol = 'aprendiz';
         }
     }
@@ -113,17 +113,25 @@ class ChartManager {
     async cargarDatos() {
         const endpoint = this.rol === 'orientador' 
             ? '/orientador/resultados/datos'
-            : '/aprendiz/resultados/datos';
+            : '/estudiante/resultados/datos';  // ← RUTA CORREGIDA
+
+        console.log('🔍 Cargando datos desde:', endpoint);
 
         const response = await fetch(endpoint);
-        if (!response.ok) throw new Error('Error al cargar datos');
+        if (!response.ok) {
+            console.error('❌ Error HTTP:', response.status);
+            throw new Error('Error al cargar datos');
+        }
         
         const datos = await response.json();
+        console.log('✅ Datos recibidos:', datos);
         this.renderizarGraficas(datos);
     }
 
     // Renderizar todas las gráficas
     renderizarGraficas(datos) {
+        console.log('🎨 Renderizando gráficas con datos:', datos);
+
         // 1. Gráfica de Citas por Mes (Barras)
         if (datos.citasPorMes) {
             this.crearGraficaCitasMes(datos.citasPorMes);
@@ -152,6 +160,11 @@ class ChartManager {
         // Mostrar estadísticas rápidas
         if (datos.estadisticas) {
             this.mostrarEstadisticasRapidas(datos.estadisticas);
+        }
+
+        // 6. Mostrar tabla de evaluaciones recientes
+        if (datos.evaluacionesRecientes) {
+            this.mostrarTablaEvaluaciones(datos.evaluacionesRecientes);
         }
     }
 
@@ -553,6 +566,92 @@ class ChartManager {
         `;
     }
 
+    
+// ========================================================================
+// TABLA DE EVALUACIONES RECIENTES (CORREGIDO)
+// ========================================================================
+mostrarTablaEvaluaciones(evaluaciones) {
+    const tbody = document.querySelector('#tabla-evaluaciones tbody');
+    if (!tbody) {
+        console.warn('⚠️ No se encontró el tbody de la tabla de evaluaciones');
+        return;
+    }
+    
+    // 🔍 DEBUG: Ver estructura exacta de los datos
+    console.log('📋 Mostrando evaluaciones:', evaluaciones);
+    if (evaluaciones && evaluaciones.length > 0) {
+        console.log('🔍 Primera evaluación (estructura):', evaluaciones[0]);
+        console.log('🔍 Propiedades disponibles:', Object.keys(evaluaciones[0]));
+    }
+    
+    if (!evaluaciones || evaluaciones.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 2rem; color: #64748b;">
+                    📭 No hay evaluaciones registradas todavía
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    // ✅ CAMBIO: 'eval' → 'evaluacion'
+    tbody.innerHTML = evaluaciones.map(evaluacion => {
+        // 🔧 Mapeo flexible de propiedades (ajustar según backend)
+        const fecha = evaluacion.fecha || evaluacion.fechaEvaluacion || evaluacion.fecha_evaluacion;
+        const estudiante = evaluacion.estudiante || evaluacion.nombreEstudiante || evaluacion.nombre_estudiante || evaluacion.aprendiz;
+        const puntuacion = evaluacion.puntuacion || evaluacion.puntaje || evaluacion.score || 0;
+        const nivel = evaluacion.nivel || evaluacion.nivelEstres || evaluacion.nivel_estres || 'BAJO';
+        const observaciones = evaluacion.observaciones || evaluacion.observacion || evaluacion.comentarios || 'Sin observaciones';
+        const fechaCita = evaluacion.fechaCita || evaluacion.fecha_cita;
+        
+        // Determinar la clase del badge según el nivel
+        let badgeClass = 'nivel-bajo';
+        const nivelUpper = nivel.toString().toUpperCase();
+        if (nivelUpper === 'MEDIO' || nivelUpper === 'MODERADO') badgeClass = 'nivel-medio';
+        if (nivelUpper === 'ALTO' || nivelUpper === 'SEVERO') badgeClass = 'nivel-alto';
+        
+        // Formatear observaciones (limitar longitud)
+        let obsFormateadas = observaciones;
+        if (obsFormateadas.length > 100) {
+            obsFormateadas = obsFormateadas.substring(0, 100) + '...';
+        }
+        
+        // Construir la fila según el rol
+        if (this.rol === 'orientador') {
+            return `
+                <tr>
+                    <td>${this.formatearFecha(fecha)}</td>
+                    <td>${estudiante || 'N/A'}</td>
+                    <td><strong>${puntuacion}</strong></td>
+                    <td><span class="nivel-badge ${badgeClass}">${nivel}</span></td>
+                    <td style="max-width: 300px;">${obsFormateadas}</td>
+                </tr>
+            `;
+        } else {
+            // Para aprendiz
+            return `
+                <tr>
+                    <td>${this.formatearFecha(fecha)}</td>
+                    <td>${this.formatearFecha(fechaCita)}</td>
+                    <td><strong>${puntuacion}</strong></td>
+                    <td><span class="nivel-badge ${badgeClass}">${nivel}</span></td>
+                    <td style="max-width: 300px;">${obsFormateadas}</td>
+                </tr>
+            `;
+        }
+    }).join('');
+}
+
+    // Formatear fecha en formato más legible
+    formatearFecha(fechaString) {
+        if (!fechaString) return 'N/A';
+        
+        const fecha = new Date(fechaString + 'T00:00:00'); // Agregar hora para evitar problemas de zona horaria
+        const opciones = { year: 'numeric', month: 'short', day: 'numeric' };
+        return fecha.toLocaleDateString('es-ES', opciones);
+    }
+
     // ========================================================================
     // MODAL PARA CREAR RESULTADO (Solo Orientador)
     // ========================================================================
@@ -657,9 +756,37 @@ class ChartManager {
 
         const filtroEstudiante = document.getElementById('filtro-estudiante');
         if (filtroEstudiante) {
+            // Cargar lista de estudiantes
+            this.cargarEstudiantes();
+
+            // Evento change
             filtroEstudiante.addEventListener('change', () => {
                 this.aplicarFiltros();
             });
+        }
+    }
+
+    async cargarEstudiantes() {
+        try {
+            const response = await fetch('/orientador/estudiantes');
+            const estudiantes = await response.json();
+
+            const filtroEstudiante = document.getElementById('filtro-estudiante');
+            if (!filtroEstudiante) return;
+
+            // Mantener la opción "Todos"
+            filtroEstudiante.innerHTML = '<option value="">Todos los estudiantes</option>';
+
+            estudiantes.forEach(estudiante => {
+                const option = document.createElement('option');
+                option.value = estudiante.id;
+                option.textContent = estudiante.nombre;
+                filtroEstudiante.appendChild(option);
+            });
+
+            console.log('✅ Estudiantes cargados en el filtro:', estudiantes.length);
+        } catch (error) {
+            console.error('❌ Error al cargar estudiantes:', error);
         }
     }
 
@@ -695,14 +822,3 @@ document.addEventListener('DOMContentLoaded', () => {
     window.chartManager = new ChartManager();
     window.chartManager.init();
 });
-
-   // Funcionalidad del sidebar
-    function toggleSidebar() {
-      const sidebar = document.getElementById('sidebar');
-      sidebar.classList.toggle('collapsed');
-    }
-
-    // Cerrar modal con botón cancelar
-    document.getElementById('btn-cancelar')?.addEventListener('click', () => {
-      document.getElementById('modal-crear-resultado').style.display = 'none';
-    });

@@ -3,151 +3,169 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mis Resultados - MindWell Aprendiz</title>
-  <link rel="stylesheet" th:href="">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <title>Mis Resultados - Estadísticas Personales</title>
+  <link rel="stylesheet" href="/css/dashboardO.css" />
+  <link rel="stylesheet" href="/css/resultados.css" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
-  <!-- SIDEBAR -->
+  <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-logo">🧠</div>
-      <h1 class="sidebar-title">MINDWELL</h1>
+      <div class="sidebar-logo">📊</div>
+      <h1 class="sidebar-title">MIS RESULTADOS</h1>
     </div>
     <div class="toggle-btn" onclick="toggleSidebar()">▶</div>
-    <ul>
-      <li data-icon="🏠">
+        <ul>
+      <li data-icon="🏠" class="">
         <a href="/estudiante/dashboard">
           <span>Inicio</span>
         </a>
       </li>
-      <li data-icon="📅">
-        <a href="#">
+      <li data-icon="📅" class="">
+        <a href="/gestionCita">
           <span>Gestiona tus citas</span>
         </a>
       </li>
-      <li data-icon="🎓">
+      <li data-icon="🎓" class="">
         <a href="/actividades">
           <span>Talleres</span>
         </a>
       </li>
-      <li data-icon="📈">
-        <a href="*">
+      <li data-icon="📈" class="">
+        <a href="/estudiante/resultado">
           <span>Resultados</span>
         </a>
       </li>
     </ul>
   </div>
 
-  <!-- HEADER -->
+  <!-- Header -->
   <header class="header">
-    <div class="header-title">📊 Mis Resultados y Progreso</div>
+    <div class="header-title">Mis Resultados y Estadísticas</div>
     <div class="user-info">
       <div class="user-avatar">A</div>
-      <button class="btn-sesion" onclick="window.location.href='/logout'">Cerrar sesión</button>
+      <button class="btn-sesion" id="btn-sesion">Cerrar sesión</button>
     </div>
   </header>
 
-  <!-- MAIN CONTENT -->
+  <!-- Main Content -->
   <main class="main-content">
     
-    <!-- MENSAJE INFORMATIVO -->
-    <section class="info-card">
-      <h2>👋 Bienvenido a tu panel de estadísticas</h2>
-      <p>Aquí podrás visualizar tu progreso personal, tus citas agendadas y los niveles de estrés y ansiedad evaluados por tu orientador en los últimos 12 meses.</p>
-    </section>
+    <!-- Banner informativo -->
+    <div class="info-banner">
+      <div class="info-icon">ℹ️</div>
+      <div class="info-content">
+        <h3>Bienvenido a tus estadísticas personales</h3>
+        <p>Aquí puedes visualizar el progreso de tus citas y evaluaciones de estrés y ansiedad realizadas por tu orientador.</p>
+      </div>
+    </div>
 
-    <!-- GRÁFICAS EN GRID -->
-    <section class="charts-grid">
+    <!-- Estadísticas rápidas -->
+    <div id="estadisticas-rapidas" class="stats-grid">
+      <!-- Se llenan dinámicamente con JavaScript -->
+    </div>
+
+    <!-- Grid de Gráficas -->
+    <div class="charts-grid">
       
       <!-- Gráfica 1: Mis Citas por Mes -->
-      <div class="chart-card">
-        <h3>📅 Mis Citas por Mes</h3>
-        <div class="chart-container">
-          <img th:src="${graficaCitasMes}" alt="Mis Citas por Mes" class="chart-image">
+      <div class="chart-container large">
+        <div class="chart-wrapper">
+          <canvas id="chartCitasMes"></canvas>
         </div>
+        <p class="chart-desc">Evolución de tus citas en los últimos 12 meses</p>
       </div>
 
-      <!-- Gráfica 2: Motivos de Mis Citas -->
-      <div class="chart-card">
-        <h3>🧩 Motivos de Mis Consultas</h3>
-        <div class="chart-container">
-          <img th:src="${graficaMotivos}" alt="Motivos" class="chart-image">
+      <!-- Gráfica 2: Mi Nivel de Estrés -->
+      <div class="chart-container medium">
+        <div class="chart-wrapper">
+          <canvas id="chartNivelEstres"></canvas>
         </div>
+        <p class="chart-desc">Distribución de tus niveles de estrés evaluados</p>
       </div>
 
-      <!-- Gráfica 3: Mi Nivel de Estrés -->
-      <div class="chart-card">
-        <h3>📊 Mi Nivel de Estrés y Ansiedad</h3>
-        <div class="chart-container">
-          <img th:src="${graficaNivelEstres}" alt="Nivel de Estrés" class="chart-image">
+      <!-- Gráfica 3: Mis Motivos de Consulta -->
+      <div class="chart-container medium">
+        <div class="chart-wrapper">
+          <canvas id="chartMotivos"></canvas>
         </div>
+        <p class="chart-desc">Categorización de tus motivos de consulta</p>
       </div>
 
-      <!-- Gráfica 4: Horario de Mis Citas -->
-      <div class="chart-card">
-        <h3>🕐 Horario de Mis Citas</h3>
-        <div class="chart-container">
-          <img th:src="${graficaHora}" alt="Horario" class="chart-image">
+      <!-- Gráfica 4: Mis Horarios Preferidos -->
+      <div class="chart-container medium">
+        <div class="chart-wrapper">
+          <canvas id="chartHorarios"></canvas>
         </div>
+        <p class="chart-desc">Horarios en los que sueles agendar tus citas</p>
       </div>
 
-      <!-- Gráfica 5: Días que Agendo Citas -->
-      <div class="chart-card">
-        <h3>📆 Días de la Semana</h3>
-        <div class="chart-container">
-          <img th:src="${graficaDia}" alt="Día de la Semana" class="chart-image">
+      <!-- Gráfica 5: Mis Días Preferidos -->
+      <div class="chart-container medium">
+        <div class="chart-wrapper">
+          <canvas id="chartDiasSemana"></canvas>
         </div>
+        <p class="chart-desc">Días de la semana en que más agendas citas</p>
       </div>
 
-    </section>
+    </div>
 
-    <!-- TABLA DE MIS EVALUACIONES -->
-    <section class="appointments-section">
-      <h2 class="section-title">📋 Historial de Mis Evaluaciones</h2>
+    <!-- Tabla de Mis Evaluaciones -->
+    <div class="recent-evaluations">
+      <div class="section-title">
+        <h3>📋 Mis Evaluaciones</h3>
+      </div>
       <div class="table-container">
-        <table class="styled-table">
+        <table class="evaluations-table" id="tabla-evaluaciones">
           <thead>
             <tr>
-              <th>Fecha Cita</th>
-              <th>Orientador</th>
+              <th>Fecha de Evaluación</th>
+              <th>Fecha de Cita</th>
               <th>Puntuación</th>
-              <th>Nivel</th>
+              <th>Nivel Detectado</th>
               <th>Observaciones</th>
             </tr>
           </thead>
-          <tbody id="tabla-evaluaciones">
-            <tr th:each="eval : ${evaluaciones}">
-              <td th:text="${#temporals.format(eval.cita.fechaCita, 'dd/MM/yyyy')}">Fecha</td>
-              <td th:text="${eval.cita.orientador.persona.nombreCompleto}">Orientador</td>
-              <td th:text="${eval.puntuacion}">45</td>
-              <td>
-                <span class="nivel-badge" 
-                      th:classappend="${eval.nivelDetectado == 'BAJO' ? 'nivel-bajo' : (eval.nivelDetectado == 'MEDIO' ? 'nivel-medio' : 'nivel-alto')}" 
-                      th:text="${eval.nivelDetectado}">MEDIO</span>
-              </td>
-              <td th:text="${eval.observaciones != null ? eval.observaciones : 'Sin observaciones'}">Observaciones</td>
-            </tr>
+          <tbody>
+            <!-- Se llena dinámicamente -->
           </tbody>
         </table>
       </div>
-    </section>
+    </div>
+
+    <!-- Mensaje de motivación -->
+    <div class="motivation-card">
+      <div class="motivation-icon">💪</div>
+      <div class="motivation-content">
+        <h4>¡Sigue adelante!</h4>
+        <p>El seguimiento de tu bienestar emocional es el primer paso hacia una vida más equilibrada. Continúa asistiendo a tus citas y trabajando en tu desarrollo personal.</p>
+      </div>
+    </div>
 
   </main>
 
-  <!-- FOOTER -->
+  <!-- Footer -->
   <footer>
-    <p>&copy; Team Scrum 2 - SENA</p>
+    <p>&copy; Team Scrum 2 Sena - Tu Bienestar es Nuestra Prioridad</p>
   </footer>
+
+  <!-- Scripts -->
+  <script src="/js/logout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="/js/resultados-charts.js"></script>
 
   <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema">
     <span id="theme-icon">🌙</span>
   </button>
-
-  <script th:src="@{/js/cambiarTema.js}"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script th:src="@{/js/resultados.js}"></script>
+  
+  <script>
+    // Funcionalidad del sidebar
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('collapsed');
+    }
+  </script>
 </body>
 </html>

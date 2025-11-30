@@ -11,6 +11,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,66 +28,105 @@ import com.proyecto.spring.services.EvaluacionEstresService;
 import lombok.RequiredArgsConstructor;
 
 @Controller
-@RequestMapping("/aprendiz")
+@RequestMapping("/estudiante")  // ← MANTENER TU RUTA ORIGINAL
 @RequiredArgsConstructor
 public class ResultadosAprendizController {
+    
+    private static final Logger log = LoggerFactory.getLogger(ResultadosAprendizController.class);
     
     private final EvaluacionEstresService evaluacionService;
 
     /**
      * Muestra la página de resultados del aprendiz
      */
-    @GetMapping("/resultados")
+    @GetMapping("/resultado")  // ← MANTENER TU RUTA ORIGINAL
     public String mostrarMisResultados(Model model,
             @AuthenticationPrincipal UserDetailsServiceImpl.UsuarioDetailsCustom userDetails) {
         
         var usuario = userDetails.getUsuario();
+        log.info("🟢 Aprendiz {} accediendo a resultados", usuario.getIdUsuario());
         model.addAttribute("nombreAprendiz", usuario.getPersona().getNombreCompleto());
-        return "aprendiz/resultados-aprendiz";
+        return "estudiante/resultado";  // ← MANTENER TU RUTA ORIGINAL
     }
 
     /**
      * Endpoint REST que devuelve todos los datos para las gráficas en formato JSON
+     * ¡IMPORTANTE! Esta ruta debe coincidir con la que busca el JavaScript
      */
-    @GetMapping("/resultados/datos")
+    @GetMapping("/resultados/datos")  // ← NUEVA RUTA PARA EL JS
     @ResponseBody
     public Map<String, Object> obtenerDatosGraficas(
             @AuthenticationPrincipal UserDetailsServiceImpl.UsuarioDetailsCustom userDetails) {
         
-        var usuario = userDetails.getUsuario();
-        Long idUsuario = usuario.getIdUsuario().longValue();
-        
-        LocalDate hoy = LocalDate.now();
-        LocalDate hace12meses = hoy.minusMonths(12);
-        
-        // Obtener mis datos
-        List<EvaluacionEstres> evaluaciones = evaluacionService.getMisEvaluaciones(idUsuario);
-        List<Cita> citas = evaluacionService.getMisCitas(idUsuario, hace12meses, hoy);
-        
-        Map<String, Object> response = new HashMap<>();
-        
-        // 1. Datos para gráfica de Mis Citas por Mes
-        response.put("citasPorMes", generarDatosCitasPorMes(citas));
-        
-        // 2. Datos para gráfica de Mis Motivos Clasificados
-        response.put("motivosClasificados", generarDatosMotivos(citas));
-        
-        // 3. Datos para gráfica de Mi Nivel de Estrés
-        response.put("nivelesEstres", generarDatosNivelEstres(evaluaciones));
-        
-        // 4. Datos para gráfica de Mis Horarios
-        response.put("citasPorHora", generarDatosHorarios(citas));
-        
-        // 5. Datos para gráfica de Mis Días de la Semana
-        response.put("citasPorDia", generarDatosDiasSemana(citas));
-        
-        // 6. Mis Estadísticas rápidas
-        response.put("estadisticas", generarEstadisticasRapidas(citas, evaluaciones));
-        
-        // 7. Lista de mis evaluaciones recientes
-        response.put("evaluacionesRecientes", generarListaEvaluaciones(evaluaciones, citas));
-        
-        return response;
+        try {
+            var usuario = userDetails.getUsuario();
+            Long idUsuario = usuario.getIdUsuario().longValue();
+            
+            log.info("📊 Cargando datos para aprendiz ID: {}", idUsuario);
+            
+            LocalDate hoy = LocalDate.now();
+            LocalDate hace12meses = hoy.minusMonths(12);
+            
+            // Obtener mis datos
+            List<EvaluacionEstres> evaluaciones = evaluacionService.getMisEvaluaciones(idUsuario);
+            List<Cita> citas = evaluacionService.getMisCitas(idUsuario, hace12meses, hoy);
+            
+            log.info("✅ Datos cargados: {} evaluaciones, {} citas", evaluaciones.size(), citas.size());
+            
+            // DEBUG: Imprimir datos
+            if (!citas.isEmpty()) {
+                log.info("📅 Primera cita: ID={}, Fecha={}", 
+                        citas.get(0).getIdCita(),
+                        citas.get(0).getFechaCita());
+            } else {
+                log.warn("⚠️ NO SE ENCONTRARON CITAS para aprendiz {}", idUsuario);
+            }
+            
+            if (!evaluaciones.isEmpty()) {
+                log.info("📝 Primera evaluación: puntuación={}", evaluaciones.get(0).getPuntuacion());
+            } else {
+                log.warn("⚠️ NO SE ENCONTRARON EVALUACIONES para aprendiz {}", idUsuario);
+            }
+            
+            Map<String, Object> response = new HashMap<>();
+            
+            // 1. Datos para gráfica de Mis Citas por Mes
+            response.put("citasPorMes", generarDatosCitasPorMes(citas));
+            
+            // 2. Datos para gráfica de Mis Motivos Clasificados
+            response.put("motivosClasificados", generarDatosMotivos(citas));
+            
+            // 3. Datos para gráfica de Mi Nivel de Estrés
+            response.put("nivelesEstres", generarDatosNivelEstres(evaluaciones));
+            
+            // 4. Datos para gráfica de Mis Horarios
+            response.put("citasPorHora", generarDatosHorarios(citas));
+            
+            // 5. Datos para gráfica de Mis Días de la Semana
+            response.put("citasPorDia", generarDatosDiasSemana(citas));
+            
+            // 6. Mis Estadísticas rápidas
+            response.put("estadisticas", generarEstadisticasRapidas(citas, evaluaciones));
+            
+            // 7. Lista de mis evaluaciones recientes
+            response.put("evaluacionesRecientes", generarListaEvaluaciones(evaluaciones, citas));
+            
+            log.info("📤 Enviando respuesta al frontend");
+            return response;
+            
+        } catch (Exception e) {
+            log.error("❌ Error al cargar datos del aprendiz: {}", e.getMessage(), e);
+            // Retornar estructura vacía en caso de error
+            Map<String, Object> response = new HashMap<>();
+            response.put("citasPorMes", crearEstructuraVacia());
+            response.put("motivosClasificados", crearMotivosVacios());
+            response.put("nivelesEstres", crearNivelesVacios());
+            response.put("citasPorHora", crearEstructuraVacia());
+            response.put("citasPorDia", crearDiasVacios());
+            response.put("estadisticas", crearEstadisticasVacias());
+            response.put("evaluacionesRecientes", new ArrayList<>());
+            return response;
+        }
     }
 
     // ========================================================================
@@ -94,6 +135,14 @@ public class ResultadosAprendizController {
 
     private Map<String, Object> generarDatosCitasPorMes(List<Cita> citas) {
         Map<String, Object> datos = new HashMap<>();
+        
+        if (citas.isEmpty()) {
+            datos.put("meses", new ArrayList<>());
+            datos.put("cantidades", new ArrayList<>());
+            log.warn("⚠️ No hay citas para generar gráfica de citas por mes");
+            return datos;
+        }
+        
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("MMM yyyy", new Locale("es", "ES"));
         
         // Agrupar por mes
@@ -114,41 +163,63 @@ public class ResultadosAprendizController {
         
         datos.put("meses", meses);
         datos.put("cantidades", cantidades);
+        
+        log.debug("📊 Citas por mes: {} meses con datos", meses.size());
         return datos;
     }
 
     private Map<String, Long> generarDatosMotivos(List<Cita> citas) {
         Map<String, Long> datos = new HashMap<>();
-        datos.put("ansiedad", citas.stream()
+        
+        long ansiedad = citas.stream()
                 .filter(c -> "ANSIEDAD".equalsIgnoreCase(c.getMotivoClasificado()))
-                .count());
-        datos.put("estres", citas.stream()
+                .count();
+        long estres = citas.stream()
                 .filter(c -> "ESTRES".equalsIgnoreCase(c.getMotivoClasificado()))
-                .count());
-        datos.put("otro", citas.stream()
+                .count();
+        long otro = citas.stream()
                 .filter(c -> c.getMotivoClasificado() == null ||
                         (!"ANSIEDAD".equalsIgnoreCase(c.getMotivoClasificado()) &&
                          !"ESTRES".equalsIgnoreCase(c.getMotivoClasificado())))
-                .count());
+                .count();
+        
+        datos.put("ansiedad", ansiedad);
+        datos.put("estres", estres);
+        datos.put("otro", otro);
+        
+        log.debug("📊 Motivos: ansiedad={}, estrés={}, otro={}", ansiedad, estres, otro);
         return datos;
     }
 
     private Map<String, Long> generarDatosNivelEstres(List<EvaluacionEstres> evaluaciones) {
         Map<String, Long> datos = new HashMap<>();
-        datos.put("bajo", evaluaciones.stream()
+        
+        long bajo = evaluaciones.stream()
                 .filter(e -> e.getPuntuacion() <= 33)
-                .count());
-        datos.put("medio", evaluaciones.stream()
+                .count();
+        long medio = evaluaciones.stream()
                 .filter(e -> e.getPuntuacion() > 33 && e.getPuntuacion() <= 66)
-                .count());
-        datos.put("alto", evaluaciones.stream()
+                .count();
+        long alto = evaluaciones.stream()
                 .filter(e -> e.getPuntuacion() > 66)
-                .count());
+                .count();
+        
+        datos.put("bajo", bajo);
+        datos.put("medio", medio);
+        datos.put("alto", alto);
+        
+        log.debug("📊 Niveles estrés: bajo={}, medio={}, alto={}", bajo, medio, alto);
         return datos;
     }
 
     private Map<String, Object> generarDatosHorarios(List<Cita> citas) {
         Map<String, Object> datos = new HashMap<>();
+        
+        if (citas.isEmpty()) {
+            datos.put("horas", new ArrayList<>());
+            datos.put("cantidades", new ArrayList<>());
+            return datos;
+        }
         
         Map<Integer, Long> citasPorHora = citas.stream()
                 .collect(Collectors.groupingBy(
@@ -231,5 +302,52 @@ public class ResultadosAprendizController {
                     return evalMap;
                 })
                 .collect(Collectors.toList());
+    }
+
+    // ========================================================================
+    // MÉTODOS AUXILIARES PARA ESTRUCTURAS VACÍAS (en caso de error)
+    // ========================================================================
+
+    private Map<String, Object> crearEstructuraVacia() {
+        Map<String, Object> datos = new HashMap<>();
+        datos.put("meses", new ArrayList<>());
+        datos.put("cantidades", new ArrayList<>());
+        datos.put("horas", new ArrayList<>());
+        return datos;
+    }
+
+    private Map<String, Long> crearMotivosVacios() {
+        Map<String, Long> datos = new HashMap<>();
+        datos.put("ansiedad", 0L);
+        datos.put("estres", 0L);
+        datos.put("otro", 0L);
+        return datos;
+    }
+
+    private Map<String, Long> crearNivelesVacios() {
+        Map<String, Long> datos = new HashMap<>();
+        datos.put("bajo", 0L);
+        datos.put("medio", 0L);
+        datos.put("alto", 0L);
+        return datos;
+    }
+
+    private Map<String, Object> crearDiasVacios() {
+        Map<String, Object> datos = new HashMap<>();
+        List<Long> cantidades = new ArrayList<>();
+        for (int i = 0; i < 7; i++) {
+            cantidades.add(0L);
+        }
+        datos.put("cantidades", cantidades);
+        return datos;
+    }
+
+    private Map<String, Object> crearEstadisticasVacias() {
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("totalCitas", 0);
+        stats.put("totalEvaluaciones", 0);
+        stats.put("promedioEstres", "N/A");
+        stats.put("citasEsteMes", 0);
+        return stats;
     }
 }
