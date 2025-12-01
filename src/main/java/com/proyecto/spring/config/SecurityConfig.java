@@ -40,7 +40,7 @@ public class SecurityConfig {
                             .anyMatch(a -> "2".equals(a.getAuthority()))
                     )
                 )
-                .requestMatchers("/orientador/**").access((authentication, context) -> 
+                .requestMatchers("/orientador/**", "/api/pdf/**").access((authentication, context) -> 
                     new AuthorizationDecision(
                         authentication.get().getAuthorities().stream()
                             .anyMatch(a -> "3".equals(a.getAuthority()))

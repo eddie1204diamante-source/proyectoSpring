@@ -1,4 +1,3 @@
-// src/main/java/com/proyecto/spring/Entity/EvaluacionEstres.java
 package com.proyecto.spring.Entity;
 
 import java.time.LocalDateTime;
@@ -61,7 +60,7 @@ public class EvaluacionEstres {
         }
     }
 
-    // Método para usar en el código viejo (getNivel)
+    
     @Transient
     public String getNivel() {
         if (puntuacion == null) return "SIN_EVALUAR";

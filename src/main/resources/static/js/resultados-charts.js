@@ -1,6 +1,3 @@
-// resultados-charts.js - Sistema de Gráficas Dinámicas e Interactivas
-// ============================================================================
-
 // Configuración global de Chart.js
 Chart.defaults.font.family = "'Inter', 'Segoe UI', sans-serif";
 Chart.defaults.plugins.legend.labels.usePointStyle = true;
@@ -75,9 +72,9 @@ const TOOLTIP_CONFIG = {
     }
 };
 
-// ============================================================================
+// 
 // CLASE PRINCIPAL DEL SISTEMA DE GRÁFICAS
-// ============================================================================
+// 
 class ChartManager {
     constructor() {
         this.charts = {};
@@ -113,7 +110,7 @@ class ChartManager {
     async cargarDatos() {
         const endpoint = this.rol === 'orientador' 
             ? '/orientador/resultados/datos'
-            : '/estudiante/resultados/datos';  // ← RUTA CORREGIDA
+            : '/estudiante/resultados/datos';  
 
         console.log('🔍 Cargando datos desde:', endpoint);
 
@@ -168,9 +165,9 @@ class ChartManager {
         }
     }
 
-    // ========================================================================
+
     // GRÁFICA 1: CITAS POR MES (Barras con gradiente)
-    // ========================================================================
+ 
     crearGraficaCitasMes(datos) {
         const ctx = document.getElementById('chartCitasMes');
         if (!ctx) return;
@@ -242,9 +239,9 @@ class ChartManager {
         });
     }
 
-    // ========================================================================
-    // GRÁFICA 2: MOTIVOS CLASIFICADOS (Pie con animación)
-    // ========================================================================
+
+    // GRÁFICA 2: MOTIVOS CLASIFICADOS
+  
     crearGraficaMotivos(datos) {
         const ctx = document.getElementById('chartMotivos');
         if (!ctx) return;
@@ -309,9 +306,9 @@ class ChartManager {
         });
     }
 
-    // ========================================================================
+   
     // GRÁFICA 3: NIVEL DE ESTRÉS Y ANSIEDAD (Donut)
-    // ========================================================================
+    
     crearGraficaNivelEstres(datos) {
         const ctx = document.getElementById('chartNivelEstres');
         if (!ctx) return;
@@ -377,9 +374,9 @@ class ChartManager {
         });
     }
 
-    // ========================================================================
+ 
     // GRÁFICA 4: HORARIOS MÁS FRECUENTES (Barras horizontales)
-    // ========================================================================
+   
     crearGraficaHorarios(datos) {
         const ctx = document.getElementById('chartHorarios');
         if (!ctx) return;
@@ -449,9 +446,9 @@ class ChartManager {
         });
     }
 
-    // ========================================================================
-    // GRÁFICA 5: DÍAS DE LA SEMANA (Barras con colores distintos)
-    // ========================================================================
+
+    // GRÁFICA 5: DÍAS DE LA SEMANA 
+ 
     crearGraficaDiasSemana(datos) {
         const ctx = document.getElementById('chartDiasSemana');
         if (!ctx) return;
@@ -527,9 +524,9 @@ class ChartManager {
         });
     }
 
-    // ========================================================================
+   
     // ESTADÍSTICAS RÁPIDAS
-    // ========================================================================
+  
     mostrarEstadisticasRapidas(stats) {
         const container = document.getElementById('estadisticas-rapidas');
         if (!container) return;
@@ -567,9 +564,9 @@ class ChartManager {
     }
 
     
-// ========================================================================
+
 // TABLA DE EVALUACIONES RECIENTES (CORREGIDO)
-// ========================================================================
+
 mostrarTablaEvaluaciones(evaluaciones) {
     const tbody = document.querySelector('#tabla-evaluaciones tbody');
     if (!tbody) {
@@ -647,14 +644,14 @@ mostrarTablaEvaluaciones(evaluaciones) {
     formatearFecha(fechaString) {
         if (!fechaString) return 'N/A';
         
-        const fecha = new Date(fechaString + 'T00:00:00'); // Agregar hora para evitar problemas de zona horaria
+        const fecha = new Date(fechaString + 'T00:00:00');
         const opciones = { year: 'numeric', month: 'short', day: 'numeric' };
         return fecha.toLocaleDateString('es-ES', opciones);
     }
 
-    // ========================================================================
+
     // MODAL PARA CREAR RESULTADO (Solo Orientador)
-    // ========================================================================
+
     setupModalCrearResultado() {
         if (this.rol !== 'orientador') return;
 
@@ -748,9 +745,9 @@ mostrarTablaEvaluaciones(evaluaciones) {
         }
     }
 
-    // ========================================================================
+  
     // FILTROS (PARA ORIENTADOR)
-    // ========================================================================
+     
     setupFiltros() {
         if (this.rol !== 'orientador') return;
 
@@ -801,9 +798,9 @@ mostrarTablaEvaluaciones(evaluaciones) {
         this.renderizarGraficas(datos);
     }
 
-    // ========================================================================
+ 
     // UTILIDADES
-    // ========================================================================
+  
     mostrarError(mensaje) {
         // Implementar notificación toast o alert
         alert(mensaje);
@@ -815,9 +812,9 @@ mostrarTablaEvaluaciones(evaluaciones) {
     }
 }
 
-// ============================================================================
-// INICIALIZACIÓN AUTOMÁTICA
-// ============================================================================
+
+// INICIALIZACIÓN 
+
 document.addEventListener('DOMContentLoaded', () => {
     window.chartManager = new ChartManager();
     window.chartManager.init();
