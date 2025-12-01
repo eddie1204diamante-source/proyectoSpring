@@ -1,113 +1,92 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard - MindWell</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindWell | Administración de Usuarios</title>
+
   <link rel="stylesheet" href="/css/dashboardAdmin.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
+</head>
 
 <body>
 
-<!-- 
-     SIDEBAR
- -->
-<aside class="sidebar" id="sidebar">
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-        <div class="sidebar-logo"> <img src="/img/logo.png" alt="Logo MindWell" class="logo-img" /></div>
-        <span class="sidebar-title">MindWell Admin</span>
+      <div class="sidebar-logo">🧠</div>
+      <h1 class="sidebar-title">MINDWELL</h1>
     </div>
+    <ul><li data-icon="👥" class="active"><a href="#"><span>Administrar Usuarios</span></a></li></ul>
+</div>
 
-    <div class="toggle-btn" onclick="toggleSidebar()">⮜</div>
-
-    <ul>
-        <li th:class="${activePage == 'home'} ? 'active'" data-icon="🏠">
-            <a th:href="@{/dashboard}"><span>Inicio</span></a>
-        </li>
-
-        <li th:class="${activePage == 'usuarios'} ? 'active'" data-icon="👤">
-            <a th:href="@{/admin/usuarios}"><span>Gestión de Usuarios</span></a>
-        </li>
-
-        <li th:class="${activePage == 'reportes'} ? 'active'" data-icon="📊">
-            <a th:href="@{/admin/reportes}"><span>Reportes</span></a>
-        </li>
-
-        <li data-icon="🚪">
-            <a href="/logout"><span>Cerrar Sesión</span></a>
-        </li>
-    </ul>
-</aside>
-
-<!-- 
-     HEADER
- -->
+<!-- HEADER -->
 <header class="header">
-    <h1 class="header-title">Dashboard General</h1>
-
-    <div class="user-info">
-        <div class="user-avatar">A</div>
-        <button class="btn-sesion" onclick="location.href='/logout'">Salir</button>
-    </div>
+  <div class="header-title">Administración de Usuarios</div>
+  <div class="user-info">
+      <div class="user-avatar">A</div>
+   <button class="btn-sesion" id="btn-sesion">Cerrar sesión</button>
+  </div>
 </header>
 
-<!-- 
-     MAIN CONTENT
- -->
+<!--  CONTENIDO  -->
 <main class="main-content">
+  <div class="content-box">
+      <h2 style="margin-bottom:10px;color:var(--primary-color)">🔐 Control de Usuarios del Sistema</h2>
 
-    <h2 style="margin-bottom: 1rem;">Estadísticas Generales</h2>
-
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon">👥</div>
-            <div class="stat-value" th:text="${totalUsuarios}">0</div>
-            <div class="stat-label">Usuarios totales</div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon">📇</div>
-            <div class="stat-value" th:text="${totalPersonas}">0</div>
-            <div class="stat-label">Personas registradas</div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon">🎓</div>
-            <div class="stat-value" th:text="${totalAprendices}">0</div>
-            <div class="stat-label">Aprendices</div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon">💚</div>
-            <div class="stat-value" th:text="${totalBienestar}">0</div>
-            <div class="stat-label">Registros Bienestar</div>
-        </div>
-    </div>
-
-    <div class="chart-container">
-        <h3 class="chart-title">Niveles de Estrés</h3>
-        <canvas id="estresChart"></canvas>
-    </div>
-
+      <table id="tablaUsuarios">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Rol</th>
+            <th>Persona</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+  </div>
 </main>
 
-<footer>
-    © 2025 MindWell — Gaes 2
-</footer>
+<!--  MODAL FORMULARIO  -->
+<div class="form-popup" id="formUsuario">
+  <h3 id="tituloForm"></h3>
+  <input type="hidden" id="idUsuario">
+
+  <label>Correo:</label>
+  <input type="email" id="correo" required placeholder="ejemplo@email.com">
+
+  
+  <label>Rol:</label>
+  <select id="rolId">
+    <option value="">Seleccione un rol</option>
+    <option value="1">Admin</option>
+    <option value="2">Aprendiz</option>
+    <option value="3">Orientador</option>
+  </select>
+
+  <label>ID Persona:</label>
+  <input type="number" id="personaId" placeholder="Ej: 12">
+
+  <button class="btn btn-create" onclick="guardarUsuario()">Guardar</button>
+  <button class="btn btn-delete" onclick="cerrarForm()">Cancelar</button>
+</div>
 
 <script>
-function toggleSidebar() {
-    const sidebar = document.getElementById("sidebar");
-    sidebar.classList.toggle("closed");
-}
-
-const ctx = document.getElementById('estresChart').getContext('2d');
-
-
 </script>
+
+
+<script src="/js/logout.js"></script>
+<script src="/js/admin.js"></script>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; Team scrum 2 Sena.</p>
+  </footer>
 
 </body>
 </html>

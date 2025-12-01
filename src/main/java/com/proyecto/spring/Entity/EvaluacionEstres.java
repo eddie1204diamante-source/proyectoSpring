@@ -16,7 +16,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 @Entity
 @Table(name = "evaluacion_estres")
 @Data
@@ -27,6 +26,7 @@ public class EvaluacionEstres {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_evaluacion_estres")
     private Long id;
 
     @OneToOne
@@ -44,23 +44,17 @@ public class EvaluacionEstres {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    // Se ejecuta antes de guardar
+    
     @PrePersist
     public void calcularNivelYFecha() {
         this.createdAt = LocalDateTime.now();
         if (puntuacion != null) {
-            if (puntuacion <= 33) {
-                this.nivelDetectado = "BAJO";
-            } else if (puntuacion <= 66) {
-                this.nivelDetectado = "MEDIO";
-            } else {
-                this.nivelDetectado = "ALTO";
-            }
+            if (puntuacion <= 33) this.nivelDetectado = "BAJO";
+            else if (puntuacion <= 66) this.nivelDetectado = "MEDIO";
+            else this.nivelDetectado = "ALTO";
         }
     }
 
-    
     @Transient
     public String getNivel() {
         if (puntuacion == null) return "SIN_EVALUAR";
