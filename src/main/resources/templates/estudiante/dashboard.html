@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard - MindWell</title>
+  <title>Dashboard Aprendiz - MindWell</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="/css/dashboard.css">
@@ -17,131 +17,92 @@
     </div>
     <div class="toggle-btn" onclick="toggleSidebar()">▶</div>
     <ul>
-      <li data-icon="🏠" class="">
-        <a href="#">
+      <li data-icon="🏠" class="active">
+        <a href="/estudiante/dashboard">
           <span>Inicio</span>
         </a>
       </li>
-      <li data-icon="📅" class="">
+      <li data-icon="📅">
         <a href="/gestionCita">
           <span>Gestiona tus citas</span>
         </a>
       </li>
-      <li data-icon="🎓" class="">
+      <li data-icon="🎓">
         <a href="/actividades">
           <span>Talleres</span>
         </a>
       </li>
-      <li data-icon="📈" class="">
+      <li data-icon="📈">
         <a href="/estudiante/resultado">
           <span>Resultados</span>
         </a>
       </li>
     </ul>
   </div>
-  <!-- header -->
+
+  <!-- Header -->
   <header class="header">
-    <div class="header-title">Dashboard</div>
+    <div class="header-title">Dashboard Aprendiz</div>
     <div class="user-info">
-      <div class="user-avatar">U</div>
-         <button class="btn-sesion" id="btn-sesion">Cerrar sesión</button>
-</div>
+      <div class="user-avatar">Aprendiz</div>
+      <button class="btn-sesion" id="btn-sesion">Cerrar sesión</button>
     </div>
   </header>
+
   <!-- Main Content -->
   <main class="main-content">
+    <!-- Estadísticas Rápidas -->
     <div class="stats-grid">
       <div class="stat-card">
         <span class="stat-icon">👥</span>
-        <div class="stat-value">100</div>
-        <div class="stat-label">Usuarios Activos</div>
-      </div>
-      <div class="stat-card">
-        <span class="stat-icon">📅</span>
-        <div class="stat-value">0</div>
-        <div class="stat-label">Personas Registradas</div>
+        <div class="stat-value" id="stat-usuarios">0</div>
+        <div class="stat-label">Usuarios Totales</div>
       </div>
       <div class="stat-card">
         <span class="stat-icon">🎓</span>
-        <div class="stat-value">0</div>
+        <div class="stat-value" id="stat-aprendices">0</div>
         <div class="stat-label">Aprendices</div>
       </div>
       <div class="stat-card">
-        <span class="stat-icon">🧘‍♀</span>
-        <div class="stat-value">0</div>
-        <div class="stat-label">Bienestar</div>
+        <span class="stat-icon">🧘‍♀️</span>
+        <div class="stat-value" id="stat-orientadores">0</div>
+        <div class="stat-label">Orientadores</div>
       </div>
     </div>
+
+    <!-- Botones de Acción Rápida -->
     <div class="quick-actions">
-      <a href="{{ route('estudiante.programarcita') }}" class="action-btn">
+      <a href="/gestionCita" class="action-btn">
         📅 <span>Nueva Cita</span>
       </a>
-      <a href="{{ route('estudiante.consultardiag') }}" class="action-btn">
+      <a href="/estudiante/resultado" class="action-btn">
         🔍 <span>Ver Diagnóstico</span>
       </a>
-      <a href="{{ route('estudiante.bienestar.view') }}" class="action-btn">
-        🧘‍♀ <span>Ejercicios</span>
-      </a>
-      <a href="{{ route('estudiante.talleres') }}" class="action-btn">
+      <a href="/actividades" class="action-btn">
         🎓 <span>Talleres</span>
       </a>
+      <a href="/estudiante/bienestar" class="action-btn">
+        🧘‍♀️ <span>Ejercicios</span>
+      </a>
     </div>
-    <div class="dashboard-grid">
-      <div class="chart-container">
-        <div class="chart-title">
-          📊 Distribución del Estrés
-        </div>
-        <canvas id="pieChart" style="max-height: 300px;"></canvas>
-        <p class="chart-desc">Distribución actual del nivel de estrés en usuarios activos</p>
-      </div>
-      <div class="chart-container">
-        <div class="chart-title">
-          📈 Tendencia Mensual
-        </div>
-        <canvas id="lineChart" style="max-height: 300px;"></canvas>
-        <p class="chart-desc">Evolución del estrés por categoría durante el año 2025</p>
-      </div>
-    </div>
-    <div class="recent-activity">
-      <div class="chart-title">
-        🕒 Actividad Reciente
-      </div>
-      <div class="activity-item">
-        <div class="activity-icon" style="background: #dbeafe; color: #3b82f6;">📅</div>
-        <div class="activity-content">
-          <h4>Nueva cita programada</h4>
-          <p>Sesión de terapia cognitivo-conductual</p>
-        </div>
-        <div class="activity-time">Hace 5 min</div>
-      </div>
-      <div class="activity-item">
-        <div class="activity-icon" style="background: #dcfce7; color: #16a34a;">✅</div>
-        <div class="activity-content">
-          <h4>Evaluación completada</h4>
-          <p>Test de ansiedad GAD-7</p>
-        </div>
-        <div class="activity-time">Hace 2 horas</div>
-      </div>
-      <div class="activity-item">
-        <div class="activity-icon" style="background: #fef3c7; color: #d97706;">🧘‍♀</div>
-        <div class="activity-content">
-          <h4>Ejercicio de mindfulness</h4>
-          <p>Sesión de 10 minutos completada</p>
-        </div>
-        <div class="activity-time">Ayer</div>
-      </div>
-    </div>
+
+    <!-- Poema del Día -->
+    <div id="poema-container"></div>
   </main>
+
+  <!-- Footer -->
   <footer>
-    <p>&copy; Team scrum 2 Sena.</p>
+    <p>&copy; 2025 Team Scrum 2 - SENA</p>
   </footer>
+
+  <!-- Botón de Tema -->
   <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema">
     <span id="theme-icon">🌙</span>
   </button>
-  <script src="js/cambiarTema.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="/js/logout.js">
-</script>
 
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="/js/logout.js"></script>
+  <script src="/js/dashboard.js"></script>
 </body>
 </html>

@@ -10,7 +10,15 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.proyecto.spring.Entity.Cita;
 import com.proyecto.spring.Entity.Usuario;
@@ -223,22 +231,27 @@ public class CitaController {
     }
 
     @GetMapping("/{idCita}")
-    public ResponseEntity<?> getDetalleCita(@PathVariable Long idCita) {
-        try {
-            Cita cita = citaService.getCitaPorId(idCita);
-            Map<String, Object> detalle = convertirCitaAMap(cita);
-            detalle.put("nombreEstudiante", obtenerNombreCompleto(
-                cita.getAprendiz().getUsuario().getPersona()
-            ));
-            detalle.put("nombreOrientador", obtenerNombreCompleto(
-                cita.getOrientador().getPersona()
-            ));
-            return ResponseEntity.ok(detalle);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
-        }
+public ResponseEntity<?> getDetalleCita(@PathVariable Long idCita) {
+    try {
+        Cita cita = citaService.getCitaPorId(idCita);
+        Map<String, Object> detalle = convertirCitaAMap(cita);
+        
+        // IMPORTANTE: Agregar información del orientador y estudiante
+        detalle.put("idOrientador", cita.getOrientador().getIdOrientador());
+        detalle.put("idEstudiante", cita.getAprendiz().getIdEstudiante());
+        
+        detalle.put("nombreEstudiante", obtenerNombreCompleto(
+            cita.getAprendiz().getUsuario().getPersona()
+        ));
+        detalle.put("nombreOrientador", obtenerNombreCompleto(
+            cita.getOrientador().getPersona()
+        ));
+        
+        return ResponseEntity.ok(detalle);
+    } catch (RuntimeException e) {
+        return ResponseEntity.status(404).body(Map.of("error", e.getMessage()));
     }
-
+}
     // ====================== MÉTODOS AUXILIARES ======================
     private Map<String, Object> convertirCitaAMap(Cita cita) {
         Map<String, Object> map = new HashMap<>();

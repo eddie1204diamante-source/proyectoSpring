@@ -222,43 +222,57 @@ public class CitaService {
      * Reprogramar cita
      */
     @Transactional
-    public Cita reprogramarCita(Long idCita, LocalDate nuevaFecha, LocalTime nuevaHora) {
-        Cita cita = citaRepository.findById(idCita)
-                .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
+public Cita reprogramarCita(Long idCita, LocalDate nuevaFecha, LocalTime nuevaHora) {
+    Cita cita = citaRepository.findById(idCita)
+            .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
 
-        // Validar que no esté cancelada
-        if (cita.getEstado() == EstadoCita.CANCELADA) {
-            throw new RuntimeException("No se puede reprogramar una cita cancelada");
-        }
-
-        // Validaciones de fecha y hora (reutilizar lógica)
-        if (nuevaFecha.isBefore(LocalDate.now())) {
-            throw new RuntimeException("No se permiten fechas pasadas");
-        }
-
-        if (nuevaHora.isBefore(LocalTime.of(6, 0)) || nuevaHora.isAfter(LocalTime.of(18, 0))) {
-            throw new RuntimeException("El horario debe estar entre 06:00 y 18:00");
-        }
-
-        if (nuevaHora.getMinute() % 30 != 0) {
-            throw new RuntimeException("Solo se permiten horarios cada 30 minutos");
-        }
-
-        // Verificar disponibilidad del nuevo horario
-        boolean ocupado = citaRepository.existsByOrientadorIdOrientadorAndFechaCitaAndHoraCitaAndEstadoNot(
-                cita.getOrientador().getIdOrientador(), nuevaFecha, nuevaHora, EstadoCita.CANCELADA);
-
-        if (ocupado) {
-            throw new RuntimeException("El nuevo horario no está disponible");
-        }
-
-        // Actualizar cita
-        cita.setFechaCita(nuevaFecha);
-        cita.setHoraCita(nuevaHora);
-        cita.setEstado(EstadoCita.PENDIENTE); // Vuelve a PENDIENTE
-
-        return citaRepository.save(cita);
+    // Validar que no esté cancelada o finalizada
+    if (cita.getEstado() == EstadoCita.CANCELADA || cita.getEstado() == EstadoCita.FINALIZADA) {
+        throw new RuntimeException("No se puede reprogramar una cita cancelada o finalizada");
     }
+
+    // Si la fecha y hora son las mismas, no hacer nada
+    if (cita.getFechaCita().equals(nuevaFecha) && cita.getHoraCita().equals(nuevaHora)) {
+        throw new RuntimeException("La nueva fecha y hora son iguales a las actuales");
+    }
+
+    // Validaciones de fecha y hora
+    if (nuevaFecha.isBefore(LocalDate.now())) {
+        throw new RuntimeException("No se permiten fechas pasadas");
+    }
+
+    LocalDate fechaMaxima = LocalDate.now().plusDays(60);
+    if (nuevaFecha.isAfter(fechaMaxima)) {
+        throw new RuntimeException("No se pueden solicitar citas con más de 60 días de anticipación");
+    }
+
+    if (nuevaHora.isBefore(LocalTime.of(6, 0)) || nuevaHora.isAfter(LocalTime.of(18, 0))) {
+        throw new RuntimeException("El horario debe estar entre 06:00 y 18:00");
+    }
+
+    if (nuevaHora.getMinute() % 30 != 0) {
+        throw new RuntimeException("Solo se permiten horarios cada 30 minutos");
+    }
+
+    // Verificar disponibilidad EXCLUYENDO la cita actual
+    List<Cita> citasConflicto = citaRepository.findByOrientadorIdOrientadorAndFechaCitaAndHoraCitaAndEstadoNot(
+            cita.getOrientador().getIdOrientador(), nuevaFecha, nuevaHora, EstadoCita.CANCELADA);
+    
+    // Filtrar para excluir la cita actual
+    boolean ocupado = citasConflicto.stream()
+            .anyMatch(c -> !c.getIdCita().equals(idCita));
+
+    if (ocupado) {
+        throw new RuntimeException("El nuevo horario no está disponible");
+    }
+
+    // Actualizar cita
+    cita.setFechaCita(nuevaFecha);
+    cita.setHoraCita(nuevaHora);
+    cita.setEstado(EstadoCita.PENDIENTE);
+
+    return citaRepository.save(cita);
+}
 
     /**
      * Cancelar cita

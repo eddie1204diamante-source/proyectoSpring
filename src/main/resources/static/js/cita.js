@@ -47,6 +47,8 @@ function initFlatpickr(inputId, isFilter = false) {
   flatpickr(input, config);
 }
 
+let citaActual = null;
+
 //  AUTOCOMPLETADO MEJORADO PARA MOTIVO 
 function setupMotivoAutocomplete() {
   const motivoInput = document.getElementById("motivo");
@@ -165,6 +167,8 @@ function populateHoras(selectId, fecha = null) {
     }
   }
 }
+
+
 
 //  VALIDACIÓN DE FECHA Y HORA 
 async function validarFechaHora(fecha, hora) {
@@ -359,20 +363,137 @@ async function guardarCita(e) {
         icon: 'error',
         title: 'Error',
         text: err.message || 'No se pudo crear la cita',
+        text: err.message || 'Esta fecha ya esta ocupada o intentalo nuevamente',
         confirmButtonColor: '#dc3545'
       });
     });
 }
 
-//  REPROGRAMAR (AMBOS ROLES) 
+// Variable global para guardar la cita actual
+
+
+/**
+ * Abre el modal de reprogramar según el rol
+ */
 function abrirReprogramar(idCita) {
   setCitaId(idCita);
   const rol = localStorage.getItem("rol");
-  const horaSelectId = rol === "estudiante" ? "hora_reprogramar" : "hora_reprogramar_o";
-  populateHoras(horaSelectId);
-  openModal(rol === "estudiante" ? "modal-reprogramar" : "modal-reprogramar-orientador");
+  
+  // Cargar datos de la cita actual
+  fetch(`http://localhost:8080/api/citas/${idCita}`, { credentials: "include" })
+    .then(res => res.json())
+    .then(cita => {
+      // Guardar cita completa con información del orientador
+      citaActual = {
+        idCita: cita.idCita,
+        fechaCita: cita.fechaCita,
+        horaCita: cita.horaCita,
+        idOrientador: cita.idOrientador || cita.orientadorId,
+        estado: cita.estado
+      };
+      
+      console.log("Cita actual cargada:", citaActual);
+      
+      if (rol === "estudiante") {
+        // Pre-cargar fecha y hora actuales
+        document.getElementById("fecha_reprogramar").value = cita.fechaCita;
+        
+        // Cargar horas disponibles para esa fecha
+        populateHoras("hora_reprogramar", cita.fechaCita);
+        
+        // Esperar a que se carguen las horas y luego seleccionar la actual
+        setTimeout(() => {
+          document.getElementById("hora_reprogramar").value = cita.horaCita;
+        }, 100);
+        
+        openModal("modal-reprogramar");
+      } else {
+        // Orientador: cargar lista de citas y seleccionar la actual
+        loadCitasIntoSelectReprogramar("cita-reprogramar-select", idCita);
+        populateHoras("hora_reprogramar_o");
+        openModal("modal-reprogramar-orientador");
+      }
+    })
+    .catch(err => {
+      console.error("Error cargando cita:", err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo cargar la información de la cita',
+        confirmButtonColor: '#dc3545'
+      });
+    });
 }
 
+/**
+ * Cargar citas en select para orientador (con pre-selección)
+ */
+function loadCitasIntoSelectReprogramar(selectId, idCitaSeleccionada = null) {
+  const idUsuario = localStorage.getItem("idUsuario");
+  
+  fetch(`http://localhost:8080/api/citas/orientador/${idUsuario}`, { credentials: "include" })
+    .then(res => res.json())
+    .then(citas => {
+      const select = document.getElementById(selectId);
+      if (!select) return;
+      select.innerHTML = '<option value="">Selecciona una cita</option>';
+      
+      // Filtrar citas reprogramables
+      const citasFiltradas = citas.filter(cita => 
+        cita.estado !== "CANCELADA" && cita.estado !== "FINALIZADA"
+      );
+      
+      if (citasFiltradas.length === 0) {
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.textContent = "No hay citas disponibles para reprogramar";
+        select.appendChild(opt);
+        return;
+      }
+      
+      citasFiltradas.forEach(cita => {
+        const opt = document.createElement("option");
+        opt.value = cita.idCita;
+        opt.textContent = `${cita.nombreEstudiante} - ${cita.fechaCita} ${cita.horaCita} (${cita.estado})`;
+        
+        // Pre-seleccionar si es la cita que se está editando
+        if (idCitaSeleccionada && cita.idCita == idCitaSeleccionada) {
+          opt.selected = true;
+          
+          // Cargar fecha y hora actuales
+          setTimeout(() => {
+            document.getElementById("fecha_reprogramar_o").value = cita.fechaCita;
+            populateHoras("hora_reprogramar_o", cita.fechaCita);
+            setTimeout(() => {
+              document.getElementById("hora_reprogramar_o").value = cita.horaCita;
+            }, 100);
+          }, 100);
+        }
+        
+        select.appendChild(opt);
+      });
+      
+      // Listener para cuando el orientador cambie de cita
+      select.addEventListener("change", function() {
+        const citaId = this.value;
+        if (citaId) {
+          const citaSeleccionada = citasFiltradas.find(c => c.idCita == citaId);
+          if (citaSeleccionada) {
+            setCitaId(citaId);
+            document.getElementById("fecha_reprogramar_o").value = citaSeleccionada.fechaCita;
+            populateHoras("hora_reprogramar_o", citaSeleccionada.fechaCita);
+            setTimeout(() => {
+              document.getElementById("hora_reprogramar_o").value = citaSeleccionada.horaCita;
+            }, 100);
+          }
+        }
+      });
+    });
+}
+
+/**
+ * Ejecutar reprogramación (ambos roles)
+ */
 async function reprogramarCita(e) {
   e.preventDefault();
   
@@ -403,6 +524,18 @@ async function reprogramarCita(e) {
     return;
   }
   
+  // Validar que no sea la misma fecha y hora
+  if (citaActual && fecha === citaActual.fechaCita && hora === citaActual.horaCita) {
+    await Swal.fire({
+      icon: 'info',
+      title: 'Sin cambios',
+      text: 'La fecha y hora son las mismas. No hay cambios para guardar.',
+      confirmButtonColor: '#007bff'
+    });
+    return;
+  }
+  
+  // Validación de fecha/hora para estudiantes
   if (rol === "estudiante") {
     const validacionFechaHora = await validarFechaHora(fecha, hora);
     if (!validacionFechaHora) {
@@ -410,13 +543,43 @@ async function reprogramarCita(e) {
     }
   }
   
+  // Verificar disponibilidad antes de enviar
+  if (citaActual && citaActual.idOrientador) {
+    try {
+      const disponible = await verificarDisponibilidadParaReprogramar(
+        citaActual.idCita, 
+        citaActual.idOrientador,
+        fecha, 
+        hora
+      );
+      
+      if (!disponible) {
+        await Swal.fire({
+          icon: 'error',
+          title: 'Horario no disponible',
+          text: 'El orientador ya tiene una cita en ese horario. Por favor, selecciona otro horario.',
+          confirmButtonColor: '#dc3545'
+        });
+        return;
+      }
+    } catch (err) {
+      console.error("Error verificando disponibilidad:", err);
+    }
+  }
+  
+  // Enviar solicitud de reprogramación
   fetch(`http://localhost:8080/api/citas/${currentCitaId}/reprogramar`, {
     method: "PUT",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ fecha, hora })
   })
-    .then(res => res.ok ? res.json() : Promise.reject("Error"))
+    .then(res => {
+      if (!res.ok) {
+        return res.json().then(err => Promise.reject(err));
+      }
+      return res.json();
+    })
     .then(() => {
       Swal.fire({
         icon: 'success',
@@ -425,17 +588,79 @@ async function reprogramarCita(e) {
         confirmButtonColor: '#28a745',
         timer: 2000
       });
+      
+      // Limpiar formulario
+      document.getElementById(fechaInput).value = "";
+      document.getElementById(horaInput).value = "";
+      citaActual = null;
+      
       closeModal(rol === "estudiante" ? "modal-reprogramar" : "modal-reprogramar-orientador");
       loadCitas();
     })
-    .catch(() => {
+    .catch(err => {
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'No se pudo reprogramar la cita',
+        text: err.error || 'No se pudo reprogramar la cita',
         confirmButtonColor: '#dc3545'
       });
     });
+}
+
+/**
+ * Verificar disponibilidad excluyendo la cita actual
+ */
+async function verificarDisponibilidadParaReprogramar(idCitaActual, idOrientador, fecha, hora) {
+  try {
+    // Validar que idOrientador no sea undefined
+    if (!idOrientador) {
+      console.error("idOrientador es undefined");
+      return false;
+    }
+    
+    console.log("Verificando disponibilidad:", { idOrientador, fecha, hora });
+    
+    const res = await fetch(
+      `http://localhost:8080/api/citas/disponibilidad?orientador_id=${idOrientador}&fecha=${fecha}&hora=${hora}`,
+      { credentials: "include" }
+    );
+    
+    if (!res.ok) return false;
+    
+    const disponible = await res.json();
+    
+    // Si está disponible, ok
+    if (disponible) return true;
+    
+    // Si no está disponible, verificar si es porque está ocupado por la misma cita
+    const resDetalle = await fetch(
+      `http://localhost:8080/api/citas/${idCitaActual}`,
+      { credentials: "include" }
+    );
+    
+    if (!resDetalle.ok) return false;
+    
+    const citaActualDetalle = await resDetalle.json();
+    
+    // Si la fecha y hora coinciden con la cita actual, está disponible
+    return citaActualDetalle.fechaCita === fecha && citaActualDetalle.horaCita === hora;
+    
+  } catch (err) {
+    console.error("Error verificando disponibilidad:", err);
+    return false;
+  }
+}
+
+/**
+ * Para orientador: abrir modal de reprogramar desde el menú principal
+ */
+function abrirModalReprogramarOrientador() {
+  currentCitaId = null;
+  citaActual = null;
+  loadCitasIntoSelectReprogramar("cita-reprogramar-select");
+  document.getElementById("fecha_reprogramar_o").value = "";
+  document.getElementById("hora_reprogramar_o").innerHTML = '<option value="">Hora</option>';
+  openModal("modal-reprogramar-orientador");
 }
 
 //  FINALIZAR CITA (ORIENTADOR) 

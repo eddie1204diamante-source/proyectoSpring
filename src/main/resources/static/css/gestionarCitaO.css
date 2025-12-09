@@ -210,9 +210,9 @@ body {
   gap: 1rem;
 }
 .user-avatar {
-  width: 40px;
+  width: 80px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: 20%;
   background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
   color: white;
   display: flex;
@@ -787,4 +787,8 @@ footer {
 .btn-finalizar:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.swal2-container {
+  z-index: 999999 !important;
 }

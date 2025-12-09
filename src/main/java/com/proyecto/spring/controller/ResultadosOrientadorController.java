@@ -21,9 +21,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.proyecto.spring.Entity.aprendiz;
 import com.proyecto.spring.Entity.Cita;
 import com.proyecto.spring.Entity.EvaluacionEstres;
+import com.proyecto.spring.Entity.aprendiz;
 import com.proyecto.spring.Entity.psicologica;
 import com.proyecto.spring.config.UserDetailsServiceImpl;
 import com.proyecto.spring.repository.CitaRepository;
@@ -82,12 +82,41 @@ public class ResultadosOrientadorController {
        
         if (idEstudiante != null) {
             log.info("🔍 Filtrando por estudiante ID: {}", idEstudiante);
+            
+            // CORRECCIÓN: Filtrar por idUsuario en lugar de idEstudiante
             evaluaciones = evaluacionService.getEvaluacionesOrientador(idOrientador).stream()
-                    .filter(e -> e.getCita().getAprendiz().getIdEstudiante().equals(idEstudiante))
+                    .filter(e -> {
+                        try {
+                            Long idUsuarioAprendiz = e.getCita().getAprendiz().getUsuario().getIdUsuario().longValue();
+                            boolean match = idUsuarioAprendiz.equals(idEstudiante);
+                            if (match) {
+                                log.debug("✓ Evaluación coincide: Usuario {} = {}", idUsuarioAprendiz, idEstudiante);
+                            }
+                            return match;
+                        } catch (Exception ex) {
+                            log.error("❌ Error al filtrar evaluación: {}", ex.getMessage());
+                            return false;
+                        }
+                    })
                     .collect(Collectors.toList());
+            
             citas = evaluacionService.getCitasAtendidasOrientador(idOrientador, desde, hasta).stream()
-                    .filter(c -> c.getAprendiz().getIdEstudiante().equals(idEstudiante))
+                    .filter(c -> {
+                        try {
+                            Long idUsuarioAprendiz = c.getAprendiz().getUsuario().getIdUsuario().longValue();
+                            boolean match = idUsuarioAprendiz.equals(idEstudiante);
+                            if (match) {
+                                log.debug("✓ Cita coincide: Usuario {} = {}", idUsuarioAprendiz, idEstudiante);
+                            }
+                            return match;
+                        } catch (Exception ex) {
+                            log.error("❌ Error al filtrar cita: {}", ex.getMessage());
+                            return false;
+                        }
+                    })
                     .collect(Collectors.toList());
+                    
+            log.info("✅ Datos filtrados: {} evaluaciones, {} citas", evaluaciones.size(), citas.size());
         } else {
             log.info("📋 Cargando todos los datos del orientador");
             evaluaciones = evaluacionService.getEvaluacionesOrientador(idOrientador);
@@ -194,13 +223,19 @@ public class ResultadosOrientadorController {
             
             log.info("📋 Total de citas: {}", citas.size());
             
-            // Usar Map para evitar duplicados por ID
-            Map<Integer, aprendiz> estudiantesUnicos = new HashMap<>();
+            // CORRECCIÓN: Usar idUsuario en lugar de idEstudiante para evitar duplicados
+            Map<Long, aprendiz> estudiantesUnicos = new HashMap<>();
             
             for (Cita cita : citas) {
                 aprendiz aprendiz = cita.getAprendiz();
-                if (aprendiz != null && !estudiantesUnicos.containsKey(aprendiz.getIdEstudiante())) {
-                    estudiantesUnicos.put(aprendiz.getIdEstudiante(), aprendiz);
+                if (aprendiz != null && aprendiz.getUsuario() != null) {
+                    Long idUsuario = aprendiz.getUsuario().getIdUsuario().longValue();
+                    if (!estudiantesUnicos.containsKey(idUsuario)) {
+                        estudiantesUnicos.put(idUsuario, aprendiz);
+                        log.debug("➕ Agregando estudiante: ID Usuario={}, Nombre={}", 
+                                idUsuario, 
+                                aprendiz.getUsuario().getPersona().getNombreCompleto());
+                    }
                 }
             }
             
@@ -209,13 +244,18 @@ public class ResultadosOrientadorController {
             for (aprendiz aprendiz : estudiantesUnicos.values()) {
                 try {
                     Map<String, Object> estudianteMap = new HashMap<>();
-                    estudianteMap.put("id", aprendiz.getIdEstudiante());
+                    // CORRECCIÓN: Devolver idUsuario en lugar de idEstudiante
+                    Long idUsuario = aprendiz.getUsuario().getIdUsuario().longValue();
+                    estudianteMap.put("id", idUsuario);
                     estudianteMap.put("nombre", 
                             aprendiz.getUsuario().getPersona().getNombreCompleto());
                     resultado.add(estudianteMap);
+                    
+                    log.debug("✓ Estudiante agregado al resultado: ID={}, Nombre={}", 
+                            idUsuario, 
+                            estudianteMap.get("nombre"));
                 } catch (Exception e) {
-                    log.error("❌ Error al procesar estudiante ID {}: {}", 
-                            aprendiz.getIdEstudiante(), e.getMessage());
+                    log.error("❌ Error al procesar estudiante: {}", e.getMessage());
                 }
             }
             
@@ -231,6 +271,7 @@ public class ResultadosOrientadorController {
     @PostMapping("/evaluacion/guardar")
     @ResponseBody
     public Map<String, Object> guardarEvaluacion(
+            @AuthenticationPrincipal UserDetailsServiceImpl.UsuarioDetailsCustom userDetails,
             @RequestParam Long idCita,
             @RequestParam Integer puntuacion,
             @RequestParam(required = false) String observaciones) {
@@ -240,7 +281,17 @@ public class ResultadosOrientadorController {
         try {
             log.info("💾 Guardando evaluación para cita ID: {}, puntuación: {}", idCita, puntuacion);
             
-            // Validaciones
+            // CORRECCIÓN: Validar que el usuario sea un orientador
+            var usuario = userDetails.getUsuario();
+            psicologica orientador = usuario.getPersona().getPsicologica();
+            
+            if (orientador == null) {
+                throw new RuntimeException("No tienes perfil de orientador");
+            }
+            
+            log.info("✓ Orientador validado: ID={}", orientador.getIdOrientador());
+            
+            // Validaciones de datos
             if (idCita == null || idCita <= 0) {
                 throw new RuntimeException("ID de cita inválido");
             }
@@ -249,6 +300,18 @@ public class ResultadosOrientadorController {
                 throw new RuntimeException("La puntuación debe estar entre 0 y 99");
             }
             
+            // CORRECCIÓN: Verificar que la cita pertenezca al orientador
+            Cita cita = citaRepository.findById(idCita)
+                    .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
+            
+            if (!cita.getOrientador().getIdOrientador().equals(orientador.getIdOrientador())) {
+                log.error("❌ La cita {} no pertenece al orientador {}", idCita, orientador.getIdOrientador());
+                throw new RuntimeException("No tienes permiso para evaluar esta cita");
+            }
+            
+            log.info("✓ Cita validada: pertenece al orientador");
+            
+            // Guardar evaluación
             EvaluacionEstres evaluacion = evaluacionService.guardarEvaluacion(
                     idCita, puntuacion, observaciones);
             
@@ -257,6 +320,7 @@ public class ResultadosOrientadorController {
             response.put("success", true);
             response.put("message", "Evaluación guardada correctamente");
             response.put("evaluacionId", evaluacion.getId());
+            response.put("nivel", evaluacion.getNivelDetectado());
             
         } catch (RuntimeException e) {
             log.error("❌ Error al guardar evaluación: {}", e.getMessage());

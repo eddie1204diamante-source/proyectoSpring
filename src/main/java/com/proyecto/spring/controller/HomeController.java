@@ -19,10 +19,6 @@ public class HomeController {
     }
 
     // ==================== ESTUDIANTE / APRENDIZ ====================
-    @GetMapping("/estudiante/dashboard")
-    public String dashboardEstudiante() {
-        return "estudiante/dashboard";
-    }
 
     @GetMapping("/gestionCita")  // Esta ruta estaba mal porque no tenía el prefijo /estudiante
     public String gestionarCitaEstudiante() {
@@ -35,10 +31,6 @@ public class HomeController {
     }
 
     // ==================== ORIENTADOR ====================
-    @GetMapping("/orientador/dashboard")
-    public String dashboardOrientador() {
-        return "orientador/dashboard";
-    }
 
     @GetMapping("/orientador/gestionarCita")
     public String gestionarCitaOrientador() {

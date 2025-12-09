@@ -67,6 +67,112 @@ body {
   transform: translateY(-3px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
+
+/* =============================
+   POEMA DEL DÍA
+   ============================= */
+#poema-container {
+  margin: 2rem 0;
+}
+
+.poema-card {
+  background: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary));
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border: 2px solid var(--primary-color);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.poema-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+}
+
+.poema-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 35px rgba(0, 150, 108, 0.3);
+}
+
+.poema-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.poema-icon {
+  font-size: 2.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.poema-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin: 0;
+}
+
+.poema-content {
+  padding: 1rem 0;
+}
+
+.poema-texto {
+  font-size: 1.25rem;
+  line-height: 1.8;
+  color: var(--text-primary);
+  font-style: italic;
+  margin: 0 0 1.5rem 0;
+  white-space: pre-line;
+  text-align: center;
+  font-weight: 500;
+}
+
+.poema-autor {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  text-align: right;
+  margin: 0;
+  font-weight: 600;
+}
+
+/* Tema oscuro */
+[data-theme="dark"] .poema-card {
+  background: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary));
+  border-color: var(--primary-color);
+}
+
+[data-theme="dark"] .poema-texto {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .poema-autor {
+  color: var(--text-secondary);
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .poema-card {
+    padding: 1.5rem;
+  }
+  
+  .poema-texto {
+    font-size: 1.1rem;
+  }
+  
+  .poema-title {
+    font-size: 1.25rem;
+  }
+}
 /* =============================
    SIDEBAR
    ============================= */
@@ -236,9 +342,9 @@ body {
   gap: 1rem;
 }
 .user-avatar {
-  width: 40px;
+  width: 80px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: 20%;
   background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
   display: flex;
   align-items: center;

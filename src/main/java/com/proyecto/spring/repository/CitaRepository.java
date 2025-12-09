@@ -70,6 +70,16 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
             @Param("idOrientador") Long idOrientador,
             @Param("fechaCita") LocalDate fechaCita,
             @Param("estado") EstadoCita estado);
+
+       @Query("SELECT c FROM Cita c " +
+            "WHERE c.orientador.idOrientador = :idOrientador " +
+            "AND c.fechaCita = :fechaCita " +
+            "AND c.estado <> :estadoCancelada")
+       List<Cita> findByOrientadorIdOrientadorAndFechaCitaAndHoraCitaAndEstadoNot(
+              @Param("idOrientador") Long idOrientador,
+              @Param("fechaCita") LocalDate fechaCita,
+              @Param("horaCita") LocalTime horaCita,
+              @Param("estadoCancelada") EstadoCita estadoCancelada);
     
     @Query("SELECT c FROM Cita c " +
            "WHERE c.orientador.idOrientador = :idOrientador " +
@@ -118,4 +128,6 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
     @Query("SELECT COUNT(c) FROM Cita c " +
            "WHERE c.orientador.idOrientador = :idOrientador")
     long countByOrientadorIdOrientador(@Param("idOrientador") Long idOrientador);
+
+    
 }

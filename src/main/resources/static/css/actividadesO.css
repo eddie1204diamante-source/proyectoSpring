@@ -233,9 +233,9 @@ body {
 }
 
 .user-avatar {
-  width: 40px;
+  width: 80px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: 20%;
   background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
   color: white;
   display: flex;
