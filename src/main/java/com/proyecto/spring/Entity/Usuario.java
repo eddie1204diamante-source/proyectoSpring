@@ -11,7 +11,7 @@ public class Usuario {
     @Column(name = "Id_usuario")
     private Integer idUsuario;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "Id_persona", nullable = false)
     private persona persona;
 
