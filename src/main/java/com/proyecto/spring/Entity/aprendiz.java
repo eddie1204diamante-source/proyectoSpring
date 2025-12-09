@@ -1,7 +1,19 @@
     package com.proyecto.spring.Entity;
     import java.util.Set;
-    import jakarta.persistence.*;
-    import lombok.*;
+
+    import jakarta.persistence.Column;
+    import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
     @Entity
     @Table(name = "aprendiz")
@@ -12,12 +24,11 @@
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         @Column(name = "idEstudiante")
-        private Integer idEstudiante;  // MISMO ID que el usuario
+        private Integer idEstudiante;  // ✅ PK independiente
 
         @OneToOne
-        @MapsId
-        @JoinColumn(name = "Id_usuario_int", referencedColumnName = "Id_usuario")
-        private Usuario usuario;
+        @JoinColumn(name = "Id_usuario_int", referencedColumnName = "Id_usuario", nullable = false, unique = true)
+        private Usuario usuario;  // ✅ FK normal, sin @MapsId
 
 
         @Column(name = "tipo_problema", length = 100)
