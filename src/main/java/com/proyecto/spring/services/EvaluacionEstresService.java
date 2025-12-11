@@ -146,7 +146,21 @@ public class EvaluacionEstresService {
     // ========================================================================
     // GUARDAR Y VALIDAR EVALUACIÓN
     // ========================================================================
-    
+    // ========================================================================
+// OBTENER EVALUACIÓN POR ID
+// ========================================================================
+
+public EvaluacionEstres getById(Long id) {
+    try {
+        log.info("🔍 Buscando evaluación estrés con ID: {}", id);
+        return evaluacionRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Evaluación no encontrada con ID: " + id));
+    } catch (Exception e) {
+        log.error("❌ Error al obtener evaluación: {}", e.getMessage(), e);
+        throw new RuntimeException("Error al obtener evaluación: " + e.getMessage());
+    }
+}
+
     /**
      * Guardar una nueva evaluación de estrés (solo una vez por cita)
      */
