@@ -16,8 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.proyecto.spring.Entity.Usuario;
+import com.proyecto.spring.Entity.administrador;
+import com.proyecto.spring.Entity.aprendiz;
+import com.proyecto.spring.Entity.psicologica;
 import com.proyecto.spring.config.UserDetailsServiceImpl;
 import com.proyecto.spring.dto.LoginRequest;
+import com.proyecto.spring.repository.administradorRepository;
+import com.proyecto.spring.repository.aprendizRepository;
+import com.proyecto.spring.repository.psicologicaRepository;
 import com.proyecto.spring.services.authService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +37,16 @@ public class authController {
     private authService authService;
 
     @Autowired
-    private AuthenticationManager authenticationManager; // ← NUEVO: clave para que funcione todo
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private aprendizRepository aprendizRepository;
+
+    @Autowired
+    private psicologicaRepository psicologicaRepository;
+
+    @Autowired
+    private administradorRepository administradorRepository;
 
     // === DTO interno para registro ===
     public static class RegisterRequest {
@@ -59,7 +74,7 @@ public class authController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
         try {
-            // ← AQUÍ ESTÁ LA MAGIA: usamos AuthenticationManager → pasa por UserDetailsServiceImpl
+            // Autenticación usando Spring Security
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                     request.getDocumento(),
@@ -67,10 +82,10 @@ public class authController {
                 )
             );
 
-            // Guardamos la autenticación (ahora el principal es UsuarioDetailsCustom)
+            // Guardamos la autenticación
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // Forzamos creación de sesión (como antes)
+            // Forzamos creación de sesión
             httpRequest.getSession();
 
             // Obtenemos el usuario desde nuestro UserDetails personalizado
@@ -85,6 +100,31 @@ public class authController {
             response.put("rol", usuario.getRolId());
             response.put("idUsuario", usuario.getIdUsuario());
             response.put("nombreCompleto", usuario.getPersona().getNombreCompleto());
+
+            // 👇 AGREGAR EL ID ESPECÍFICO SEGÚN EL ROL
+            switch (usuario.getRolId()) {
+                case 2: // ESTUDIANTE
+                    aprendiz aprendiz = aprendizRepository.findByUsuarioId(usuario.getIdUsuario());
+                    if (aprendiz != null) {
+                        response.put("idEstudiante", aprendiz.getIdEstudiante());
+                    }
+                    break;
+
+                case 3: // ORIENTADOR
+                    psicologica orientador = psicologicaRepository.findByPersonaId(usuario.getPersona().getId_persona());
+                    if (orientador != null) {
+                        response.put("idOrientador", orientador.getIdOrientador());
+                    }
+                    break;
+
+                case 1: // ADMINISTRADOR
+                    administrador admin = administradorRepository.findByPersonaId(usuario.getPersona().getId_persona());
+                    if (admin != null) {
+                        response.put("idAdministrador", admin.getId_administrador());
+                    }
+                    break;
+            }
+
             response.put("redirect", getRedirectUrl(usuario.getRolId()));
 
             return ResponseEntity.ok(response);

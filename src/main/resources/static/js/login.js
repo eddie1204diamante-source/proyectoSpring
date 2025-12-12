@@ -203,9 +203,44 @@ loginForm.addEventListener('submit', async (e) => {
       return;
     }
 
+    // 👇 GUARDAR DATOS BÁSICOS
     localStorage.setItem("idUsuario", data.idUsuario);
     localStorage.setItem("nombreEstudiante", data.nombreCompleto);
-    localStorage.setItem("rol", data.rol === 2 ? "estudiante" : data.rol === 3 ? "orientador" : "administrador");
+    
+    // 👇 GUARDAR ROL COMO TEXTO
+    const rolTexto = data.rol === 2 ? "estudiante" : data.rol === 3 ? "orientador" : "administrador";
+    localStorage.setItem("rol", rolTexto);
+
+    // 👇 GUARDAR ID ESPECÍFICO SEGÚN EL ROL
+    switch (data.rol) {
+      case 2: // ESTUDIANTE
+        if (data.idEstudiante) {
+          localStorage.setItem("id_estudiante", data.idEstudiante);
+          localStorage.setItem("idEstudiante", data.idEstudiante); // Ambas variantes por compatibilidad
+        }
+        break;
+
+      case 3: // ORIENTADOR
+        if (data.idOrientador) {
+          localStorage.setItem("id_orientador", data.idOrientador);
+          localStorage.setItem("idOrientador", data.idOrientador);
+        }
+        break;
+
+      case 1: // ADMINISTRADOR
+        if (data.idAdministrador) {
+          localStorage.setItem("id_administrador", data.idAdministrador);
+          localStorage.setItem("idAdministrador", data.idAdministrador);
+        }
+        break;
+    }
+
+    console.log("✅ Datos guardados en localStorage:");
+    console.log("- idUsuario:", localStorage.getItem("idUsuario"));
+    console.log("- rol:", localStorage.getItem("rol"));
+    console.log("- id_estudiante:", localStorage.getItem("id_estudiante"));
+    console.log("- id_orientador:", localStorage.getItem("id_orientador"));
+    console.log("- id_administrador:", localStorage.getItem("id_administrador"));
 
     const redirectUrl = 'http://localhost:8080' + data.redirect;
 
@@ -218,6 +253,62 @@ loginForm.addEventListener('submit', async (e) => {
     console.error(err);
     showCustomAlert('Error de conexión', 'No se pudo conectar con el servidor.', 'error');
   }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  createStars();
+
+  fetch('http://localhost:8080/api/auth/me', { 
+    credentials: 'include' 
+  })
+  .then(r => {
+    if (r.ok) return r.json();
+    throw new Error("No autenticado");
+  })
+  .then(user => {
+    // 👇 GUARDAR DATOS EN localStorage
+    const rolTexto = user.rol === 2 ? "estudiante" : user.rol === 3 ? "orientador" : "administrador";
+    localStorage.setItem("rol", rolTexto);
+    localStorage.setItem("idUsuario", user.idUsuario);
+    localStorage.setItem("nombreEstudiante", user.nombreCompleto);
+
+    // 👇 GUARDAR ID ESPECÍFICO SEGÚN EL ROL
+    switch (user.rol) {
+      case 2: // ESTUDIANTE
+        if (user.idEstudiante) {
+          localStorage.setItem("id_estudiante", user.idEstudiante);
+          localStorage.setItem("idEstudiante", user.idEstudiante);
+        }
+        break;
+
+      case 3: // ORIENTADOR
+        if (user.idOrientador) {
+          localStorage.setItem("id_orientador", user.idOrientador);
+          localStorage.setItem("idOrientador", user.idOrientador);
+        }
+        break;
+
+      case 1: // ADMINISTRADOR
+        if (user.idAdministrador) {
+          localStorage.setItem("id_administrador", user.idAdministrador);
+          localStorage.setItem("idAdministrador", user.idAdministrador);
+        }
+        break;
+    }
+
+    console.log("✅ Usuario ya autenticado, datos guardados");
+
+    const redirectMap = {
+      estudiante: "/estudiante/dashboard",
+      orientador: "/orientador/dashboard",
+      administrador: "/administrador/dashboard"
+    };
+
+    window.location.href = "http://localhost:8080" + (redirectMap[rolTexto] || "/estudiante/dashboard");
+  })
+  .catch(() => {
+    setTimeout(() => document.getElementById('loginDocumento').focus(), 800);
+  });
 });
 
 // ==================== REGISTRO CON ALERTAS BONITAS ====================

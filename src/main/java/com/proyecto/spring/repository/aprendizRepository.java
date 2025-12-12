@@ -1,13 +1,22 @@
 package com.proyecto.spring.repository;
 
 
-import com.proyecto.spring.Entity.aprendiz;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import com.proyecto.spring.Entity.aprendiz;
 
 @Repository
 public interface aprendizRepository extends JpaRepository<aprendiz, Integer> {
+    aprendiz findByUsuario_IdUsuario(Integer idUsuario);
+
+    @Query("SELECT a FROM aprendiz a WHERE a.usuario.idUsuario = :idUsuario")
+    aprendiz findByUsuarioId(@Param("idUsuario") Integer idUsuario);
+
 
     // Busca el aprendiz por el id_usuario (clave en la sesión)
     Optional<aprendiz> findByUsuarioIdUsuario(Long idUsuario);
@@ -16,5 +25,7 @@ public interface aprendizRepository extends JpaRepository<aprendiz, Integer> {
     default Optional<aprendiz> findByIdUsuario(Long idUsuario) {
         return findByUsuarioIdUsuario(idUsuario);
     }
+
+    
 }
 

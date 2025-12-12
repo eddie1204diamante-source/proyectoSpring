@@ -12,6 +12,10 @@ import com.proyecto.spring.Entity.psicologica;
 @Repository
 public interface psicologicaRepository extends JpaRepository<psicologica, Long> {
 
+    // ✅ Cambiado: id_persona → Id_persona (como está en la entidad)
+    @Query("SELECT p FROM psicologica p WHERE p.persona.Id_persona = :idPersona")
+    psicologica findByPersonaId(@Param("idPersona") Integer idPersona);
+
     /**
      * Busca el registro de psicologica (orientador) a partir del id_usuario
      * Esto es necesario porque en la tabla citas guardamos id_orientador (de psicologica),
@@ -20,6 +24,4 @@ public interface psicologicaRepository extends JpaRepository<psicologica, Long> 
     @Query("SELECT p FROM psicologica p " +
            "WHERE p.persona.Usuario.idUsuario = :idUsuario")
     Optional<psicologica> findByIdUsuario(@Param("idUsuario") Long idUsuario);
-
-    // ←←← FIN DEL CAMBIO ←←←
 }
