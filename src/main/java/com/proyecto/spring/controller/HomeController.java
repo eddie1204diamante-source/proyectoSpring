@@ -20,7 +20,7 @@ public class HomeController {
 
     // ==================== ESTUDIANTE / APRENDIZ ====================
 
-    @GetMapping("/gestionCita")  // Esta ruta estaba mal porque no tenía el prefijo /estudiante
+    @GetMapping("/gestionCita")  
     public String gestionarCitaEstudiante() {
         return "estudiante/gestionarCita";
     }

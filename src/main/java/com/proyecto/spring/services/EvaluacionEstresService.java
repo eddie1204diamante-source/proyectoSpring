@@ -1,4 +1,3 @@
-// src/main/java/com/proyecto/spring/services/EvaluacionEstresService.java
 package com.proyecto.spring.services;
 
 import java.time.LocalDate;
@@ -146,7 +145,16 @@ public class EvaluacionEstresService {
     // ========================================================================
     // GUARDAR Y VALIDAR EVALUACIÓN
     // ========================================================================
-    
+    // En tu EvaluacionEstresService.java, agrega este método:
+
+public List<EvaluacionEstres> getAllEvaluaciones() {
+    try {
+        return evaluacionRepo.findAll(); // Esto trae TODAS las evaluaciones
+    } catch (Exception e) {
+        log.error("Error al obtener todas las evaluaciones: {}", e.getMessage());
+        return new ArrayList<>();
+    }
+}
     /**
      * Guardar una nueva evaluación de estrés (solo una vez por cita)
      */

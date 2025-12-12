@@ -373,3 +373,7 @@ footer {
 .sidebar.closed ~ footer {
   margin-left: var(--sidebar-collapsed);
 }
+.logo-img {
+  height: 75px;
+ width: 75px;
+}
